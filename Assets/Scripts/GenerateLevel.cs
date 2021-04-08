@@ -32,8 +32,8 @@ public class GenerateLevel : MonoBehaviour
                 else if (col % 2 == 1 && row % 2 == 1)
                 {
                     var pos = new Vector3(
-                        ((float)col - 1) / 2 + 0.5f, 
-                        ((float)row - 1) / 2 + 0.5f, 
+                        ((float) col - 1) / 2,
+                        ((float) row - 1) / 2,
                         0);
 
                     var newObject = Instantiate(_floorPrefab, pos, new Quaternion());
@@ -45,7 +45,11 @@ public class GenerateLevel : MonoBehaviour
                 // creating walls
                 else
                 {
-                    var pos = new Vector3(col >> 1, row >> 1, 0);
+                    var pos = new Vector3(
+                        ((float) col - 1) / 2,
+                        ((float) row - 1) / 2,
+                        0);
+
                     var rot = new Quaternion().normalized;
 
                     string nameSuffix = " vertical";
@@ -53,7 +57,12 @@ public class GenerateLevel : MonoBehaviour
                     if (row % 2 == 0)
                     {
                         rot *= Quaternion.Euler(0, 0, 270);
+                        pos.x -= 0.5f;
                         nameSuffix = " horizontal";
+                    }
+                    else
+                    {
+                        pos.y -= 0.5f;
                     }
 
                     var newObject = Instantiate(_wallPrefab, pos, rot);
