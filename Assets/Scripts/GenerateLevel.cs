@@ -1,38 +1,22 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
-    public Sprite _cellSprite;
-    public Sprite _wallSprite;
+    public GameObject _floorPrefab;
+    public GameObject _wallPrefab;
+
+    private List<List<GameObject>> _gameBoard = new List<List<GameObject>>();
 
     private const int BOARD_WIDTH = 10;
     private const int BOARD_HEIGHT = 10;
     private const int boardRealWidth = BOARD_WIDTH * 2 + 1;
     private const int boardRealHeight = BOARD_HEIGHT * 2 + 1;
 
-    private List<List<GameObject>> _gameBoard = new List<List<GameObject>>();
-
     void Start()
     {
-        Debug.Assert(_cellSprite != null, "CellSprite not initialized");
-        Debug.Assert(_wallSprite != null, "WallSprite not initialized");
-
-        GameObject cellObject = new GameObject("Cell Sprite");
-        {
-            SpriteRenderer cellSpriteRenderer = cellObject.AddComponent<SpriteRenderer>();
-            cellSpriteRenderer.sprite = _cellSprite;
-        }
-
-        GameObject wallObject = new GameObject("Wall Sprite");
-        {
-            SpriteRenderer wallSpriteRenderer = wallObject.AddComponent<SpriteRenderer>();
-            wallSpriteRenderer.sprite = _wallSprite;
-        }
+        Debug.Assert(_floorPrefab != null);
+        Debug.Assert(_wallPrefab != null);
 
         for (int row = 0; row < boardRealHeight; ++row)
         {
@@ -40,40 +24,46 @@ public class GenerateLevel : MonoBehaviour
 
             for (int col = 0; col < boardRealWidth; col++)
             {
+                // empty element (not a wall, not a cell)
                 if (col % 2 == 0 && row % 2 == 0)
-                { 
                     rowList.Add(null);
-                }
-                // board cells are always on the event positions
+
+                // creating cells
                 else if (col % 2 == 1 && row % 2 == 1)
                 {
-                    // var pos = cellObject.transform.position + new Vector3(col % 2 + 1, row % 2 + 1, 0);
-                    var pos = cellObject.transform.position + new Vector3(col + 1, row + 1, 0);
-                    var newObject = Instantiate(cellObject, pos, cellObject.transform.rotation);
+                    var pos = new Vector3(
+                        ((float)col - 1) / 2 + 0.5f, 
+                        ((float)row - 1) / 2 + 0.5f, 
+                        0);
+
+                    var newObject = Instantiate(_floorPrefab, pos, new Quaternion());
+                    newObject.transform.SetParent(transform);
+                    newObject.name = row + " " + col + " cell";
                     rowList.Add(newObject);
                 }
+
+                // creating walls
                 else
                 {
-                    // var pos = wallObject.transform.position + new Vector3(col % 2 + 1, row % 2 + 1, 0);
-                    var pos = wallObject.transform.position + new Vector3(col + 1, row + 1, 0);
-                    var rot = wallObject.transform.rotation;
+                    var pos = new Vector3(col >> 1, row >> 1, 0);
+                    var rot = new Quaternion().normalized;
+
+                    string nameSuffix = " vertical";
 
                     if (row % 2 == 0)
                     {
-                        rot *= Quaternion.Euler(0, 0, 90);
+                        rot *= Quaternion.Euler(0, 0, 270);
+                        nameSuffix = " horizontal";
                     }
 
-                    var newObject = Instantiate(wallObject, pos, rot);
+                    var newObject = Instantiate(_wallPrefab, pos, rot);
+                    newObject.transform.SetParent(transform);
+                    newObject.name = row + " " + col + " wall" + nameSuffix;
                     rowList.Add(newObject);
                 }
             }
 
             _gameBoard.Add(rowList);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 }

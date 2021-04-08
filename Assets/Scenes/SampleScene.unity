@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 473351115}
   - component: {fileID: 473351114}
   m_Layer: 0
-  m_Name: Level
+  m_Name: Board
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,8 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2020c153d7cf75e4ca92d74a52a721a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cellSprite: {fileID: 21300000, guid: 15b587ed425f9a64bbbfe88668a3c7f2, type: 3}
-  _wallSprite: {fileID: 21300000, guid: 7cdf6e55a9dc25a4eabd3cedfc77873b, type: 3}
+  _floorPrefab: {fileID: 2095917119862229148, guid: 433a51d082513a74ca19f8d042916dda,
+    type: 3}
+  _wallPrefab: {fileID: 1138442660322241638, guid: 6b5806014e1c47547ac8f5a84f255cdf,
+    type: 3}
 --- !u!4 &473351115
 Transform:
   m_ObjectHideFlags: 0
@@ -245,7 +247,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 5, y: 5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
