@@ -1,10 +1,16 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
     public GameObject _floorPrefab;
     public GameObject _wallPrefab;
+
+    public TextAsset _levelFileName;
 
     private List<List<GameObject>> _gameBoard = new List<List<GameObject>>();
 
@@ -17,8 +23,55 @@ public class GenerateLevel : MonoBehaviour
     {
         Debug.Assert(_floorPrefab != null);
         Debug.Assert(_wallPrefab != null);
+        Debug.Assert(_levelFileName != null);
 
-        for (int row = 0; row < boardRealHeight; ++row)
+        var levelLines = ReadLevel();
+
+        GenerateBoard(levelLines);
+    }
+
+    List<string> ReadLevel()
+    {
+        var levelFile = _levelFileName.text;
+
+        var rawLines = new List<string>();
+        rawLines.AddRange(levelFile.Split("\n"[0]));
+
+        var cleanLines = new List<string>();
+
+        foreach (var line in rawLines)
+        {
+            var commentPos = line.IndexOf("//", StringComparison.Ordinal);
+
+            string newLine = line;
+            if (commentPos >= 0)
+                newLine = newLine.Substring(0, commentPos);
+            newLine = newLine.Trim();
+
+            if (newLine.Length > 0)
+                cleanLines.Add(newLine);
+        }
+
+        cleanLines.Reverse();
+
+        return cleanLines;
+    }
+
+    private void GenerateBoard(List<string> lines)
+    { 
+        var board = new List<string[]>();
+
+        foreach (var line in lines)
+        {
+            var characters = line.Split(' ');
+            board.Add(characters);
+        }
+
+        // Debug.Log(board.Count, BOARD_HEIGHT);
+        Debug.Assert(board.Count == boardRealHeight);
+        Debug.Assert(board[0].Length == boardRealWidth);
+
+        for (var row = 0; row < boardRealHeight; ++row)
         {
             List<GameObject> rowList = new List<GameObject>();
 
@@ -69,6 +122,9 @@ public class GenerateLevel : MonoBehaviour
                     newObject.transform.SetParent(transform);
                     newObject.name = row + " " + col + " wall" + nameSuffix;
                     rowList.Add(newObject);
+ 
+                    if (board[row][col] != "w")
+                        newObject.SetActive(false);
                 }
             }
 
