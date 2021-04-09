@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 public class GenerateLevel : MonoBehaviour
 {
     public GameObject _floorPrefab;
     public GameObject _wallPrefab;
+
+    public List<string[]> _board = new List<string[]>();
 
     public TextAsset _levelFileName;
 
@@ -28,6 +27,9 @@ public class GenerateLevel : MonoBehaviour
         var levelLines = ReadLevel();
 
         GenerateBoard(levelLines);
+
+        var playerPosition = FindPlayerPosition(_board);
+        UpdatePlayerPosition(playerPosition);
     }
 
     List<string> ReadLevel()
@@ -58,18 +60,16 @@ public class GenerateLevel : MonoBehaviour
     }
 
     private void GenerateBoard(List<string> lines)
-    { 
-        var board = new List<string[]>();
-
+    {
         foreach (var line in lines)
         {
             var characters = line.Split(' ');
-            board.Add(characters);
+            _board.Add(characters);
         }
 
         // Debug.Log(board.Count, BOARD_HEIGHT);
-        Debug.Assert(board.Count == boardRealHeight);
-        Debug.Assert(board[0].Length == boardRealWidth);
+        Debug.Assert(_board.Count == boardRealHeight);
+        Debug.Assert(_board[0].Length == boardRealWidth);
 
         for (var row = 0; row < boardRealHeight; ++row)
         {
@@ -122,13 +122,41 @@ public class GenerateLevel : MonoBehaviour
                     newObject.transform.SetParent(transform);
                     newObject.name = row + " " + col + " wall" + nameSuffix;
                     rowList.Add(newObject);
- 
-                    if (board[row][col] != "w")
+
+                    if (_board[row][col] != "w")
                         newObject.SetActive(false);
                 }
             }
 
             _gameBoard.Add(rowList);
         }
+    }
+
+    Vector2Int FindPlayerPosition(List<string[]> board)
+    {
+        for (var row = 0; row < board.Count; ++row)
+        {
+            for (var col = 0; col < board[row].Length; ++col)
+            { 
+                if (board[row][col] == "P")
+                {
+                    return new Vector2Int(col, row);
+                }
+            }
+        }
+
+        Debug.Assert(false, "Did not find player position on the board");
+        return new Vector2Int(-1, -1);
+    }
+
+    void UpdatePlayerPosition(Vector2Int position)
+    {
+        var player = GameObject.Find("Player");
+        Debug.Assert(player);
+
+        var playerMovement = player.GetComponent<PlayerMovement>();
+        Debug.Assert(playerMovement);
+
+        playerMovement.BoardPosition = position;
     }
 }
