@@ -41,32 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !_isMoving)
-        {
-            var playerPos = transform.position;
-            var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            if (math.abs(clickPos.x - playerPos.x) < 1.5f &&
-                math.abs(clickPos.y - playerPos.y) < 1.5f)
-            {
-                int shiftX = (int) math.round(clickPos.x - playerPos.x);
-                int shiftY = (int) math.round(clickPos.y - playerPos.y);
-
-                if (((0 == shiftX && 1 == math.abs(shiftY)) ||
-                     (1 == math.abs(shiftX) && 0 == shiftY)) &&
-                    (_board[_boardPosition.y + shiftY][_boardPosition.x + shiftX] != "w"))
-                {
-                    _destination = new Vector3(math.round(clickPos.x), math.round(clickPos.y), 0);
-                    _direction = (_destination - transform.position).normalized;
-                    _isMoving = true;
-
-                    _boardPosition.x += 2 * shiftX;
-                    _boardPosition.y += 2 * shiftY;
-
-                    UpdateMapVisibility(_boardPosition);
-                }
-            }
-        }
+        MovePlayer();
     }
 
     void FixedUpdate()
@@ -83,6 +58,57 @@ public class PlayerMovement : MonoBehaviour
             {
                 _isMoving = false;
                 transform.position = _destination;
+            }
+        }
+    }
+
+    private void MovePlayer()
+    {
+        if (_isMoving)
+            return;
+
+        int shiftX = 0;
+        int shiftY = 0;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            var playerPos = transform.position;
+            var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            if (math.abs(clickPos.x - playerPos.x) < 1.5f &&
+                math.abs(clickPos.y - playerPos.y) < 1.5f)
+            {
+                shiftX = (int) math.round(clickPos.x - playerPos.x);
+                shiftY = (int) math.round(clickPos.y - playerPos.y);
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            shiftX = -1;
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+            shiftY = 1;
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+            shiftX = 1;
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+            shiftY = -1;
+
+        if (shiftY != 0 || shiftX != 0)
+        {
+            if (((0 == shiftX && 1 == math.abs(shiftY)) ||
+                 (1 == math.abs(shiftX) && 0 == shiftY)) &&
+                (_board[_boardPosition.y + shiftY][_boardPosition.x + shiftX] != "w"))
+            {
+                _destination = new Vector3(
+                    transform.position.x + shiftX,
+                    transform.position.y + shiftY,
+                    0);
+
+                _direction = (_destination - transform.position).normalized;
+                _isMoving = true;
+
+                _boardPosition.x += 2 * shiftX;
+                _boardPosition.y += 2 * shiftY;
+
+                UpdateMapVisibility(_boardPosition);
             }
         }
     }
