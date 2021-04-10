@@ -62,6 +62,8 @@ public class PlayerMovement : MonoBehaviour
 
                     _boardPosition.x += 2 * shiftX;
                     _boardPosition.y += 2 * shiftY;
+
+                    UpdateMapVisibility(_boardPosition);
                 }
             }
         }
@@ -83,5 +85,16 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = _destination;
             }
         }
+    }
+
+    private void UpdateMapVisibility(Vector2Int boardPosition)
+    {
+        var board = GameObject.Find("Board");
+        Debug.Assert(board);
+
+        var levelGenerator = board.GetComponent<GenerateLevel>();
+        Debug.Assert(levelGenerator);
+
+        levelGenerator.SetMapVisibility(boardPosition, true);
     }
 }

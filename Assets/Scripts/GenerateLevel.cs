@@ -6,12 +6,15 @@ public class GenerateLevel : MonoBehaviour
 {
     public GameObject _floorPrefab;
     public GameObject _wallPrefab;
+    public GameObject _ceilingPrefab;
+    public Transform _ceilingParent;
 
     public List<string[]> _board = new List<string[]>();
 
     public TextAsset _levelFileName;
 
     private List<List<GameObject>> _gameBoard = new List<List<GameObject>>();
+    private List<List<GameObject>> _ceilingBoard = new List<List<GameObject>>();
 
     private const int BOARD_WIDTH = 10;
     private const int BOARD_HEIGHT = 10;
@@ -20,9 +23,11 @@ public class GenerateLevel : MonoBehaviour
 
     void Start()
     {
-        Debug.Assert(_floorPrefab != null);
-        Debug.Assert(_wallPrefab != null);
-        Debug.Assert(_levelFileName != null);
+        Debug.Assert(_floorPrefab);
+        Debug.Assert(_wallPrefab);
+        Debug.Assert(_levelFileName);
+        Debug.Assert(_ceilingPrefab);
+        Debug.Assert(_ceilingParent);
 
         var levelLines = ReadLevel();
 
@@ -30,6 +35,8 @@ public class GenerateLevel : MonoBehaviour
 
         var playerPosition = FindPlayerPosition(_board);
         UpdatePlayerPosition(playerPosition);
+
+        _ceilingBoard[playerPosition.y][playerPosition.x].SetActive(false);
     }
 
     List<string> ReadLevel()
@@ -67,19 +74,22 @@ public class GenerateLevel : MonoBehaviour
             _board.Add(characters);
         }
 
-        // Debug.Log(board.Count, BOARD_HEIGHT);
         Debug.Assert(_board.Count == boardRealHeight);
         Debug.Assert(_board[0].Length == boardRealWidth);
 
         for (var row = 0; row < boardRealHeight; ++row)
         {
-            List<GameObject> rowList = new List<GameObject>();
+            List<GameObject> boardRowList = new List<GameObject>();
+            List<GameObject> ceilingRowList = new List<GameObject>();
 
             for (int col = 0; col < boardRealWidth; col++)
             {
                 // empty element (not a wall, not a cell)
                 if (col % 2 == 0 && row % 2 == 0)
-                    rowList.Add(null);
+                {
+                    boardRowList.Add(null);
+                    ceilingRowList.Add(null);
+                }
 
                 // creating cells
                 else if (col % 2 == 1 && row % 2 == 1)
@@ -89,10 +99,19 @@ public class GenerateLevel : MonoBehaviour
                         ((float) row - 1) / 2,
                         0);
 
-                    var newObject = Instantiate(_floorPrefab, pos, new Quaternion());
-                    newObject.transform.SetParent(transform);
-                    newObject.name = row + " " + col + " cell";
-                    rowList.Add(newObject);
+                    // creating floor cells
+                    {
+                        var floorCell = Instantiate(_floorPrefab, pos, new Quaternion(), transform);
+                        floorCell.name = row + " " + col + " cell";
+                        boardRowList.Add(floorCell);
+                    }
+
+                    // creating ceiling
+                    {
+                        var ceilingCell = Instantiate(_ceilingPrefab, pos, new Quaternion(), _ceilingParent);
+                        ceilingCell.name = row + " " + col + " ceiling";
+                        ceilingRowList.Add(ceilingCell);
+                    }
                 }
 
                 // creating walls
@@ -118,17 +137,19 @@ public class GenerateLevel : MonoBehaviour
                         pos.y -= 0.5f;
                     }
 
-                    var newObject = Instantiate(_wallPrefab, pos, rot);
-                    newObject.transform.SetParent(transform);
+                    var newObject = Instantiate(_wallPrefab, pos, rot, transform);
                     newObject.name = row + " " + col + " wall" + nameSuffix;
-                    rowList.Add(newObject);
+                    boardRowList.Add(newObject);
 
                     if (_board[row][col] != "w")
                         newObject.SetActive(false);
+
+                    ceilingRowList.Add(null);
                 }
             }
 
-            _gameBoard.Add(rowList);
+            _gameBoard.Add(boardRowList);
+            _ceilingBoard.Add(ceilingRowList);
         }
     }
 
@@ -137,7 +158,7 @@ public class GenerateLevel : MonoBehaviour
         for (var row = 0; row < board.Count; ++row)
         {
             for (var col = 0; col < board[row].Length; ++col)
-            { 
+            {
                 if (board[row][col] == "P")
                 {
                     return new Vector2Int(col, row);
@@ -158,5 +179,75 @@ public class GenerateLevel : MonoBehaviour
         Debug.Assert(playerMovement);
 
         playerMovement.BoardPosition = position;
+
+        SetMapVisibility(position, true);
+    }
+
+    public void SetMapVisibility(Vector2Int position, bool isVisible)
+    {
+        // right cell
+        if (position.x + 2 < boardRealWidth && !isWall(_board[position.y][position.x + 1]))
+        {
+            _ceilingBoard[position.y][position.x + 2].SetActive(false);
+        }
+
+        // lower-right cell
+        if (position.x + 2 < boardRealWidth &&
+            position.y - 2 >= 0 &&
+            !isWall(_board[position.y - 1][position.x]) &&
+            !isWall(_board[position.y][position.x + 1]))
+        {
+            _ceilingBoard[position.y - 2][position.x + 2].SetActive(false);
+        }
+
+        // lower cell
+        if (position.y - 2 >= 0 && !isWall(_board[position.y - 1][position.x]))
+        {
+            _ceilingBoard[position.y - 2][position.x].SetActive(false);
+        }
+
+        // low-left cell
+        if (position.x - 2 >= 0 &&
+            position.y - 2 >= 0 &&
+            !isWall(_board[position.y - 1][position.x]) &&
+            !isWall(_board[position.y][position.x - 1]))
+        {
+            _ceilingBoard[position.y - 2][position.x - 2].SetActive(false);
+        }
+
+        // left cell
+        if (position.x - 2 >= 0 && !isWall(_board[position.y][position.x - 1]))
+        {
+            _ceilingBoard[position.y][position.x - 2].SetActive(false);
+        }
+
+        // upper-left cell
+        if (position.x - 2 >= 0 &&
+            position.y + 2 < boardRealHeight &&
+            !isWall(_board[position.y + 1][position.x]) &&
+            !isWall(_board[position.y][position.x - 1]))
+        {
+            _ceilingBoard[position.y + 2][position.x - 2].SetActive(false);
+        }
+
+        // upper cell
+        if (position.y + 2 < boardRealHeight && !isWall(_board[position.y + 1][position.x]))
+        {
+            _ceilingBoard[position.y + 2][position.x].SetActive(false);
+        }
+
+        // upper-right cell
+        if (position.x + 2 < boardRealWidth &&
+            position.y + 2 < boardRealHeight &&
+            !isWall(_board[position.y + 1][position.x]) &&
+            !isWall(_board[position.y][position.x + 1]))
+        {
+            _ceilingBoard[position.y + 2][position.x + 2].SetActive(false);
+        }
+    }
+
+    bool isWall(string cellCode)
+    {
+        return cellCode == "w";
     }
 }
