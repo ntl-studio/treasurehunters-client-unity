@@ -195,7 +195,9 @@ public class GenerateLevel : MonoBehaviour
         if (position.x + 2 < boardRealWidth &&
             position.y - 2 >= 0 &&
             !isWall(_board[position.y - 1][position.x]) &&
-            !isWall(_board[position.y][position.x + 1]))
+            !isWall(_board[position.y][position.x + 1]) &&
+            !isWall(_board[position.y - 1][position.x + 2]) &&
+            !isWall(_board[position.y - 2][position.x + 1]))
         {
             _ceilingBoard[position.y - 2][position.x + 2].SetActive(false);
         }
@@ -206,11 +208,13 @@ public class GenerateLevel : MonoBehaviour
             _ceilingBoard[position.y - 2][position.x].SetActive(false);
         }
 
-        // low-left cell
+        // lower-left cell
         if (position.x - 2 >= 0 &&
             position.y - 2 >= 0 &&
             !isWall(_board[position.y - 1][position.x]) &&
-            !isWall(_board[position.y][position.x - 1]))
+            !isWall(_board[position.y][position.x - 1]) &&
+            !isWall(_board[position.y - 1][position.x - 2]) &&
+            !isWall(_board[position.y - 2][position.x - 1]))
         {
             _ceilingBoard[position.y - 2][position.x - 2].SetActive(false);
         }
@@ -225,7 +229,9 @@ public class GenerateLevel : MonoBehaviour
         if (position.x - 2 >= 0 &&
             position.y + 2 < boardRealHeight &&
             !isWall(_board[position.y + 1][position.x]) &&
-            !isWall(_board[position.y][position.x - 1]))
+            !isWall(_board[position.y][position.x - 1]) &&
+            !isWall(_board[position.y + 1][position.x - 2]) &&
+            !isWall(_board[position.y + 2][position.x - 1]))
         {
             _ceilingBoard[position.y + 2][position.x - 2].SetActive(false);
         }
@@ -240,7 +246,9 @@ public class GenerateLevel : MonoBehaviour
         if (position.x + 2 < boardRealWidth &&
             position.y + 2 < boardRealHeight &&
             !isWall(_board[position.y + 1][position.x]) &&
-            !isWall(_board[position.y][position.x + 1]))
+            !isWall(_board[position.y][position.x + 1]) &&
+            !isWall(_board[position.y + 1][position.x + 2]) &&
+            !isWall(_board[position.y + 2][position.x + 1]))
         {
             _ceilingBoard[position.y + 2][position.x + 2].SetActive(false);
         }
