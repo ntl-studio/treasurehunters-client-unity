@@ -6,8 +6,12 @@ public class GenerateLevel : MonoBehaviour
 {
     public GameObject _floorPrefab;
     public GameObject _wallPrefab;
+
     public GameObject _ceilingPrefab;
     public Transform _ceilingParent;
+
+    public GameObject _cellLabelPrefab;
+    public Transform _cellLabelsParent;
 
     public List<string[]> _board = new List<string[]>();
 
@@ -26,8 +30,12 @@ public class GenerateLevel : MonoBehaviour
         Debug.Assert(_floorPrefab);
         Debug.Assert(_wallPrefab);
         Debug.Assert(_levelFileName);
+
         Debug.Assert(_ceilingPrefab);
         Debug.Assert(_ceilingParent);
+
+        Debug.Assert(_cellLabelPrefab);
+        Debug.Assert(_cellLabelsParent);
 
         var levelLines = ReadLevel();
 
@@ -111,6 +119,13 @@ public class GenerateLevel : MonoBehaviour
                         var ceilingCell = Instantiate(_ceilingPrefab, pos, new Quaternion(), _ceilingParent);
                         ceilingCell.name = row + " " + col + " ceiling";
                         ceilingRowList.Add(ceilingCell);
+                    }
+
+                    // create debug labels
+                    {
+                        var cellLabel = Instantiate(_cellLabelPrefab, pos, new Quaternion(), _cellLabelsParent);
+                        cellLabel.name = row + " " + col + " label";
+                        cellLabel.GetComponent<CellLabel>().UpdateCellLabel(new Vector2Int(row / 2, col / 2));
                     }
                 }
 
