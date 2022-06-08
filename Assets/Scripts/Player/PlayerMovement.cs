@@ -70,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
         int shiftX = 0;
         int shiftY = 0;
 
+        // left mouse click
         if (Input.GetMouseButtonDown(0))
         {
             var playerPos = transform.position;

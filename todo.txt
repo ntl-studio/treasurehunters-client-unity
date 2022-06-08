@@ -1,1 +1,2 @@
-do work
+- add modal window to choose player action
+- add shooting gun action and bullets
