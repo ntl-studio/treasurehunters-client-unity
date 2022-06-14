@@ -13,12 +13,12 @@ public class GenerateLevel : MonoBehaviour
     public GameObject _cellLabelPrefab;
     public Transform _cellLabelsParent;
 
-    public List<string[]> _board = new List<string[]>();
+    public List<string[]> _board = new();
 
     public TextAsset _levelFileName;
 
-    private List<List<GameObject>> _gameBoard = new List<List<GameObject>>();
-    private List<List<GameObject>> _ceilingBoard = new List<List<GameObject>>();
+    private readonly List<List<GameObject>> _gameBoard = new();
+    private readonly List<List<CeilingCell>> _ceilingBoard = new();
 
     private const int BOARD_WIDTH = 10;
     private const int BOARD_HEIGHT = 10;
@@ -44,7 +44,7 @@ public class GenerateLevel : MonoBehaviour
         var playerPosition = FindPlayerPosition(_board);
         UpdatePlayerPosition(playerPosition);
 
-        _ceilingBoard[playerPosition.y][playerPosition.x].SetActive(false);
+        _ceilingBoard[playerPosition.y][playerPosition.x].State = CeilingState.Visible;
     }
 
     List<string> ReadLevel()
@@ -87,8 +87,8 @@ public class GenerateLevel : MonoBehaviour
 
         for (var row = 0; row < boardRealHeight; ++row)
         {
-            List<GameObject> boardRowList = new List<GameObject>();
-            List<GameObject> ceilingRowList = new List<GameObject>();
+            var boardRowList = new List<GameObject>();
+            var ceilingRowList = new List<CeilingCell>();
 
             for (int col = 0; col < boardRealWidth; col++)
             {
@@ -118,7 +118,7 @@ public class GenerateLevel : MonoBehaviour
                     {
                         var ceilingCell = Instantiate(_ceilingPrefab, pos, new Quaternion(), _ceilingParent);
                         ceilingCell.name = row + " " + col + " ceiling";
-                        ceilingRowList.Add(ceilingCell);
+                        ceilingRowList.Add(ceilingCell.GetComponent<CeilingCell>());
                     }
 
                     // create debug labels
@@ -195,15 +195,15 @@ public class GenerateLevel : MonoBehaviour
 
         playerMovement.BoardPosition = position;
 
-        SetMapVisibility(position, true);
+        SetMapVisibility(position, position);
     }
 
-    public void SetMapVisibility(Vector2Int position, bool isVisible)
+    public void SetMapVisibility(Vector2Int position, Vector2Int previousPosition)
     {
         // right cell
         if (position.x + 2 < boardRealWidth && !isWall(_board[position.y][position.x + 1]))
         {
-            _ceilingBoard[position.y][position.x + 2].SetActive(false);
+            _ceilingBoard[position.y][position.x + 2].State = CeilingState.Visible;
         }
 
         // lower-right cell
@@ -214,13 +214,13 @@ public class GenerateLevel : MonoBehaviour
             !isWall(_board[position.y - 1][position.x + 2]) &&
             !isWall(_board[position.y - 2][position.x + 1]))
         {
-            _ceilingBoard[position.y - 2][position.x + 2].SetActive(false);
+            _ceilingBoard[position.y - 2][position.x + 2].State = CeilingState.Visible;
         }
 
         // lower cell
         if (position.y - 2 >= 0 && !isWall(_board[position.y - 1][position.x]))
         {
-            _ceilingBoard[position.y - 2][position.x].SetActive(false);
+            _ceilingBoard[position.y - 2][position.x].State = CeilingState.Visible;
         }
 
         // lower-left cell
@@ -231,13 +231,13 @@ public class GenerateLevel : MonoBehaviour
             !isWall(_board[position.y - 1][position.x - 2]) &&
             !isWall(_board[position.y - 2][position.x - 1]))
         {
-            _ceilingBoard[position.y - 2][position.x - 2].SetActive(false);
+            _ceilingBoard[position.y - 2][position.x - 2].State = CeilingState.Visible;
         }
 
         // left cell
         if (position.x - 2 >= 0 && !isWall(_board[position.y][position.x - 1]))
         {
-            _ceilingBoard[position.y][position.x - 2].SetActive(false);
+            _ceilingBoard[position.y][position.x - 2].State = CeilingState.Visible;
         }
 
         // upper-left cell
@@ -248,13 +248,13 @@ public class GenerateLevel : MonoBehaviour
             !isWall(_board[position.y + 1][position.x - 2]) &&
             !isWall(_board[position.y + 2][position.x - 1]))
         {
-            _ceilingBoard[position.y + 2][position.x - 2].SetActive(false);
+            _ceilingBoard[position.y + 2][position.x - 2].State = CeilingState.Visible;
         }
 
         // upper cell
         if (position.y + 2 < boardRealHeight && !isWall(_board[position.y + 1][position.x]))
         {
-            _ceilingBoard[position.y + 2][position.x].SetActive(false);
+            _ceilingBoard[position.y + 2][position.x].State = CeilingState.Visible;
         }
 
         // upper-right cell
@@ -265,7 +265,71 @@ public class GenerateLevel : MonoBehaviour
             !isWall(_board[position.y + 1][position.x + 2]) &&
             !isWall(_board[position.y + 2][position.x + 1]))
         {
-            _ceilingBoard[position.y + 2][position.x + 2].SetActive(false);
+            _ceilingBoard[position.y + 2][position.x + 2].State = CeilingState.Visible;
+        }
+
+        // enabling for of war for cells we came from 
+        if (position != previousPosition)
+        {
+            // moving right
+            if (position.x > previousPosition.x)
+            {
+                if (previousPosition.x - 2 >= 0)
+                {
+                    _ceilingBoard[previousPosition.y][previousPosition.x - 2].EnableFogIfVisible();
+
+                    if (previousPosition.y - 2 >= 0)
+                        _ceilingBoard[previousPosition.y - 2][previousPosition.x - 2].EnableFogIfVisible();
+
+                    if (previousPosition.y + 2 < boardRealHeight)
+                        _ceilingBoard[previousPosition.y + 2][previousPosition.x - 2].EnableFogIfVisible();
+                }
+            }
+
+            // moving left
+            if (position.x < previousPosition.x)
+            {
+                if (previousPosition.x + 2 < boardRealWidth)
+                {
+                    _ceilingBoard[previousPosition.y][previousPosition.x + 2].EnableFogIfVisible();
+
+                    if (previousPosition.y - 2 >= 0)
+                        _ceilingBoard[previousPosition.y - 2][previousPosition.x + 2].EnableFogIfVisible();
+
+                    if (previousPosition.y + 2 < boardRealHeight)
+                        _ceilingBoard[previousPosition.y + 2][previousPosition.x + 2].EnableFogIfVisible();
+                }
+            }
+
+            // moving down
+            if (position.y < previousPosition.y)
+            {
+                if (previousPosition.y + 2 < boardRealHeight)
+                {
+                    _ceilingBoard[previousPosition.y + 2][previousPosition.x].EnableFogIfVisible();
+
+                    if (previousPosition.x - 2 >= 0)
+                        _ceilingBoard[previousPosition.y + 2][previousPosition.x - 2].EnableFogIfVisible();
+
+                    if (previousPosition.x + 2 < boardRealWidth)
+                        _ceilingBoard[previousPosition.y + 2][previousPosition.x + 2].EnableFogIfVisible();
+                }
+            }
+
+            // moving up
+            if (position.y > previousPosition.y)
+            {
+                if (previousPosition.y - 2 > 0)
+                {
+                    _ceilingBoard[previousPosition.y - 2][previousPosition.x].EnableFogIfVisible();
+
+                    if (previousPosition.x - 2 >= 0)
+                        _ceilingBoard[previousPosition.y - 2][previousPosition.x - 2].EnableFogIfVisible();
+
+                    if (previousPosition.x + 2 < boardRealWidth)
+                        _ceilingBoard[previousPosition.y - 2][previousPosition.x + 2].EnableFogIfVisible();
+                }
+            }
         }
     }
 

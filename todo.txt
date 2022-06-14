@@ -1,2 +1,17 @@
 - add modal window to choose player action
 - add shooting gun action and bullets
+- add a concept "Player Context", someting that stores what a current player (human or AI) sees and knows.
+  That at least needs 
+   * a grid of the board indicating visible cells
+   * player position on the grid
+   * player direction
+   * player current action
+   * player data
+     ** armor 0/1
+     ** grenades (count, default 3)
+     ** bullets (count, default 5)
+
+- design player actions SM:
+   - 
+
+  

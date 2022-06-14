@@ -14,6 +14,10 @@ public class PlayerMovement : MonoBehaviour
                 (_boardPosition.y - 1.0f) / 2.0f
             );
         }
+        get
+        {
+            return _boardPosition;
+        }
     }
 
     private Vector2Int _boardPosition;
@@ -106,15 +110,17 @@ public class PlayerMovement : MonoBehaviour
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
 
+                var prevPosition = _boardPosition;
+
                 _boardPosition.x += 2 * shiftX;
                 _boardPosition.y += 2 * shiftY;
 
-                UpdateMapVisibility(_boardPosition);
+                UpdateMapVisibility(_boardPosition, prevPosition);
             }
         }
     }
 
-    private void UpdateMapVisibility(Vector2Int boardPosition)
+    private void UpdateMapVisibility(Vector2Int boardPosition, Vector2Int prevPosition)
     {
         var board = GameObject.Find("Board");
         Debug.Assert(board);
@@ -122,6 +128,6 @@ public class PlayerMovement : MonoBehaviour
         var levelGenerator = board.GetComponent<GenerateLevel>();
         Debug.Assert(levelGenerator);
 
-        levelGenerator.SetMapVisibility(boardPosition, true);
+        levelGenerator.SetMapVisibility(boardPosition, prevPosition);
     }
 }
