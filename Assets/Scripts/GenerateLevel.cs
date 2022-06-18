@@ -42,9 +42,14 @@ public class GenerateLevel : MonoBehaviour
         GenerateBoard(levelLines);
 
         var playerPosition = FindPlayerPosition(_board);
-        UpdatePlayerPosition(playerPosition);
+        SetMapVisibility(playerPosition, playerPosition);
 
         _ceilingBoard[playerPosition.y][playerPosition.x].State = CeilingState.Visible;
+    }
+
+    public Vector2Int GetPlayerPosition()
+    {
+        return FindPlayerPosition(_board);
     }
 
     List<string> ReadLevel()
@@ -185,19 +190,6 @@ public class GenerateLevel : MonoBehaviour
         return new Vector2Int(-1, -1);
     }
 
-    void UpdatePlayerPosition(Vector2Int position)
-    {
-        var player = GameObject.Find("Player");
-        Debug.Assert(player);
-
-        var playerMovement = player.GetComponent<PlayerMovement>();
-        Debug.Assert(playerMovement);
-
-        playerMovement.BoardPosition = position;
-
-        SetMapVisibility(position, position);
-    }
-
     public void SetMapVisibility(Vector2Int position, Vector2Int previousPosition)
     {
         // right cell
@@ -333,7 +325,7 @@ public class GenerateLevel : MonoBehaviour
         }
     }
 
-    bool isWall(string cellCode)
+    static bool isWall(string cellCode)
     {
         return cellCode == "w";
     }

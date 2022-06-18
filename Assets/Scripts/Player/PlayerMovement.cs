@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using VContainer;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,20 +28,19 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _direction;
     private List<string[]> _board;
 
+    private GenerateLevel _levelGenerator;
+
+    [Inject]
+    public void Construct(GenerateLevel generateLevel)
+    {
+        Debug.Log("Construct");
+        _levelGenerator = generateLevel;
+    }
+
     void Start()
     {
-        var board = GameObject.Find("Board");
-        Debug.Assert(board);
-
-        var levelGenerator = board.GetComponent<GenerateLevel>();
-        Debug.Assert(levelGenerator);
-
-        _board = levelGenerator._board;
-
-        BoardPosition = new Vector2Int(
-            2 * (int) math.round(transform.position.x) + 1,
-            2 * (int) math.round(transform.position.y) + 1
-        );
+        _board = _levelGenerator._board;
+        BoardPosition = _levelGenerator.GetPlayerPosition();
     }
 
     void Update()
@@ -122,12 +122,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateMapVisibility(Vector2Int boardPosition, Vector2Int prevPosition)
     {
-        var board = GameObject.Find("Board");
-        Debug.Assert(board);
-
-        var levelGenerator = board.GetComponent<GenerateLevel>();
-        Debug.Assert(levelGenerator);
-
-        levelGenerator.SetMapVisibility(boardPosition, prevPosition);
+        _levelGenerator.SetMapVisibility(boardPosition, prevPosition);
     }
 }
