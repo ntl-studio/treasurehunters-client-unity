@@ -1,6 +1,7 @@
-using System;
 using System.Collections.Generic;
+using TreasureHunters;
 using UnityEngine;
+using VContainer;
 
 public class GenerateLevel : MonoBehaviour
 {
@@ -13,23 +14,21 @@ public class GenerateLevel : MonoBehaviour
     public GameObject _cellLabelPrefab;
     public Transform _cellLabelsParent;
 
-    public List<string[]> _board = new();
-
-    public TextAsset _levelFileName;
-
     private readonly List<List<GameObject>> _gameBoard = new();
     private readonly List<List<CeilingCell>> _ceilingBoard = new();
 
-    private const int BOARD_WIDTH = 10;
-    private const int BOARD_HEIGHT = 10;
-    private const int boardRealWidth = BOARD_WIDTH * 2 + 1;
-    private const int boardRealHeight = BOARD_HEIGHT * 2 + 1;
+    private Game _game;
+
+    [Inject]
+    void InjectGame(Game game)
+    {
+        _game = game;
+    }
 
     void Start()
     {
         Debug.Assert(_floorPrefab);
         Debug.Assert(_wallPrefab);
-        Debug.Assert(_levelFileName);
 
         Debug.Assert(_ceilingPrefab);
         Debug.Assert(_ceilingParent);
@@ -37,65 +36,20 @@ public class GenerateLevel : MonoBehaviour
         Debug.Assert(_cellLabelPrefab);
         Debug.Assert(_cellLabelsParent);
 
-        var levelLines = ReadLevel();
+        GenerateBoardSprites(_game.Board);
 
-        GenerateBoard(levelLines);
-
-        var playerPosition = FindPlayerPosition(_board);
+        var playerPosition = _game.Player.Position;
         SetMapVisibility(playerPosition, playerPosition);
-
-        _ceilingBoard[playerPosition.y][playerPosition.x].State = CeilingState.Visible;
     }
 
-    public Vector2Int GetPlayerPosition()
+    private void GenerateBoardSprites(Board board)
     {
-        return FindPlayerPosition(_board);
-    }
-
-    List<string> ReadLevel()
-    {
-        var levelFile = _levelFileName.text;
-
-        var rawLines = new List<string>();
-        rawLines.AddRange(levelFile.Split("\n"[0]));
-
-        var cleanLines = new List<string>();
-
-        foreach (var line in rawLines)
-        {
-            var commentPos = line.IndexOf("//", StringComparison.Ordinal);
-
-            string newLine = line;
-            if (commentPos >= 0)
-                newLine = newLine.Substring(0, commentPos);
-            newLine = newLine.Trim();
-
-            if (newLine.Length > 0)
-                cleanLines.Add(newLine);
-        }
-
-        cleanLines.Reverse();
-
-        return cleanLines;
-    }
-
-    private void GenerateBoard(List<string> lines)
-    {
-        foreach (var line in lines)
-        {
-            var characters = line.Split(' ');
-            _board.Add(characters);
-        }
-
-        Debug.Assert(_board.Count == boardRealHeight);
-        Debug.Assert(_board[0].Length == boardRealWidth);
-
-        for (var row = 0; row < boardRealHeight; ++row)
+        for (var row = 0; row < Board.BoardRealHeight; ++row)
         {
             var boardRowList = new List<GameObject>();
             var ceilingRowList = new List<CeilingCell>();
 
-            for (int col = 0; col < boardRealWidth; col++)
+            for (int col = 0; col < Board.BoardRealWidth; col++)
             {
                 // empty element (not a wall, not a cell)
                 if (col % 2 == 0 && row % 2 == 0)
@@ -161,7 +115,7 @@ public class GenerateLevel : MonoBehaviour
                     newObject.name = row + " " + col + " wall" + nameSuffix;
                     boardRowList.Add(newObject);
 
-                    if (_board[row][col] != "w")
+                    if (!board.IsWall(col, row))
                         newObject.SetActive(false);
 
                     ceilingRowList.Add(null);
@@ -173,160 +127,152 @@ public class GenerateLevel : MonoBehaviour
         }
     }
 
-    Vector2Int FindPlayerPosition(List<string[]> board)
+    public void SetMapVisibility(Position position, Position previousPosition)
     {
-        for (var row = 0; row < board.Count; ++row)
-        {
-            for (var col = 0; col < board[row].Length; ++col)
-            {
-                if (board[row][col] == "P")
-                {
-                    return new Vector2Int(col, row);
-                }
-            }
-        }
+        var board = _game.Board;
+        var x = position.X;
+        var y = position.Y;
 
-        Debug.Assert(false, "Did not find player position on the board");
-        return new Vector2Int(-1, -1);
-    }
+        _ceilingBoard[y][x].State = CeilingState.Visible;
 
-    public void SetMapVisibility(Vector2Int position, Vector2Int previousPosition)
-    {
         // right cell
-        if (position.x + 2 < boardRealWidth && !isWall(_board[position.y][position.x + 1]))
+        if (x + 2 < Board.BoardRealWidth && !board.IsWall(x + 1, y))
         {
-            _ceilingBoard[position.y][position.x + 2].State = CeilingState.Visible;
+            _ceilingBoard[y][x + 2].State = CeilingState.Visible;
         }
 
         // lower-right cell
-        if (position.x + 2 < boardRealWidth &&
-            position.y - 2 >= 0 &&
-            !isWall(_board[position.y - 1][position.x]) &&
-            !isWall(_board[position.y][position.x + 1]) &&
-            !isWall(_board[position.y - 1][position.x + 2]) &&
-            !isWall(_board[position.y - 2][position.x + 1]))
+        if (x + 2 < Board.BoardRealWidth &&
+            y - 2 >= 0 &&
+            !board.IsWall(x, y - 1) &&
+            !board.IsWall(x + 1, y) &&
+            !board.IsWall(x + 2, y - 1) &&
+            !board.IsWall(x + 1, y - 2))
         {
-            _ceilingBoard[position.y - 2][position.x + 2].State = CeilingState.Visible;
+            _ceilingBoard[y - 2][x + 2].State = CeilingState.Visible;
         }
 
         // lower cell
-        if (position.y - 2 >= 0 && !isWall(_board[position.y - 1][position.x]))
+        if (y - 2 >= 0 && !board.IsWall(x, y - 1))
         {
-            _ceilingBoard[position.y - 2][position.x].State = CeilingState.Visible;
+            _ceilingBoard[y - 2][x].State = CeilingState.Visible;
         }
 
         // lower-left cell
-        if (position.x - 2 >= 0 &&
-            position.y - 2 >= 0 &&
-            !isWall(_board[position.y - 1][position.x]) &&
-            !isWall(_board[position.y][position.x - 1]) &&
-            !isWall(_board[position.y - 1][position.x - 2]) &&
-            !isWall(_board[position.y - 2][position.x - 1]))
+        if (x - 2 >= 0 &&
+            y - 2 >= 0 &&
+            !board.IsWall(x, y - 1) &&
+            !board.IsWall(x - 1, y) &&
+            !board.IsWall(x - 2, y - 1) &&
+            !board.IsWall(x - 1, y - 2))
         {
-            _ceilingBoard[position.y - 2][position.x - 2].State = CeilingState.Visible;
+            _ceilingBoard[y - 2][x - 2].State = CeilingState.Visible;
         }
 
         // left cell
-        if (position.x - 2 >= 0 && !isWall(_board[position.y][position.x - 1]))
+        if (x - 2 >= 0 && !board.IsWall(x - 1, y))
         {
-            _ceilingBoard[position.y][position.x - 2].State = CeilingState.Visible;
+            _ceilingBoard[y][x - 2].State = CeilingState.Visible;
         }
 
         // upper-left cell
-        if (position.x - 2 >= 0 &&
-            position.y + 2 < boardRealHeight &&
-            !isWall(_board[position.y + 1][position.x]) &&
-            !isWall(_board[position.y][position.x - 1]) &&
-            !isWall(_board[position.y + 1][position.x - 2]) &&
-            !isWall(_board[position.y + 2][position.x - 1]))
+        if (x - 2 >= 0 &&
+            y + 2 < Board.BoardRealHeight &&
+            !board.IsWall(x, y + 1) &&
+            !board.IsWall(x - 1, y) &&
+            !board.IsWall(x - 2, y + 1) &&
+            !board.IsWall(x - 1, y + 2))
         {
-            _ceilingBoard[position.y + 2][position.x - 2].State = CeilingState.Visible;
+            _ceilingBoard[y + 2][x - 2].State = CeilingState.Visible;
         }
 
         // upper cell
-        if (position.y + 2 < boardRealHeight && !isWall(_board[position.y + 1][position.x]))
+        if (y + 2 < Board.BoardRealHeight && !board.IsWall(x, y + 1))
         {
-            _ceilingBoard[position.y + 2][position.x].State = CeilingState.Visible;
+            _ceilingBoard[y + 2][x].State = CeilingState.Visible;
         }
 
         // upper-right cell
-        if (position.x + 2 < boardRealWidth &&
-            position.y + 2 < boardRealHeight &&
-            !isWall(_board[position.y + 1][position.x]) &&
-            !isWall(_board[position.y][position.x + 1]) &&
-            !isWall(_board[position.y + 1][position.x + 2]) &&
-            !isWall(_board[position.y + 2][position.x + 1]))
+        if (x + 2 < Board.BoardRealWidth &&
+            y + 2 < Board.BoardRealHeight &&
+            !board.IsWall(x, y + 1) &&
+            !board.IsWall(x + 1, y) &&
+            !board.IsWall(x + 2, y + 1) &&
+            !board.IsWall(x + 1, y + 2))
         {
-            _ceilingBoard[position.y + 2][position.x + 2].State = CeilingState.Visible;
+            _ceilingBoard[y + 2][x + 2].State = CeilingState.Visible;
         }
 
         // enabling for of war for cells we came from 
-        if (position != previousPosition)
-        {
-            // moving right
-            if (position.x > previousPosition.x)
-            {
-                if (previousPosition.x - 2 >= 0)
-                {
-                    _ceilingBoard[previousPosition.y][previousPosition.x - 2].EnableFogIfVisible();
-
-                    if (previousPosition.y - 2 >= 0)
-                        _ceilingBoard[previousPosition.y - 2][previousPosition.x - 2].EnableFogIfVisible();
-
-                    if (previousPosition.y + 2 < boardRealHeight)
-                        _ceilingBoard[previousPosition.y + 2][previousPosition.x - 2].EnableFogIfVisible();
-                }
-            }
-
-            // moving left
-            if (position.x < previousPosition.x)
-            {
-                if (previousPosition.x + 2 < boardRealWidth)
-                {
-                    _ceilingBoard[previousPosition.y][previousPosition.x + 2].EnableFogIfVisible();
-
-                    if (previousPosition.y - 2 >= 0)
-                        _ceilingBoard[previousPosition.y - 2][previousPosition.x + 2].EnableFogIfVisible();
-
-                    if (previousPosition.y + 2 < boardRealHeight)
-                        _ceilingBoard[previousPosition.y + 2][previousPosition.x + 2].EnableFogIfVisible();
-                }
-            }
-
-            // moving down
-            if (position.y < previousPosition.y)
-            {
-                if (previousPosition.y + 2 < boardRealHeight)
-                {
-                    _ceilingBoard[previousPosition.y + 2][previousPosition.x].EnableFogIfVisible();
-
-                    if (previousPosition.x - 2 >= 0)
-                        _ceilingBoard[previousPosition.y + 2][previousPosition.x - 2].EnableFogIfVisible();
-
-                    if (previousPosition.x + 2 < boardRealWidth)
-                        _ceilingBoard[previousPosition.y + 2][previousPosition.x + 2].EnableFogIfVisible();
-                }
-            }
-
-            // moving up
-            if (position.y > previousPosition.y)
-            {
-                if (previousPosition.y - 2 > 0)
-                {
-                    _ceilingBoard[previousPosition.y - 2][previousPosition.x].EnableFogIfVisible();
-
-                    if (previousPosition.x - 2 >= 0)
-                        _ceilingBoard[previousPosition.y - 2][previousPosition.x - 2].EnableFogIfVisible();
-
-                    if (previousPosition.x + 2 < boardRealWidth)
-                        _ceilingBoard[previousPosition.y - 2][previousPosition.x + 2].EnableFogIfVisible();
-                }
-            }
-        }
+        UpdateForOfWar(position, previousPosition);
     }
 
-    static bool isWall(string cellCode)
+    void UpdateForOfWar(Position position, Position previousPosition)
     {
-        return cellCode == "w";
+        if (position == previousPosition)
+            return;
+
+        var x = position.X;
+        var y = position.Y;
+
+        // moving right
+        if (x > previousPosition.X)
+        {
+            if (previousPosition.X - 2 >= 0)
+            {
+                _ceilingBoard[previousPosition.Y][previousPosition.X - 2].EnableFogIfVisible();
+
+                if (previousPosition.Y - 2 >= 0)
+                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
+
+                if (previousPosition.Y + 2 < Board.BoardRealHeight)
+                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
+            }
+        }
+
+        // moving left
+        if (x < previousPosition.X)
+        {
+            if (previousPosition.X + 2 < Board.BoardRealWidth)
+            {
+                _ceilingBoard[previousPosition.Y][previousPosition.X + 2].EnableFogIfVisible();
+
+                if (previousPosition.Y - 2 >= 0)
+                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
+
+                if (previousPosition.Y + 2 < Board.BoardRealHeight)
+                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
+            }
+        }
+
+        // moving down
+        if (y < previousPosition.Y)
+        {
+            if (previousPosition.Y + 2 < Board.BoardRealHeight)
+            {
+                _ceilingBoard[previousPosition.Y + 2][previousPosition.X].EnableFogIfVisible();
+
+                if (previousPosition.X - 2 >= 0)
+                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
+
+                if (previousPosition.X + 2 < Board.BoardRealWidth)
+                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
+            }
+        }
+
+        // moving up
+        if (y > previousPosition.Y)
+        {
+            if (previousPosition.Y - 2 > 0)
+            {
+                _ceilingBoard[previousPosition.Y - 2][previousPosition.X].EnableFogIfVisible();
+
+                if (previousPosition.X - 2 >= 0)
+                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
+
+                if (previousPosition.X + 2 < Board.BoardRealWidth)
+                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
+            }
+        }
     }
 }

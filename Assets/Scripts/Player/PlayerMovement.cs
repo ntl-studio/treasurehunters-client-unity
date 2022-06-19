@@ -1,46 +1,49 @@
 using System.Collections.Generic;
+using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
 using VContainer;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Vector2Int BoardPosition
+    public Position BoardPosition
     {
         set
         {
             _boardPosition = value;
             transform.position = new Vector3(
-                (_boardPosition.x - 1.0f) / 2.0f,
-                (_boardPosition.y - 1.0f) / 2.0f
+                (_boardPosition.X - 1.0f) / 2.0f,
+                (_boardPosition.Y - 1.0f) / 2.0f
             );
-        }
-        get
-        {
-            return _boardPosition;
         }
     }
 
-    private Vector2Int _boardPosition;
+    private Position _boardPosition;
 
     private bool _isMoving = false;
     private Vector3 _destination;
     private Vector3 _direction;
-    private List<string[]> _board;
 
     private GenerateLevel _levelGenerator;
 
     [Inject]
     public void Construct(GenerateLevel generateLevel)
     {
-        Debug.Log("Construct");
         _levelGenerator = generateLevel;
+    }
+
+    private Game _game;
+
+    [Inject]
+    private void InjectGame(Game game)
+    {
+        _game = game;
     }
 
     void Start()
     {
-        _board = _levelGenerator._board;
-        BoardPosition = _levelGenerator.GetPlayerPosition();
+        // _board = _game.Board._board;
+        BoardPosition = _game.Player.Position;
     }
 
     void Update()
@@ -96,11 +99,13 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
             shiftY = -1;
 
+        var _board = _game.Board;
+
         if (shiftY != 0 || shiftX != 0)
         {
             if (((0 == shiftX && 1 == math.abs(shiftY)) ||
                  (1 == math.abs(shiftX) && 0 == shiftY)) &&
-                (_board[_boardPosition.y + shiftY][_boardPosition.x + shiftX] != "w"))
+                !_board.IsWall(_boardPosition.X + shiftX, _boardPosition.Y + shiftY))
             {
                 _destination = new Vector3(
                     transform.position.x + shiftX,
@@ -112,15 +117,15 @@ public class PlayerMovement : MonoBehaviour
 
                 var prevPosition = _boardPosition;
 
-                _boardPosition.x += 2 * shiftX;
-                _boardPosition.y += 2 * shiftY;
+                _boardPosition.X += 2 * shiftX;
+                _boardPosition.Y += 2 * shiftY;
 
                 UpdateMapVisibility(_boardPosition, prevPosition);
             }
         }
     }
 
-    private void UpdateMapVisibility(Vector2Int boardPosition, Vector2Int prevPosition)
+    private void UpdateMapVisibility(Position boardPosition, Position prevPosition)
     {
         _levelGenerator.SetMapVisibility(boardPosition, prevPosition);
     }
