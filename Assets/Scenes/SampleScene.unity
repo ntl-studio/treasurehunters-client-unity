@@ -487,7 +487,7 @@ GameObject:
   - component: {fileID: 473351115}
   - component: {fileID: 473351114}
   m_Layer: 0
-  m_Name: Board
+  m_Name: BoardView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -515,7 +515,6 @@ MonoBehaviour:
   _cellLabelPrefab: {fileID: 3586773874639434706, guid: 4025784b8ca9ff645bb4f4d361921069,
     type: 3}
   _cellLabelsParent: {fileID: 1608669925}
-  _levelFileName: {fileID: 4900000, guid: 5666b18ef28d1c14fa42f35e80dd498a, type: 3}
 --- !u!4 &473351115
 Transform:
   m_ObjectHideFlags: 0
@@ -1538,7 +1537,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _generateLevel: {fileID: 473351114}
+  _boardView: {fileID: 473351114}
   _playerMovement: {fileID: 208662326}
 --- !u!4 &1558547489
 Transform:

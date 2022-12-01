@@ -24,12 +24,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    private GenerateLevel _levelGenerator;
+    private BoardView _levelGenerator;
 
     [Inject]
-    public void Construct(GenerateLevel generateLevel)
+    public void Construct(BoardView boardView)
     {
-        _levelGenerator = generateLevel;
+        _levelGenerator = boardView;
     }
 
     private Game _game;

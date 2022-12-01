@@ -3,7 +3,7 @@ using TreasureHunters;
 using UnityEngine;
 using VContainer;
 
-public class GenerateLevel : MonoBehaviour
+public class BoardView : MonoBehaviour
 {
     public GameObject _floorPrefab;
     public GameObject _wallPrefab;
@@ -115,8 +115,8 @@ public class GenerateLevel : MonoBehaviour
                     newObject.name = row + " " + col + " wall" + nameSuffix;
                     boardRowList.Add(newObject);
 
-                    if (!board.IsWall(col, row))
-                        newObject.SetActive(false);
+                    //if (!board.IsWall(col, row))
+                    //    newObject.SetActive(false);
 
                     ceilingRowList.Add(null);
                 }
