@@ -204,10 +204,10 @@ public class GenerateLevel : MonoBehaviour
         }
 
         // enabling for of war for cells we came from 
-        UpdateForOfWar(position, previousPosition);
+        UpdateFogOfWar(position, previousPosition);
     }
 
-    void UpdateForOfWar(Position position, Position previousPosition)
+    void UpdateFogOfWar(Position position, Position previousPosition)
     {
         if (position == previousPosition)
             return;
