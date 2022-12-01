@@ -57,13 +57,16 @@ namespace TreasureHunters
         public int Bullets;
     }
 
-    public class Board
+    public static class BoardSettings
     {
         public const int BoardWidth = 10;
         public const int BoardHeight = 10;
         public const int BoardRealWidth = BoardWidth * 2 + 1;
         public const int BoardRealHeight = BoardHeight * 2 + 1;
+    }
 
+    public class Board
+    {
         private List<string[]> _board = new();
 
         public void Init()
@@ -80,7 +83,14 @@ namespace TreasureHunters
 
         public bool Valid(Position pos)
         {
-            return pos.X > 0 && pos.Y > 0 && pos.X < BoardRealWidth && pos.Y < BoardRealHeight;
+            return pos.X > 0 && pos.Y > 0 && 
+                   pos.X < BoardSettings.BoardRealWidth && 
+                   pos.Y < BoardSettings.BoardRealHeight;
+        }
+
+        public bool IsWallCell(int x, int y)
+        {
+            return x % 2 == 1 && y % 2 == 1;
         }
 
         public bool IsWall(int x, int y)
@@ -93,8 +103,8 @@ namespace TreasureHunters
             return _board[y][x] == "P";
         }
 
-        public int Width => BoardRealWidth;
-        public int Height => BoardRealHeight;
+        public int Width => BoardSettings.BoardRealWidth;
+        public int Height => BoardSettings.BoardRealHeight;
     }
 
     public class GameState

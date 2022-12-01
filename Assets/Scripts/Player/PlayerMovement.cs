@@ -42,7 +42,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        // _board = _game.Board._board;
         BoardPosition = _game.Player.Position;
     }
 

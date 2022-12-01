@@ -36,20 +36,22 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelPrefab);
         Debug.Assert(_cellLabelsParent);
 
-        GenerateBoardSprites(_game.Board);
+        GenerateBoardSprites();
 
         var playerPosition = _game.Player.Position;
         SetMapVisibility(playerPosition, playerPosition);
     }
 
-    private void GenerateBoardSprites(Board board)
+    // Initializes all board sprites (floor tiles, walls, etc). By default the board will look like 
+    // all walls are enabled.
+    private void GenerateBoardSprites()
     {
-        for (var row = 0; row < Board.BoardRealHeight; ++row)
+        for (var row = 0; row < BoardSettings.BoardRealHeight; ++row)
         {
             var boardRowList = new List<GameObject>();
             var ceilingRowList = new List<CeilingCell>();
 
-            for (int col = 0; col < Board.BoardRealWidth; col++)
+            for (int col = 0; col < BoardSettings.BoardRealWidth; col++)
             {
                 // empty element (not a wall, not a cell)
                 if (col % 2 == 0 && row % 2 == 0)
@@ -115,15 +117,27 @@ public class BoardView : MonoBehaviour
                     newObject.name = row + " " + col + " wall" + nameSuffix;
                     boardRowList.Add(newObject);
 
-                    //if (!board.IsWall(col, row))
-                    //    newObject.SetActive(false);
-
                     ceilingRowList.Add(null);
                 }
             }
 
             _gameBoard.Add(boardRowList);
             _ceilingBoard.Add(ceilingRowList);
+        }
+    }
+
+    // Go though the Board (that is associated with the player session) and update sprites visibility:
+    // 1) Walls on/off
+    // 2) Fog of war
+    // 3) Objects like grenades, treasure, etc
+    public void updateBoard(Board board)
+    {
+        for (int row = 0; row < BoardSettings.BoardRealWidth; ++row)
+        {
+            for (int col = 0; col < BoardSettings.BoardRealWidth; ++col)
+            {
+                // TODO...
+            }
         }
     }
 
@@ -136,13 +150,13 @@ public class BoardView : MonoBehaviour
         _ceilingBoard[y][x].State = CeilingState.Visible;
 
         // right cell
-        if (x + 2 < Board.BoardRealWidth && !board.IsWall(x + 1, y))
+        if (x + 2 < BoardSettings.BoardRealWidth && !board.IsWall(x + 1, y))
         {
             _ceilingBoard[y][x + 2].State = CeilingState.Visible;
         }
 
         // lower-right cell
-        if (x + 2 < Board.BoardRealWidth &&
+        if (x + 2 < BoardSettings.BoardRealWidth &&
             y - 2 >= 0 &&
             !board.IsWall(x, y - 1) &&
             !board.IsWall(x + 1, y) &&
@@ -177,7 +191,7 @@ public class BoardView : MonoBehaviour
 
         // upper-left cell
         if (x - 2 >= 0 &&
-            y + 2 < Board.BoardRealHeight &&
+            y + 2 < BoardSettings.BoardRealHeight &&
             !board.IsWall(x, y + 1) &&
             !board.IsWall(x - 1, y) &&
             !board.IsWall(x - 2, y + 1) &&
@@ -187,14 +201,14 @@ public class BoardView : MonoBehaviour
         }
 
         // upper cell
-        if (y + 2 < Board.BoardRealHeight && !board.IsWall(x, y + 1))
+        if (y + 2 < BoardSettings.BoardRealHeight && !board.IsWall(x, y + 1))
         {
             _ceilingBoard[y + 2][x].State = CeilingState.Visible;
         }
 
         // upper-right cell
-        if (x + 2 < Board.BoardRealWidth &&
-            y + 2 < Board.BoardRealHeight &&
+        if (x + 2 < BoardSettings.BoardRealWidth &&
+            y + 2 < BoardSettings.BoardRealHeight &&
             !board.IsWall(x, y + 1) &&
             !board.IsWall(x + 1, y) &&
             !board.IsWall(x + 2, y + 1) &&
@@ -225,7 +239,7 @@ public class BoardView : MonoBehaviour
                 if (previousPosition.Y - 2 >= 0)
                     _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
 
-                if (previousPosition.Y + 2 < Board.BoardRealHeight)
+                if (previousPosition.Y + 2 < BoardSettings.BoardRealHeight)
                     _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
             }
         }
@@ -233,14 +247,14 @@ public class BoardView : MonoBehaviour
         // moving left
         if (x < previousPosition.X)
         {
-            if (previousPosition.X + 2 < Board.BoardRealWidth)
+            if (previousPosition.X + 2 < BoardSettings.BoardRealWidth)
             {
                 _ceilingBoard[previousPosition.Y][previousPosition.X + 2].EnableFogIfVisible();
 
                 if (previousPosition.Y - 2 >= 0)
                     _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
 
-                if (previousPosition.Y + 2 < Board.BoardRealHeight)
+                if (previousPosition.Y + 2 < BoardSettings.BoardRealHeight)
                     _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
@@ -248,14 +262,14 @@ public class BoardView : MonoBehaviour
         // moving down
         if (y < previousPosition.Y)
         {
-            if (previousPosition.Y + 2 < Board.BoardRealHeight)
+            if (previousPosition.Y + 2 < BoardSettings.BoardRealHeight)
             {
                 _ceilingBoard[previousPosition.Y + 2][previousPosition.X].EnableFogIfVisible();
 
                 if (previousPosition.X - 2 >= 0)
                     _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
 
-                if (previousPosition.X + 2 < Board.BoardRealWidth)
+                if (previousPosition.X + 2 < BoardSettings.BoardRealWidth)
                     _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
@@ -270,7 +284,7 @@ public class BoardView : MonoBehaviour
                 if (previousPosition.X - 2 >= 0)
                     _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
 
-                if (previousPosition.X + 2 < Board.BoardRealWidth)
+                if (previousPosition.X + 2 < BoardSettings.BoardRealWidth)
                     _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
