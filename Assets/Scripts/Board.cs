@@ -88,9 +88,15 @@ namespace TreasureHunters
                    pos.Y < BoardSettings.BoardRealHeight;
         }
 
-        public bool IsWallCell(int x, int y)
+        public static bool IsWallCell(int x, int y)
         {
-            return x % 2 == 1 && y % 2 == 1;
+            return (x % 2 == 0 && y % 2 == 1) ||
+                   (x % 2 == 1 && y % 2 == 0);
+        }
+
+        public static bool IsFloorCell(int x, int y)
+        {
+            return (x % 2 == 1 && y % 2 == 1);
         }
 
         public bool IsWall(int x, int y)

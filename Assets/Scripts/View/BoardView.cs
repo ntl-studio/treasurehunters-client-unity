@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TreasureHunters;
 using UnityEngine;
@@ -37,6 +38,7 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelsParent);
 
         GenerateBoardSprites();
+        UpdateBoard(_game.Board);
 
         var playerPosition = _game.Player.Position;
         SetMapVisibility(playerPosition, playerPosition);
@@ -53,19 +55,19 @@ public class BoardView : MonoBehaviour
 
             for (int col = 0; col < BoardSettings.BoardRealWidth; col++)
             {
-                // empty element (not a wall, not a cell)
+                //empty element (not a wall, not a cell)
                 if (col % 2 == 0 && row % 2 == 0)
                 {
                     boardRowList.Add(null);
                     ceilingRowList.Add(null);
                 }
-
                 // creating cells
                 else if (col % 2 == 1 && row % 2 == 1)
+                //else if (Board.IsWallCell(row, col))
                 {
                     var pos = new Vector3(
-                        ((float) col - 1) / 2,
-                        ((float) row - 1) / 2,
+                        ((float)col - 1) / 2,
+                        ((float)row - 1) / 2,
                         0);
 
                     // creating floor cells
@@ -89,13 +91,12 @@ public class BoardView : MonoBehaviour
                         cellLabel.GetComponent<CellLabel>().UpdateCellLabel(new Vector2Int(row / 2, col / 2));
                     }
                 }
-
                 // creating walls
-                else
+                else if (Board.IsWallCell(row, col))
                 {
                     var pos = new Vector3(
-                        ((float) col - 1) / 2,
-                        ((float) row - 1) / 2,
+                        ((float)col - 1) / 2,
+                        ((float)row - 1) / 2,
                         0);
 
                     var rot = new Quaternion().normalized;
@@ -119,6 +120,10 @@ public class BoardView : MonoBehaviour
 
                     ceilingRowList.Add(null);
                 }
+                else
+                {
+                    throw new Exception($"Invalid board col ${col} and row ${row} values");
+                }
             }
 
             _gameBoard.Add(boardRowList);
@@ -130,13 +135,16 @@ public class BoardView : MonoBehaviour
     // 1) Walls on/off
     // 2) Fog of war
     // 3) Objects like grenades, treasure, etc
-    public void updateBoard(Board board)
+    public void UpdateBoard(Board board)
     {
         for (int row = 0; row < BoardSettings.BoardRealWidth; ++row)
         {
             for (int col = 0; col < BoardSettings.BoardRealWidth; ++col)
             {
-                // TODO...
+                if (Board.IsWallCell(row, col))
+                {
+                    _gameBoard[col][row].SetActive(board.IsWall(row, col));
+                }
             }
         }
     }
