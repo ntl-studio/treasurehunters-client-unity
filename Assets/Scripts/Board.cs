@@ -5,64 +5,6 @@ using UnityEngine;
 
 namespace TreasureHunters
 {
-    public struct Cell
-    {
-        public bool LeftWall;
-        public bool RightWall;
-        public bool UpWall;
-        public bool DownWall;
-
-        // other stuff
-    }
-
-    public struct Position
-    {
-        public int X;
-        public int Y;
-
-        public Position(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-
-        public bool Equals(Position other)
-        {
-            return X == other.X && Y == other.Y;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Position other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(X, Y);
-        }
-
-        public static bool operator ==(Position lhs, Position rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
-
-        public static bool operator !=(Position lhs, Position rhs) => !(lhs == rhs);
-    }
-
-    public class Player
-    {
-        public Position Position;
-        public bool IsArmor;
-        public bool IsTreasure;
-        public int Grenades;
-        public int Bullets;
-    }
-
-    public static class BoardSettings
-    {
-        public const int BoardWidth = 10;
-        public const int BoardHeight = 10;
-        public const int BoardRealWidth = BoardWidth * 2 + 1;
-        public const int BoardRealHeight = BoardHeight * 2 + 1;
-    }
-
     public class Board
     {
         private Player _player;
@@ -143,29 +85,5 @@ namespace TreasureHunters
     {
         public EActionDirection Direction;
         public EActionType Type;
-    }
-
-    public class Game
-    {
-        private GameState GameState { get; set; } = new();
-
-        public Board Board => GameState.Board;
-
-        public Player Player => GameState.Player;
-
-        public Game()
-        {
-            Board.Init();
-            GameState.Player.Position = GameUtils.FindPlayerPosition(Board);
-        }
-
-        GameState GetInitialGameState()
-        {
-            return new GameState();
-        }
-
-        void UpdateGameState(PlayerAction playerAction)
-        {
-        }
     }
 }
