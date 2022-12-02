@@ -1,42 +1,26 @@
+using System.Collections.Generic;
+
 namespace TreasureHunters
 {
     public class Game
     {
-        private GameState GameState { get; set; } = new();
+        public Board CurrentBoard => CurrentPlayer.Board;
+        public Player CurrentPlayer => _players[_currentPlayer];
 
-        public Board Board => GameState.Player.Board;
-
-        public Player Player => GameState.Player;
+        private readonly List<Player> _players = new();
+        private int _currentPlayer = 0;
 
         public Game()
         {
-            Board.Init();
-            GameState.Player.Position = GameUtils.FindPlayerPosition(Board);
+            var board = new Board("Level//level01.txt");
+
+            var player = new Player()
+            {
+                Board = board,
+                Position = GameUtils.FindPlayerPosition(board)
+            };
+
+            _players.Add(player);
         }
-
-        GameState GetInitialGameState()
-        {
-            return new GameState();
-        }
-
-        void UpdateGameState(PlayerAction playerAction)
-        {
-        }
-    }
-
-    public enum EActionDirection
-    {
-        Left, Right, Up, Down, None
-    }
-
-    public enum EActionType
-    {
-        Move, Grenade, Bullet, Skip
-    }
-
-    public struct PlayerAction
-    {
-        public EActionDirection Direction;
-        public EActionType Type;
     }
 }

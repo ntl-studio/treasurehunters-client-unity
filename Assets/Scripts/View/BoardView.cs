@@ -41,7 +41,7 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        var playerPosition = _game.Player.Position;
+        var playerPosition = _game.CurrentPlayer.Position;
         SetMapVisibility(playerPosition, playerPosition);
     }
 
@@ -160,7 +160,7 @@ public class BoardView : MonoBehaviour
 
     public void SetMapVisibility(Position position, Position previousPosition)
     {
-        UpdateBoard(_game.Board);
+        UpdateBoard(_game.CurrentBoard);
         return;
 
         // This is the code to "open" the map when player is moving, respecting the walls when

@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace TreasureHunters
 {
-
     public static class GameUtils
     {
         public static IList<string> ReadLevelFromTextFile(string levelText)

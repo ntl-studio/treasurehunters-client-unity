@@ -7,17 +7,11 @@ namespace TreasureHunters
 {
     public class Board
     {
-        private Player _player;
-        public Board(Player player)
-        {
-            _player = player;
-        }
+        public Player Player;
 
-        private List<string[]> _board = new();
-
-        public void Init()
+        public Board(string filePath)
         {
-            using var sr = new StreamReader(Path.Combine(Application.dataPath, "Level//level01.txt"));
+            using var sr = new StreamReader(Path.Combine(Application.dataPath, filePath));
             var fileContents = sr.ReadToEnd();
             var lines = GameUtils.ReadLevelFromTextFile(fileContents);
             foreach (var line in lines)
@@ -26,6 +20,8 @@ namespace TreasureHunters
                 _board.Add(characters);
             }
         }
+
+        private List<string[]> _board = new();
 
         public bool Valid(Position pos)
         {
@@ -58,7 +54,7 @@ namespace TreasureHunters
         // For now just check the Manhattan distance between the player and the cell
         public bool IsCellVisible(int x, int y)
         {
-            var pos = _player.Position;
+            var pos = Player.Position;
             return (Math.Abs(pos.X - x) + Math.Abs(pos.Y - y)) < 5;
         }
 

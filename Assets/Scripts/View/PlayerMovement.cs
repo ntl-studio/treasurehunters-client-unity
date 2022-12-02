@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
@@ -42,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        BoardPosition = _game.Player.Position;
+        BoardPosition = _game.CurrentPlayer.Position;
     }
 
     void Update()
@@ -98,13 +97,13 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
             shiftY = -1;
 
-        var _board = _game.Board;
+        var board = _game.CurrentBoard;
 
         if (shiftY != 0 || shiftX != 0)
         {
             if (((0 == shiftX && 1 == math.abs(shiftY)) ||
                  (1 == math.abs(shiftX) && 0 == shiftY)) &&
-                !_board.IsWall(_boardPosition.X + shiftX, _boardPosition.Y + shiftY))
+                !board.IsWall(_boardPosition.X + shiftX, _boardPosition.Y + shiftY))
             {
                 _destination = new Vector3(
                     transform.position.x + shiftX,
@@ -119,7 +118,7 @@ public class PlayerMovement : MonoBehaviour
                 _boardPosition.X += 2 * shiftX;
                 _boardPosition.Y += 2 * shiftY;
 
-                _game.Player.Position = _boardPosition;
+                _game.CurrentPlayer.Position = _boardPosition;
 
                 UpdateMapVisibility(_boardPosition, prevPosition);
             }

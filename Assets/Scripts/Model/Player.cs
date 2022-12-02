@@ -7,11 +7,16 @@ namespace TreasureHunters
         public bool IsTreasure;
         public int Grenades;
         public int Bullets;
-        public Board Board;
 
-        public Player()
+        private Board _board;
+        public Board Board
         {
-            Board = new Board(this);
+            set
+            {
+                _board = value;
+                _board.Player = this;
+            }
+            get => _board;
         }
     }
 }
