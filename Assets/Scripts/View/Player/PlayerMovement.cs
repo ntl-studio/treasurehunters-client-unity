@@ -9,26 +9,17 @@ public class PlayerMovement : MonoBehaviour
     {
         set
         {
-            _boardPosition = value;
+            _game.CurrentPlayer.Position = value;
             transform.position = new Vector3(
-                (_boardPosition.X - 1.0f) / 2.0f,
-                (_boardPosition.Y - 1.0f) / 2.0f
+                (value.X - 1.0f) / 2.0f,
+                (value.Y - 1.0f) / 2.0f
             );
         }
     }
 
-    private Position _boardPosition;
-
     private bool _isMoving = false;
     private Vector3 _destination;
     private Vector3 _direction;
-
-    private BoardView _boardView;
-    [Inject]
-    public void Construct(BoardView boardView)
-    {
-        _boardView = boardView;
-    }
 
     private Game _game;
     [Inject]
@@ -104,12 +95,13 @@ public class PlayerMovement : MonoBehaviour
             shiftY = -1;
 
         var board = _game.CurrentBoard;
+        var pos = _game.CurrentPlayer.Position;
 
         if (shiftY != 0 || shiftX != 0)
         {
             if (((0 == shiftX && 1 == math.abs(shiftY)) ||
                  (1 == math.abs(shiftX) && 0 == shiftY)) &&
-                !board.IsWall(_boardPosition.X + shiftX, _boardPosition.Y + shiftY))
+                !board.IsWall(pos.X + shiftX, pos.Y + shiftY))
             {
                 _destination = new Vector3(
                     transform.position.x + shiftX,
@@ -119,14 +111,10 @@ public class PlayerMovement : MonoBehaviour
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
 
-                var prevPosition = _boardPosition;
+                pos.X += 2 * shiftX;
+                pos.Y += 2 * shiftY;
 
-                _boardPosition.X += 2 * shiftX;
-                _boardPosition.Y += 2 * shiftY;
-
-                _game.CurrentPlayer.Position = _boardPosition;
-
-                _boardView.UpdateBoard(_game.CurrentBoard);
+                _game.CurrentPlayer.Position = pos;
             }
         }
     }

@@ -27,6 +27,14 @@ public class BoardView : MonoBehaviour
         _game = game;
     }
 
+    private PlayerMovement _playerMovement;
+
+    [Inject]
+    void InjectPlayerMovement(PlayerMovement playerMovement)
+    {
+        _playerMovement = playerMovement;
+    }
+
     void Start()
     {
         Debug.Assert(_floorPrefab);
@@ -40,7 +48,8 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        UpdateBoard(_game.CurrentBoard);
+        _game.OnEndTurn += UpdateBoard;
+        UpdateBoard();
     }
 
     // Initializes all board sprites (floor tiles, walls, etc). By default the board will look like 
@@ -134,8 +143,10 @@ public class BoardView : MonoBehaviour
     // 1) Walls on/off
     // 2) Fog of war
     // 3) Objects like grenades, treasure, etc
-    public void UpdateBoard(Board board)
+    public void UpdateBoard()
     {
+        var board = _game.CurrentBoard;
+
         for (int row = 0; row < BoardSettings.BoardRealWidth; ++row)
         {
             for (int col = 0; col < BoardSettings.BoardRealWidth; ++col)
@@ -155,13 +166,12 @@ public class BoardView : MonoBehaviour
             }
         }
 
-        //_playerMovement
+        _playerMovement.UpdatePosition();
     }
 
     // This is the code to "open" the map when player is moving, respecting the walls when
     // checking for visibility. Leaving it here in case we might need to use it again in the client.
     // Eventually this information should come from the server, and hopefully it will one day.
-
     public void SetMapVisibility(Position position, Position previousPosition)
     {
         var board = _game.CurrentBoard;

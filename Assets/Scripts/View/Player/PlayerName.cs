@@ -17,7 +17,15 @@ public class PlayerName : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(_game.CurrentPlayer.Name);
-        PlayerNameText.text = _game.CurrentPlayer.Name;
+        _game.OnEndTurn += UpdatePlayerName;
+
+        UpdatePlayerName();
+    }
+
+    void UpdatePlayerName()
+    {
+        PlayerNameText.text = _game.CurrentPlayer.Name +
+                              " (" + _game.CurrentPlayer.Position.X + ", "
+                              + _game.CurrentPlayer.Position.Y + ")";
     }
 }

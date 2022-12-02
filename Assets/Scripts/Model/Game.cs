@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using VContainer;
 
@@ -12,17 +13,17 @@ namespace TreasureHunters
         private int _currentPlayer = 0;
         private const int PlayersCount = 2;
 
+        public delegate void EndTurnEventHandler();
+        public event EndTurnEventHandler OnEndTurn;
+
         public void EndTurn()
         {
-            // Player ends his turn 
-
-            // The game switches to the next player and updates the board view
-
             _currentPlayer++;
 
             if (_currentPlayer >= PlayersCount)
                 _currentPlayer = 0;
 
+            OnEndTurn?.Invoke();
         }
 
         public Game()
@@ -42,7 +43,7 @@ namespace TreasureHunters
                 var board = new Board("Level//level01.txt");
                 var player = new Player()
                 {
-                    Name = "Player2",
+                    Name = "Player 2",
                     Board = board,
                     Position = GameUtils.FindPlayerPosition(board)
                 };
