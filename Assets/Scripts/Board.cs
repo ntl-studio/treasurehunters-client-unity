@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace TreasureHunters
 {
@@ -67,6 +65,12 @@ namespace TreasureHunters
 
     public class Board
     {
+        private Player _player;
+        public Board(Player player)
+        {
+            _player = player;
+        }
+
         private List<string[]> _board = new();
 
         public void Init()
@@ -99,9 +103,21 @@ namespace TreasureHunters
             return (x % 2 == 1 && y % 2 == 1);
         }
 
+        public static bool IsValidCell(int x, int y)
+        {
+            return !(x % 2 == 0 && y % 2 == 0);
+        }
+
         public bool IsWall(int x, int y)
         {
             return _board[y][x] == "w";
+        }
+
+        // For now just check the Manhattan distance between the player and the cell
+        public bool IsCellVisible(int x, int y)
+        {
+            var pos = _player.Position;
+            return (Math.Abs(pos.X - x) + Math.Abs(pos.Y - y)) < 5;
         }
 
         public bool IsPlayer(int x, int y)
@@ -111,12 +127,6 @@ namespace TreasureHunters
 
         public int Width => BoardSettings.BoardRealWidth;
         public int Height => BoardSettings.BoardRealHeight;
-    }
-
-    public class GameState
-    {
-        public Board Board = new();
-        public Player Player = new();
     }
 
     public enum EActionDirection

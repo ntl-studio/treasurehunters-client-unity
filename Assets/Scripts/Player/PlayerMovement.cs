@@ -24,12 +24,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    private BoardView _levelGenerator;
+    private BoardView _boardView;
 
     [Inject]
     public void Construct(BoardView boardView)
     {
-        _levelGenerator = boardView;
+        _boardView = boardView;
     }
 
     private Game _game;
@@ -119,6 +119,8 @@ public class PlayerMovement : MonoBehaviour
                 _boardPosition.X += 2 * shiftX;
                 _boardPosition.Y += 2 * shiftY;
 
+                _game.Player.Position = _boardPosition;
+
                 UpdateMapVisibility(_boardPosition, prevPosition);
             }
         }
@@ -126,6 +128,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateMapVisibility(Position boardPosition, Position prevPosition)
     {
-        _levelGenerator.SetMapVisibility(boardPosition, prevPosition);
+        _boardView.SetMapVisibility(boardPosition, prevPosition);
     }
 }

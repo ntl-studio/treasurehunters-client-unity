@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TreasureHunters;
 using UnityEngine;
 using VContainer;
+using Debug = UnityEngine.Debug;
 
 public class BoardView : MonoBehaviour
 {
@@ -38,7 +40,6 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelsParent);
 
         GenerateBoardSprites();
-        UpdateBoard(_game.Board);
 
         var playerPosition = _game.Player.Position;
         SetMapVisibility(playerPosition, playerPosition);
@@ -141,16 +142,31 @@ public class BoardView : MonoBehaviour
         {
             for (int col = 0; col < BoardSettings.BoardRealWidth; ++col)
             {
-                if (Board.IsWallCell(row, col))
+                if (!Board.IsValidCell(col, row))
+                    continue;
+
+                if (Board.IsFloorCell(row, col))
                 {
-                    _gameBoard[col][row].SetActive(board.IsWall(row, col));
+                    _ceilingBoard[col][row].State = 
+                        board.IsCellVisible(row, col) ? 
+                            CeilingState.Visible : CeilingState.Hidden;
                 }
+
+                if (Board.IsWallCell(row, col))
+                    _gameBoard[col][row].SetActive(board.IsWall(row, col));
             }
         }
     }
 
     public void SetMapVisibility(Position position, Position previousPosition)
     {
+        UpdateBoard(_game.Board);
+        return;
+
+        // This is the code to "open" the map when player is moving, respecting the walls when
+        // checking for visibility. Leaving it here in case we might need to use it again in the client.
+        // Eventually this information should come from the server, and hopefully it will one day.
+        /*
         var board = _game.Board;
         var x = position.X;
         var y = position.Y;
@@ -227,6 +243,7 @@ public class BoardView : MonoBehaviour
 
         // enabling for of war for cells we came from 
         UpdateFogOfWar(position, previousPosition);
+        */
     }
 
     void UpdateFogOfWar(Position position, Position previousPosition)
