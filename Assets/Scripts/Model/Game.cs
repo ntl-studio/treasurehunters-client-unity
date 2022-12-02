@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using VContainer;
 
 namespace TreasureHunters
 {
@@ -11,7 +9,6 @@ namespace TreasureHunters
 
         private readonly List<Player> _players = new();
         private int _currentPlayer = 0;
-        private const int PlayersCount = 2;
 
         public delegate void EndTurnEventHandler();
         public event EndTurnEventHandler OnEndTurn;
@@ -20,7 +17,7 @@ namespace TreasureHunters
         {
             _currentPlayer++;
 
-            if (_currentPlayer >= PlayersCount)
+            if (_currentPlayer >= GameSettings.PlayersCount)
                 _currentPlayer = 0;
 
             OnEndTurn?.Invoke();

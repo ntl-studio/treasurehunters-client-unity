@@ -4,12 +4,12 @@ using VContainer;
 
 public class PlayerActions : MonoBehaviour
 {
-    //private Game _game;
-    //[Inject]
-    //private void InjectGame(Game game)
-    //{
-    //    _game = game;
-    //}
+    [Inject]
+    private void InjectGame(Game game)
+    {
+        _game = game;
+    }
+    private Game _game;
 
     public void GrenadeAction()
     {
@@ -24,6 +24,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        //_game.EndTurn();
+        _game.EndTurn();
     }
 }

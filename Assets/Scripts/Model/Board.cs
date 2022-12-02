@@ -26,8 +26,8 @@ namespace TreasureHunters
         public bool Valid(Position pos)
         {
             return pos.X > 0 && pos.Y > 0 && 
-                   pos.X < BoardSettings.BoardRealWidth && 
-                   pos.Y < BoardSettings.BoardRealHeight;
+                   pos.X < GameSettings.BoardRealWidth && 
+                   pos.Y < GameSettings.BoardRealHeight;
         }
 
         public static bool IsWallCell(int x, int y)
@@ -63,7 +63,7 @@ namespace TreasureHunters
             return _board[y][x] == "P";
         }
 
-        public int Width => BoardSettings.BoardRealWidth;
-        public int Height => BoardSettings.BoardRealHeight;
+        public int Width => GameSettings.BoardRealWidth;
+        public int Height => GameSettings.BoardRealHeight;
     }
 }
