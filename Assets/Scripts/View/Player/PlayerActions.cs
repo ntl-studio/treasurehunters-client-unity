@@ -1,7 +1,16 @@
+using TreasureHunters;
 using UnityEngine;
+using VContainer;
 
 public class PlayerActions : MonoBehaviour
 {
+    //private Game _game;
+    //[Inject]
+    //private void InjectGame(Game game)
+    //{
+    //    _game = game;
+    //}
+
     public void GrenadeAction()
     {
         Debug.Log("Throw grenade");
@@ -15,5 +24,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
+        //_game.EndTurn();
     }
 }

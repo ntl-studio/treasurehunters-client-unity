@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using TreasureHunters;
 using UnityEngine;
 using VContainer;
@@ -41,8 +40,7 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        var playerPosition = _game.CurrentPlayer.Position;
-        SetMapVisibility(playerPosition, playerPosition);
+        UpdateBoard(_game.CurrentBoard);
     }
 
     // Initializes all board sprites (floor tiles, walls, etc). By default the board will look like 
@@ -132,7 +130,7 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    // Go though the Board (that is associated with the player session) and update sprites visibility:
+    // Go through the Board (that is associated with the player session) and update sprites visibility:
     // 1) Walls on/off
     // 2) Fog of war
     // 3) Objects like grenades, treasure, etc
@@ -156,18 +154,17 @@ public class BoardView : MonoBehaviour
                     _gameBoard[col][row].SetActive(board.IsWall(row, col));
             }
         }
+
+        //_playerMovement
     }
+
+    // This is the code to "open" the map when player is moving, respecting the walls when
+    // checking for visibility. Leaving it here in case we might need to use it again in the client.
+    // Eventually this information should come from the server, and hopefully it will one day.
 
     public void SetMapVisibility(Position position, Position previousPosition)
     {
-        UpdateBoard(_game.CurrentBoard);
-        return;
-
-        // This is the code to "open" the map when player is moving, respecting the walls when
-        // checking for visibility. Leaving it here in case we might need to use it again in the client.
-        // Eventually this information should come from the server, and hopefully it will one day.
-        /*
-        var board = _game.Board;
+        var board = _game.CurrentBoard;
         var x = position.X;
         var y = position.Y;
 
@@ -243,7 +240,6 @@ public class BoardView : MonoBehaviour
 
         // enabling for of war for cells we came from 
         UpdateFogOfWar(position, previousPosition);
-        */
     }
 
     void UpdateFogOfWar(Position position, Position previousPosition)

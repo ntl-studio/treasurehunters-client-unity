@@ -3,6 +3,7 @@ namespace TreasureHunters
     public class Player
     {
         public Position Position;
+        public string Name;
         public bool IsArmor;
         public bool IsTreasure;
         public int Grenades;

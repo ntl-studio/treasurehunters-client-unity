@@ -24,7 +24,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _direction;
 
     private BoardView _boardView;
-
     [Inject]
     public void Construct(BoardView boardView)
     {
@@ -32,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private Game _game;
-
     [Inject]
     private void InjectGame(Game game)
     {
@@ -41,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        BoardPosition = _game.CurrentPlayer.Position;
+        UpdatePosition();
     }
 
     void Update()
@@ -63,8 +61,16 @@ public class PlayerMovement : MonoBehaviour
             {
                 _isMoving = false;
                 transform.position = _destination;
+
+                // tell them game we finished the move when animation finished playing
+                _game.EndTurn(); 
             }
         }
+    }
+
+    public void UpdatePosition()
+    {
+        BoardPosition = _game.CurrentPlayer.Position;
     }
 
     private void MovePlayer()
@@ -120,13 +126,8 @@ public class PlayerMovement : MonoBehaviour
 
                 _game.CurrentPlayer.Position = _boardPosition;
 
-                UpdateMapVisibility(_boardPosition, prevPosition);
+                _boardView.UpdateBoard(_game.CurrentBoard);
             }
         }
-    }
-
-    private void UpdateMapVisibility(Position boardPosition, Position prevPosition)
-    {
-        _boardView.SetMapVisibility(boardPosition, prevPosition);
     }
 }

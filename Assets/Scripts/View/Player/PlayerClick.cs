@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerClick : MonoBehaviour
 {
     [SerializeField]
-    GameObject _playerActionsWindow; // TODO move window to DI constainer
+    GameObject _playerActionsWindow; // TODO move window to DI container 
 
     private void OnMouseDown()
     {
