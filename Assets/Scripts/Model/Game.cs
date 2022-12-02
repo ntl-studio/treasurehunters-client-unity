@@ -23,4 +23,20 @@ namespace TreasureHunters
         {
         }
     }
+
+    public enum EActionDirection
+    {
+        Left, Right, Up, Down, None
+    }
+
+    public enum EActionType
+    {
+        Move, Grenade, Bullet, Skip
+    }
+
+    public struct PlayerAction
+    {
+        public EActionDirection Direction;
+        public EActionType Type;
+    }
 }

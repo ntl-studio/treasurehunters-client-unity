@@ -70,20 +70,4 @@ namespace TreasureHunters
         public int Width => BoardSettings.BoardRealWidth;
         public int Height => BoardSettings.BoardRealHeight;
     }
-
-    public enum EActionDirection
-    {
-        Left, Right, Up, Down, None
-    }
-
-    public enum EActionType
-    {
-        Move, Grenade, Bullet, Skip
-    }
-
-    public struct PlayerAction
-    {
-        public EActionDirection Direction;
-        public EActionType Type;
-    }
 }
