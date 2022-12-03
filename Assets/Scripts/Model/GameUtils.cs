@@ -33,9 +33,9 @@ namespace TreasureHunters
 
         public static Position FindPlayerPosition(Board board)
         {
-            for (var row = 0; row < board.Width; ++row)
+            for (var row = 0; row < board.RealWidth; ++row)
             {
-                for (var col = 0; col < board.Height; ++col)
+                for (var col = 0; col < board.RealHeight; ++col)
                 {
                     if (board.IsPlayer(col, row))
                     {
