@@ -5,22 +5,27 @@ namespace TreasureHunters
     public class Game
     {
         public Board CurrentBoard => CurrentPlayer.Board;
-        public Player CurrentPlayer => _players[_currentPlayer];
+        public Player CurrentPlayer => Players[_currentPlayer];
+        public int PlayersCount => GameSettings.PlayersCount;
 
-        private readonly List<Player> _players = new();
+        public readonly List<Player> Players = new();
         private int _currentPlayer = 0;
 
         public delegate void EndTurnEventHandler();
-        public event EndTurnEventHandler OnEndTurn;
+        public event EndTurnEventHandler OnBeforeEndTurn;
+        public event EndTurnEventHandler OnAfterEndTurn;
+
 
         public void EndTurn()
         {
+            OnBeforeEndTurn?.Invoke();
+
             _currentPlayer++;
 
             if (_currentPlayer >= GameSettings.PlayersCount)
                 _currentPlayer = 0;
 
-            OnEndTurn?.Invoke();
+            OnAfterEndTurn?.Invoke();
         }
 
         public Game()
@@ -33,7 +38,7 @@ namespace TreasureHunters
                     Board = board,
                     Position = GameUtils.FindPlayerPosition(board)
                 };
-                _players.Add(player);
+                Players.Add(player);
             }
 
             {
@@ -44,7 +49,7 @@ namespace TreasureHunters
                     Board = board,
                     Position = GameUtils.FindPlayerPosition(board)
                 };
-                _players.Add(player);
+                Players.Add(player);
             }
         }
     }

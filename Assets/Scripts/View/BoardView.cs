@@ -48,7 +48,7 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnEndTurn += UpdateBoard;
+        _game.OnAfterEndTurn += UpdateBoard;
         UpdateBoard();
     }
 

@@ -17,7 +17,7 @@ public class PlayerName : MonoBehaviour
 
     void Start()
     {
-        _game.OnEndTurn += UpdatePlayerName;
+        _game.OnAfterEndTurn += UpdatePlayerName;
 
         UpdatePlayerName();
     }

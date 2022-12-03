@@ -7,8 +7,8 @@ namespace TreasureHunters
         public const int BoardRealWidth = BoardWidth * 2 + 1;
         public const int BoardRealHeight = BoardHeight * 2 + 1;
 
-        private const int WindowWidth = 3;
-        private const int WindowHeight = 3;
+        private const int WindowWidth = 1;
+        private const int WindowHeight = 1;
         public const int WindowRealWidth = WindowWidth * 2 + 1;
         public const int WindowRealHeight = WindowHeight * 2 + 1;
 
