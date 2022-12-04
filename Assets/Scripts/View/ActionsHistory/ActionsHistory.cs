@@ -20,7 +20,7 @@ public class ActionsHistory : MonoBehaviour
     {
         Debug.Assert(ActionsListViewPrefab);
 
-        _game.OnBeforeEndTurn += () =>
+        _game.OnEndTurn += () =>
         {
             var player = _game.CurrentPlayer;
             var pos = player.Position;
@@ -34,7 +34,7 @@ public class ActionsHistory : MonoBehaviour
         {
             var actionsListObj = Instantiate(ActionsListViewPrefab, transform, true);
             actionsListObj.transform.SetPositionAndRotation(lastListPosition, Quaternion.identity);
-            lastListPosition.y -= 100.0f;
+            lastListPosition.y -= 120.0f;
 
             var playerName = _game.Players[i].Name;
             var actionsList = actionsListObj.GetComponent<ActionsListView>();

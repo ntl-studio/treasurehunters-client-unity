@@ -1,3 +1,4 @@
+using System.Collections;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
@@ -21,16 +22,18 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    private Game _game;
     [Inject]
     private void InjectGame(Game game)
     {
         _game = game;
     }
+    private Game _game;
 
+    private 
+    
     void Start()
     {
-        UpdatePosition();
+        UpdateView();
     }
 
     void Update()
@@ -53,15 +56,36 @@ public class PlayerMovement : MonoBehaviour
                 _isMoving = false;
                 transform.position = _destination;
 
+
                 // tell them game we finished the move when animation finished playing
                 _game.EndTurn(); 
             }
         }
     }
 
-    public void UpdatePosition()
+    public void UpdateView()
     {
         BoardPosition = _game.CurrentPlayer.Position;
+        UpdateRotation();
+    }
+
+    private void UpdateRotation()
+    {
+        transform.rotation = Quaternion.Euler(0, 0, 0);
+        switch (_game.CurrentPlayer.MoveDirection)
+        {
+            case Player.EMoveDirection.Right:
+                transform.rotation = Quaternion.Euler(0, 0, -90);
+                break;
+            case Player.EMoveDirection.Down:
+                transform.rotation = Quaternion.Euler(0, 0, 180);
+                break;
+            case Player.EMoveDirection.Left:
+                transform.rotation = Quaternion.Euler(0, 0, 90);
+                break;
+            case Player.EMoveDirection.Up:
+                break;
+        }
     }
 
     private void MovePlayer()
@@ -115,6 +139,8 @@ public class PlayerMovement : MonoBehaviour
                 pos.Y += 2 * shiftY;
 
                 _game.CurrentPlayer.Position = pos;
+
+                UpdateRotation();
             }
         }
     }

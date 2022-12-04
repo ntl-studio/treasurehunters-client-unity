@@ -48,7 +48,7 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnAfterEndTurn += UpdateBoard;
+        _game.OnStartNextTurn+= UpdateBoard;
         UpdateBoard();
     }
 
@@ -166,7 +166,7 @@ public class BoardView : MonoBehaviour
             }
         }
 
-        _playerMovement.UpdatePosition();
+        _playerMovement.UpdateView();
     }
 
     // This is the code to "open" the map when player is moving, respecting the walls when
