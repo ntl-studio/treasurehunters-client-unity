@@ -47,5 +47,24 @@ namespace TreasureHunters
             Debug.Assert(false, "Did not find player position on the board");
             return new Position(-1, -1);
         }
+
+        public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            switch (moveDirection)
+            {
+                case Player.EMoveDirection.Right:
+                    transform.rotation = Quaternion.Euler(0, 0, -90);
+                    break;
+                case Player.EMoveDirection.Down:
+                    transform.rotation = Quaternion.Euler(0, 0, 180);
+                    break;
+                case Player.EMoveDirection.Left:
+                    transform.rotation = Quaternion.Euler(0, 0, 90);
+                    break;
+                case Player.EMoveDirection.Up:
+                    break;
+            }
+        }
     }
 }

@@ -11,14 +11,13 @@ namespace TreasureHunters
         public readonly List<Player> Players = new();
         private int _currentPlayer = 0;
 
-        public delegate void TurnEventHandler();
-        public event TurnEventHandler OnStartTurn;
-        public event TurnEventHandler OnEndTurn;
+        public delegate void GameEvent();
+        public event GameEvent OnStartTurn;
+        public event GameEvent OnEndTurn;
+        public event GameEvent OnPlayerClicked;
 
-        public void EndTurn()
-        {
-            OnEndTurn?.Invoke();
-        }
+
+        public void EndTurn() { OnEndTurn?.Invoke(); }
 
         public void StartNextTurn()
         {
@@ -30,6 +29,8 @@ namespace TreasureHunters
             OnStartTurn?.Invoke();
         }
 
+        public void PlayerClicked() { OnPlayerClicked?.Invoke(); }
+
         public Game()
         {
             {
@@ -37,6 +38,7 @@ namespace TreasureHunters
                 var player = new Player()
                 {
                     Name = "Player 1",
+                    Color = UnityEngine.Color.blue,
                     Board = board,
                     Position = GameUtils.FindPlayerPosition(board)
                 };
@@ -48,6 +50,7 @@ namespace TreasureHunters
                 var player = new Player()
                 {
                     Name = "Player 2",
+                    Color = UnityEngine.Color.yellow,
                     Board = board,
                     Position = GameUtils.FindPlayerPosition(board)
                 };

@@ -9,11 +9,7 @@ public class ActionsHistory : MonoBehaviour
 
     private readonly Dictionary<string, ActionsListView> _actionViews= new();
 
-    [Inject]
-    void InjectGame(Game game)
-    {
-        _game = game;
-    }
+    [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
 
     void Start()

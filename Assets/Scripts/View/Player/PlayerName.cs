@@ -5,20 +5,18 @@ using VContainer;
 
 public class PlayerName : MonoBehaviour
 {
-    public TextMeshProUGUI PlayerNameText;
+    private TextMeshProUGUI PlayerNameText;
 
+    [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
-
-    [Inject]
-    void InjectGame(Game game)
-    {
-        _game = game;
-    }
 
     void Start()
     {
+        PlayerNameText = GetComponent<TextMeshProUGUI>();
+
         UpdatePlayerName();
         _game.OnStartTurn += UpdatePlayerName;
+        _game.OnEndTurn += UpdatePlayerName;
     }
 
     void UpdatePlayerName()

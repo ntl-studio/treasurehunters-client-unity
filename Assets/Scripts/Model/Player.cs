@@ -1,3 +1,4 @@
+using System.Drawing;
 using Debug = UnityEngine.Debug;
 
 namespace TreasureHunters
@@ -47,6 +48,7 @@ namespace TreasureHunters
         public Position PrevPosition { private set; get; }
 
         public string Name;
+        public UnityEngine.Color Color = UnityEngine.Color.white;
         public bool IsArmor;
         public bool IsTreasure;
         public int Grenades;

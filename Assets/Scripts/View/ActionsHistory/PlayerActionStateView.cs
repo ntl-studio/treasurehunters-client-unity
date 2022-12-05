@@ -23,6 +23,6 @@ public class PlayerActionStateView : MonoBehaviour
         LeftWallImage.gameObject.SetActive(playerState.IsLeftWall);
         UpWallImage.gameObject.SetActive(playerState.IsUpWall);
 
-        PlayerMovement.UpdateRotation(playerState.MoveDirection, PlayerDirectionTransform);
+        GameUtils.UpdateRotation(playerState.MoveDirection, PlayerDirectionTransform);
     }
 }

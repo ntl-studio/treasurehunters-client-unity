@@ -19,21 +19,8 @@ public class BoardView : MonoBehaviour
     private readonly List<List<GameObject>> _gameBoard = new();
     private readonly List<List<CeilingCell>> _ceilingBoard = new();
 
+    [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
-
-    [Inject]
-    void InjectGame(Game game)
-    {
-        _game = game;
-    }
-
-    private PlayerMovement _playerMovement;
-
-    [Inject]
-    void InjectPlayerMovement(PlayerMovement playerMovement)
-    {
-        _playerMovement = playerMovement;
-    }
 
     void Start()
     {
@@ -48,8 +35,9 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnStartTurn+= UpdateBoard;
+        _game.OnStartTurn += UpdateBoard;
         _game.OnEndTurn += UpdateBoard;
+
         UpdateBoard();
     }
 
@@ -166,8 +154,6 @@ public class BoardView : MonoBehaviour
                     _gameBoard[col][row].SetActive(board.IsWall(row, col));
             }
         }
-
-        _playerMovement.UpdateView();
     }
 
     // This is the code to "open" the map when player is moving, respecting the walls when

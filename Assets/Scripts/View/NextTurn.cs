@@ -6,11 +6,7 @@ public class NextTurn : MonoBehaviour
 {
     public GameObject NextTurnPanel;
 
-    [Inject]
-    void InjectGame(Game game)
-    {
-        _game = game;
-    }
+    [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
 
     void Start()

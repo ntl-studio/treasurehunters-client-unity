@@ -1,13 +1,14 @@
+using TreasureHunters;
 using UnityEngine;
+using VContainer;
 
 public class PlayerClick : MonoBehaviour
 {
-    [SerializeField]
-    GameObject _playerActionsWindow; // TODO move window to DI container 
+    [Inject] void InjectGame(Game game) { _game = game; }
+    private Game _game;
 
     private void OnMouseDown()
     {
-        Debug.Log("Mouse down");
-        _playerActionsWindow.SetActive(true);
+        _game.PlayerClicked();
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
@@ -6,6 +5,8 @@ using VContainer;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public bool AcceptInput = false;
+
     public Position BoardPosition
     {
         set
@@ -22,14 +23,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    [Inject]
-    private void InjectGame(Game game)
-    {
-        _game = game;
-    }
+    [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
-
-    private 
     
     void Start()
     {
@@ -38,7 +33,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        MovePlayer();
+        if (AcceptInput)
+            MovePlayer();
     }
 
     void FixedUpdate()
@@ -66,26 +62,7 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateView()
     {
         BoardPosition = _game.CurrentPlayer.Position;
-        UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
-    }
-
-    public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)
-    {
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-        switch (moveDirection)
-        {
-            case Player.EMoveDirection.Right:
-                transform.rotation = Quaternion.Euler(0, 0, -90);
-                break;
-            case Player.EMoveDirection.Down:
-                transform.rotation = Quaternion.Euler(0, 0, 180);
-                break;
-            case Player.EMoveDirection.Left:
-                transform.rotation = Quaternion.Euler(0, 0, 90);
-                break;
-            case Player.EMoveDirection.Up:
-                break;
-        }
+        GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
     }
 
     private void MovePlayer()
@@ -140,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
 
                 _game.CurrentPlayer.Position = pos;
 
-                UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
+                GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
             }
         }
     }
