@@ -14,8 +14,6 @@ public class ActionsListView : MonoBehaviour
         Debug.Assert(ActionStateViewPrefab);
         Debug.Assert(ActionsParent);
         Debug.Assert(PlayerNameText);
-
-        _lastActionPosition = transform.position;
     }
 
     public void SetPlayerName(string playerName)
@@ -24,17 +22,28 @@ public class ActionsListView : MonoBehaviour
     }
 
     private Vector3 _lastActionPosition;
-    private List<GameObject> _actionsList = new();
+    private readonly List<GameObject> _actionsList = new();
 
     public void AddPlayerActionState(PlayerActionState playerStater)
     {
         var actionStateViewObj = Instantiate(ActionStateViewPrefab, transform, false);
-        actionStateViewObj.transform.SetPositionAndRotation(_lastActionPosition, Quaternion.identity);
-        _lastActionPosition.x += 130;
 
         var actionView = actionStateViewObj.GetComponent<PlayerActionStateView>();
         Debug.Assert(actionView);
         actionView.SetWallsVisibility(playerStater);
+
+        if (_actionsList.Count > 3)
+        {
+            Destroy(_actionsList[0]);
+            _actionsList.RemoveAt(0);
+        }
+
+        foreach (var action in _actionsList)
+        {
+            var pos = action.transform.position;
+            pos.x += 130;
+            action.transform.position = pos;
+        }
 
         _actionsList.Add(actionStateViewObj);
     }
