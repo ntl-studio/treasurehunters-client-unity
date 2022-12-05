@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using UnityEditor.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 namespace TreasureHunters
@@ -15,6 +13,11 @@ namespace TreasureHunters
         }
 
         public EMoveDirection MoveDirection;
+
+        public Player()
+        {
+            PrevPosition = Position;
+        }
 
         private Position _position = new Position(-1, -1);
         public Position Position
@@ -34,11 +37,14 @@ namespace TreasureHunters
                     else 
                         Debug.Assert(false, "Invalid position value");
 
+                    PrevPosition = _position;
                     _position = value;
                 }
             }
             get => _position;
         }
+
+        public Position PrevPosition { private set; get; }
 
         public string Name;
         public bool IsArmor;

@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using UnityEngine.EventSystems;
+
 namespace TreasureHunters
 {
     public class PlayerActionState : BaseBoard
@@ -5,15 +9,20 @@ namespace TreasureHunters
         public override int RealWidth => GameSettings.WindowRealWidth;
         public override int RealHeight => GameSettings.WindowRealHeight;
 
-        public PlayerActionState(int x, int y, Board board)
+        public Player.EMoveDirection MoveDirection;
+
+        public PlayerActionState(Position position, Board board, Player.EMoveDirection moveDirection)
         {
             // TODO respect edge cases, like (x, y) is at the edge of the board
 
-            for (int i = y - RealHeight / 2; i < y + RealHeight / 2; ++i)
+            for (int row = position.Y - 1; row <= position.Y + 1; ++row)
             {
-                var s = board.BoardStrings[i];
-                BoardStrings.Add(s);
+                var fullLine = board.BoardStrings[row];
+                var line = fullLine.Skip(position.X - 1).Take(3).ToArray();
+                BoardStrings.Add(line);
             }
+
+            MoveDirection = moveDirection;
         }
 
         public bool IsRightWall => IsWall(2, 1);

@@ -12,8 +12,8 @@ namespace TreasureHunters
         private int _currentPlayer = 0;
 
         public delegate void TurnEventHandler();
+        public event TurnEventHandler OnStartTurn;
         public event TurnEventHandler OnEndTurn;
-        public event TurnEventHandler OnStartNextTurn;
 
         public void EndTurn()
         {
@@ -27,7 +27,7 @@ namespace TreasureHunters
             if (_currentPlayer >= GameSettings.PlayersCount)
                 _currentPlayer = 0;
 
-            OnStartNextTurn?.Invoke();
+            OnStartTurn?.Invoke();
         }
 
         public Game()

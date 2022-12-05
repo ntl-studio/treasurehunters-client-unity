@@ -66,13 +66,13 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateView()
     {
         BoardPosition = _game.CurrentPlayer.Position;
-        UpdateRotation();
+        UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
     }
 
-    private void UpdateRotation()
+    public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)
     {
         transform.rotation = Quaternion.Euler(0, 0, 0);
-        switch (_game.CurrentPlayer.MoveDirection)
+        switch (moveDirection)
         {
             case Player.EMoveDirection.Right:
                 transform.rotation = Quaternion.Euler(0, 0, -90);
@@ -140,7 +140,7 @@ public class PlayerMovement : MonoBehaviour
 
                 _game.CurrentPlayer.Position = pos;
 
-                UpdateRotation();
+                UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
             }
         }
     }

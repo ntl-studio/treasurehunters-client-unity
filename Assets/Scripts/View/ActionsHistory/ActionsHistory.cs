@@ -23,8 +23,9 @@ public class ActionsHistory : MonoBehaviour
         _game.OnEndTurn += () =>
         {
             var player = _game.CurrentPlayer;
-            var pos = player.Position;
-            var playerState = new PlayerActionState(pos.X, pos.Y, _game.CurrentBoard);
+            var playerState = new PlayerActionState(
+                player.PrevPosition, _game.CurrentBoard, player.MoveDirection);
+
             AddActionState(player.Name, playerState);
         };
 

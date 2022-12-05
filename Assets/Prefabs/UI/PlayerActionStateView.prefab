@@ -96,6 +96,7 @@ MonoBehaviour:
   DownWallImage: {fileID: 9165378353755109213}
   LeftWallImage: {fileID: 9165378352306669668}
   UpWallImage: {fileID: 9165378352395958456}
+  PlayerDirectionTransform: {fileID: 9165378352849977960}
 --- !u!1 &9165378352202072787
 GameObject:
   m_ObjectHideFlags: 0
