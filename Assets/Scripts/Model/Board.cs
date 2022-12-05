@@ -23,7 +23,7 @@ namespace TreasureHunters
         public bool IsCellVisible(int x, int y)
         {
             var pos = Player.Position;
-            return (Math.Abs(pos.X - x) + Math.Abs(pos.Y - y)) < 5;
+            return (Math.Abs(pos.X - x) <= 2) && (Math.Abs(pos.Y - y) <= 2);
         }
 
         public override int RealWidth => GameSettings.BoardRealWidth;
