@@ -9,6 +9,7 @@ public class PlayerClick : MonoBehaviour
 
     private void OnMouseDown()
     {
+        Debug.Log("Player clicked");
         _game.PlayerClicked();
     }
 }

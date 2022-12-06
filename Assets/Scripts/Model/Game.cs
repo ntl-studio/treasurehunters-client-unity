@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TreasureHunters
 {
@@ -12,12 +13,16 @@ namespace TreasureHunters
         private int _currentPlayer = 0;
 
         public delegate void GameEvent();
+
         public event GameEvent OnStartTurn;
         public event GameEvent OnEndTurn;
         public event GameEvent OnPlayerClicked;
 
 
-        public void EndTurn() { OnEndTurn?.Invoke(); }
+        public void EndTurn()
+        {
+            OnEndTurn?.Invoke();
+        }
 
         public void StartNextTurn()
         {
@@ -29,9 +34,12 @@ namespace TreasureHunters
             OnStartTurn?.Invoke();
         }
 
-        public void PlayerClicked() { OnPlayerClicked?.Invoke(); }
+        public void PlayerClicked()
+        {
+            OnPlayerClicked?.Invoke();
+        }
 
-        public Game()
+        public void Init()
         {
             {
                 var board = new Board("Level//level01.txt");
@@ -56,6 +64,8 @@ namespace TreasureHunters
                 };
                 Players.Add(player);
             }
+
+            Debug.Log("Game initialized successfully");
         }
     }
 }

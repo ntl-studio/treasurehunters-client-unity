@@ -22,6 +22,11 @@ public class BoardView : MonoBehaviour
     [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
 
+    void OnEnable()
+    {
+        _game.Init();
+    }
+
     void Start()
     {
         Debug.Assert(_floorPrefab);
