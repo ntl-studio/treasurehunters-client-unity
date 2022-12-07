@@ -11,7 +11,9 @@ public class PlayerActionsWindow : MonoBehaviour
 
     void Start()
     {
+        Debug.Assert(_game != null);
         Debug.Assert(ActionsWindow);
+
         ActionsWindow.SetActive(false);
 
         _game.OnPlayerClicked += () => ActionsWindow.SetActive(true);

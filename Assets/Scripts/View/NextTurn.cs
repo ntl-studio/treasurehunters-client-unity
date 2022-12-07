@@ -12,6 +12,7 @@ public class NextTurn : MonoBehaviour
     void Start()
     {
         Debug.Assert(NextTurnPanel);
+        Debug.Assert(_game != null);
 
         NextTurnPanel.SetActive(false);
         _game.OnEndTurn += () => NextTurnPanel.SetActive(true);

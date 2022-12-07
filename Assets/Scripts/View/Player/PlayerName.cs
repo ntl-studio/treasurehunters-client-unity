@@ -12,6 +12,8 @@ public class PlayerName : MonoBehaviour
 
     void Start()
     {
+        Debug.Assert(_game != null);
+
         PlayerNameText = GetComponent<TextMeshProUGUI>();
 
         UpdatePlayerName();
