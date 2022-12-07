@@ -1,10 +1,10 @@
 {
   "scopedRegistries": [
     {
-      "name": "Ntl-Studio Registry",
-      "url": "https://npm.pkg.github.com/ntl-studio",
+      "name": "ntl-studio",
+      "url": "https://npm.pkg.github.com/@ntl-studio",
       "scopes": [
-        "ntl-studio"
+        "com.ntlstudio"
       ]
     }
   ],
@@ -55,6 +55,6 @@
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.11.0",
-    "ntl-studio.ntlstudio.treasurehunders.model": "1.0.46"
+    "com.ntlstudio.treasurehunters.model": "1.0.3"
   }
 }

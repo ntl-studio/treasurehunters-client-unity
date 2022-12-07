@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.ntlstudio.treasurehunters.model": {
+      "version": "1.0.3",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://npm.pkg.github.com/@ntl-studio"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.5",
       "depth": 0,
