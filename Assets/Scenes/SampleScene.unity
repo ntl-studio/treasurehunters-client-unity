@@ -703,6 +703,7 @@ GameObject:
   - component: {fileID: 369810146}
   - component: {fileID: 369810148}
   - component: {fileID: 369810147}
+  - component: {fileID: 369810149}
   m_Layer: 5
   m_Name: NextTurnPanel
   m_TagString: Untagged
@@ -769,6 +770,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 369810145}
   m_CullTransparentMesh: 1
+--- !u!114 &369810149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369810145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 369810147}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1255125029}
+        m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
+        m_MethodName: SkipAction
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &404223937
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,7 +1383,7 @@ GameObject:
   - component: {fileID: 1222958836}
   - component: {fileID: 1222958837}
   m_Layer: 5
-  m_Name: Window
+  m_Name: ActionsWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1391,6 +1448,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1255125027}
   - component: {fileID: 1255125028}
+  - component: {fileID: 1255125029}
   m_Layer: 0
   m_Name: Players
   m_TagString: Untagged
@@ -1427,6 +1485,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 4014059945718007183, guid: 2f678e1536cbaef478bd93ed8fbcd13f,
     type: 3}
+--- !u!114 &1255125029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1255125026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f50149571d673d46b4d8cc354b98979, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1360367637
 GameObject:
   m_ObjectHideFlags: 0
@@ -2077,7 +2147,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1255125029}
         m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
         m_MethodName: GunAction
         m_Mode: 1
@@ -2166,6 +2236,7 @@ MonoBehaviour:
   - {fileID: 206400438}
   - {fileID: 2106983165}
   - {fileID: 278352935}
+  - {fileID: 369810145}
 --- !u!4 &1558547489
 Transform:
   m_ObjectHideFlags: 0
@@ -2270,7 +2341,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Press space for next turn
+  m_text: "Click here or press space\n for next turn"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2583,7 +2654,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1255125029}
         m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
         m_MethodName: SkipAction
         m_Mode: 1
@@ -2780,7 +2851,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1255125029}
         m_TargetAssemblyTypeName: PlayerActions, Assembly-CSharp
         m_MethodName: GrenadeAction
         m_Mode: 1

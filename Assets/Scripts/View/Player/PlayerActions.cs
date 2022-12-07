@@ -20,6 +20,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        _game.EndTurn();
+        _game.StartNextTurn();
     }
 }
