@@ -7,12 +7,9 @@ namespace TreasureHunters
     public class Board : BaseBoard
     {
         public Player Player;
-        public Board(string filePath)
+        public Board(string[] level)
         {
-            using var sr = new StreamReader(Path.Combine(Application.dataPath, filePath));
-            var fileContents = sr.ReadToEnd();
-            var lines = GameUtils.ReadLevelFromTextFile(fileContents);
-            foreach (var line in lines)
+            foreach (var line in level)
             {
                 var characters = line.Split(' ');
                 BoardStrings.Add(characters);

@@ -42,7 +42,7 @@ namespace TreasureHunters
         public void Init()
         {
             {
-                var board = new Board("Level//level01.txt");
+                var board = new Board(Levels.Level01);
                 var player = new Player()
                 {
                     Name = "Player 1",
@@ -54,7 +54,7 @@ namespace TreasureHunters
             }
 
             {
-                var board = new Board("Level//level01.txt");
+                var board = new Board(Levels.Level01);
                 var player = new Player()
                 {
                     Name = "Player 2",
