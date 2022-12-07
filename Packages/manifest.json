@@ -1,4 +1,13 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "Ntl-Studio Registry",
+      "url": "https://npm.pkg.github.com/ntl-studio",
+      "scopes": [
+        "ntl-studio"
+      ]
+    }
+  ],
   "dependencies": {
     "com.unity.2d.animation": "7.0.5",
     "com.unity.2d.pixel-perfect": "5.0.1",
@@ -45,6 +54,7 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
-    "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.11.0"
+    "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.11.0",
+    "ntl-studio.ntlstudio.treasurehunders.model": "1.0.46"
   }
 }
