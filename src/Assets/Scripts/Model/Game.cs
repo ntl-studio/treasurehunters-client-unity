@@ -42,12 +42,6 @@ namespace TreasureHunters
         public void Init()
         {
             {
-                var externalPlayer =
-                    new NtlStudio.TreasureHunters.Model.Player("Player 1",
-                        new NtlStudio.TreasureHunters.Model.Position());
-                
-                Debug.Log("The external player with name " + externalPlayer.Name + " has been created");
-                
                 var board = new Board(Levels.Level01);
                 var player = new Player()
                 {
