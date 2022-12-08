@@ -18,6 +18,12 @@ namespace TreasureHunters
 
         public SM.GameField CurrentBoard => _gameState.GameField;
 
+        public SM.FieldCell CurrentPlayerFieldCell()
+        {
+            var pos = CurrentPlayer.Position;
+            return _gameState.GameField[pos.X, pos.Y];
+        }
+
         public SM.VisibleArea CurrentVisibleArea =>
             _gameState.GetPlayerVisibleArea(_gameState.Players.ToList<SM.Player>()[_currentPlayer]);
 
@@ -37,6 +43,9 @@ namespace TreasureHunters
             {
                 Players.Add(new Player(p));
             }
+
+            Players[0].Color = UnityEngine.Color.yellow;
+            Players[1].Color = UnityEngine.Color.blue;
 
             Debug.Log("Game initialized successfully");
         }

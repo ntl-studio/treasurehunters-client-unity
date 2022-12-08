@@ -21,7 +21,9 @@ namespace TreasureHunters
         public Player(SM.Player player)
         {
             _serverPlayer = player;
-            PrevPosition = new Position(_serverPlayer.Position.X, _serverPlayer.Position.Y);
+
+            Position = new Position(_serverPlayer.Position.X, _serverPlayer.Position.Y);
+            PrevPosition = Position;
         }
 
         private Position _position = new Position(-1, -1);

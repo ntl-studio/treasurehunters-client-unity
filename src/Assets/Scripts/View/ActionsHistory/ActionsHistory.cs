@@ -20,7 +20,7 @@ public class ActionsHistory : MonoBehaviour
         {
             var player = _game.CurrentPlayer;
             var playerState = new PlayerActionState(
-                player.PrevPosition, _game.CurrentVisibleArea, player.MoveDirection);
+                player.PrevPosition, _game.CurrentPlayerFieldCell(), player.MoveDirection);
 
             AddActionState(player.Name, playerState);
         };

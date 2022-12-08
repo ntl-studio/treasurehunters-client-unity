@@ -31,23 +31,6 @@ namespace TreasureHunters
             return cleanLines;
         }
 
-        public static Position FindPlayerPosition(Board board)
-        {
-            for (var row = 0; row < board.RealWidth; ++row)
-            {
-                for (var col = 0; col < board.RealHeight; ++col)
-                {
-                    if (board.IsPlayer(col, row))
-                    {
-                        return new Position(col, row);
-                    }
-                }
-            }
-
-            Debug.Assert(false, "Did not find player position on the board");
-            return new Position(-1, -1);
-        }
-
         public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
