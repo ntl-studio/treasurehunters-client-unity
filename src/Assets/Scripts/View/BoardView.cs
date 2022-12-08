@@ -154,9 +154,11 @@ public class BoardView : MonoBehaviour
 
                 if (BoardView.IsFloorCell(row, col))
                 {
-                    _ceilingBoard[col][row].State = 
-                        _game.IsCellVisible(row, col) ? 
-                            CeilingState.Visible : CeilingState.Hidden;
+                    _ceilingBoard[col][row].State = CeilingState.Visible;
+
+                    // TODO: fix the distance function 
+                    // _game.IsCellVisible(row, col) ? 
+                    //     CeilingState.Visible : CeilingState.Hidden;
                 }
 
                 if (BoardView.IsWallCell(row, col))
