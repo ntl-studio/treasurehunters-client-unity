@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using UnityEngine.EventSystems;
 
+using SM = NtlStudio.TreasureHunters.Model;
+
 namespace TreasureHunters
 {
     public class PlayerActionState : BaseBoard
@@ -11,15 +13,15 @@ namespace TreasureHunters
 
         public Player.EMoveDirection MoveDirection;
 
-        public PlayerActionState(Position position, Board board, Player.EMoveDirection moveDirection)
+        public PlayerActionState(Position position, SM.VisibleArea visibleArea, Player.EMoveDirection moveDirection)
         {
             // TODO respect edge cases, like (x, y) is at the edge of the board
 
             for (int row = position.Y - 1; row <= position.Y + 1; ++row)
             {
-                var fullLine = board.BoardStrings[row];
-                var line = fullLine.Skip(position.X - 1).Take(3).ToArray();
-                BoardStrings.Add(line);
+                // var fullLine = board.BoardStrings[row];
+                // var line = fullLine.Skip(position.X - 1).Take(3).ToArray();
+                // BoardStrings.Add(line);
             }
 
             MoveDirection = moveDirection;

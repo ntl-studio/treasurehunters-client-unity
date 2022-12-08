@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
 using VContainer;
 using Debug = UnityEngine.Debug;
+
+using Position = TreasureHunters.Position;
+using SM = NtlStudio.TreasureHunters.Model;
 
 public class BoardView : MonoBehaviour
 {
@@ -94,7 +98,7 @@ public class BoardView : MonoBehaviour
                     }
                 }
                 // creating walls
-                else if (Board.IsWallCell(row, col))
+                else if (BoardView.IsWallCell(row, col))
                 {
                     var pos = new Vector3(
                         ((float)col - 1) / 2,
@@ -145,103 +149,66 @@ public class BoardView : MonoBehaviour
         {
             for (int col = 0; col < GameSettings.BoardRealWidth; ++col)
             {
-                if (!Board.IsValidCell(col, row))
+                if (!BoardView.IsValidCell(col, row))
                     continue;
 
-                if (Board.IsFloorCell(row, col))
+                if (BoardView.IsFloorCell(row, col))
                 {
-                    _ceilingBoard[col][row].State = 
-                        board.IsCellVisible(row, col) ? 
-                            CeilingState.Visible : CeilingState.Hidden;
+                    _ceilingBoard[col][row].State = CeilingState.Visible;
+
+                    // TODO: fix the distance function 
+                    // _game.IsCellVisible(row, col) ? 
+                    //     CeilingState.Visible : CeilingState.Hidden;
                 }
 
-                if (Board.IsWallCell(row, col))
-                    _gameBoard[col][row].SetActive(board.IsWall(row, col));
+                if (BoardView.IsWallCell(row, col))
+                {
+                    // Convert wall position from View to the Model Up/Down/Left/Right wall
+                    int serverRow = (row - 1) / 2;
+                    int serverCol = (col - 1) / 2;
+
+                    SM.FieldCell cell = _game.CurrentBoard[serverCol, serverRow];
+
+                    // if this is row wall (horizontal)
+                    if (row % 2 == 0)
+                    {
+                        if (!cell.HasFlag(FieldCell.TopWall))
+                        {
+                            _gameBoard[col][row].SetActive(false);
+                        }
+                    }
+
+                    // if this is col wall (vertical)
+                    if (col % 2 == 0)
+                    {
+                        if (!cell.HasFlag(FieldCell.LeftWall))
+                        {
+                            _gameBoard[col][row].SetActive(false);
+                        }
+                    }
+
+                    // Debug.Log($"Client ({row}, {col}, server ({serverRow}, {serverCol}");
+
+                    // _gameBoard[col][row].SetActive(board.IsWall(row / 2, col / 2));
+                }
             }
         }
     }
 
-    // This is the code to "open" the map when player is moving, respecting the walls when
-    // checking for visibility. Leaving it here in case we might need to use it again in the client.
-    // Eventually this information should come from the server, and hopefully it will one day.
-    public void SetMapVisibility(Position position, Position previousPosition)
+    public static bool IsValidCell(int x, int y)
     {
-        var board = _game.CurrentBoard;
-        var x = position.X;
-        var y = position.Y;
+        return !(x % 2 == 0 && y % 2 == 0);
+    }
 
-        _ceilingBoard[y][x].State = CeilingState.Visible;
+    public static bool IsFloorCell(int x, int y)
+    {
+        return (x % 2 == 1 && y % 2 == 1);
+    }
 
-        // right cell
-        if (x + 2 < GameSettings.BoardRealWidth && !board.IsWall(x + 1, y))
-        {
-            _ceilingBoard[y][x + 2].State = CeilingState.Visible;
-        }
-
-        // lower-right cell
-        if (x + 2 < GameSettings.BoardRealWidth &&
-            y - 2 >= 0 &&
-            !board.IsWall(x, y - 1) &&
-            !board.IsWall(x + 1, y) &&
-            !board.IsWall(x + 2, y - 1) &&
-            !board.IsWall(x + 1, y - 2))
-        {
-            _ceilingBoard[y - 2][x + 2].State = CeilingState.Visible;
-        }
-
-        // lower cell
-        if (y - 2 >= 0 && !board.IsWall(x, y - 1))
-        {
-            _ceilingBoard[y - 2][x].State = CeilingState.Visible;
-        }
-
-        // lower-left cell
-        if (x - 2 >= 0 &&
-            y - 2 >= 0 &&
-            !board.IsWall(x, y - 1) &&
-            !board.IsWall(x - 1, y) &&
-            !board.IsWall(x - 2, y - 1) &&
-            !board.IsWall(x - 1, y - 2))
-        {
-            _ceilingBoard[y - 2][x - 2].State = CeilingState.Visible;
-        }
-
-        // left cell
-        if (x - 2 >= 0 && !board.IsWall(x - 1, y))
-        {
-            _ceilingBoard[y][x - 2].State = CeilingState.Visible;
-        }
-
-        // upper-left cell
-        if (x - 2 >= 0 &&
-            y + 2 < GameSettings.BoardRealHeight &&
-            !board.IsWall(x, y + 1) &&
-            !board.IsWall(x - 1, y) &&
-            !board.IsWall(x - 2, y + 1) &&
-            !board.IsWall(x - 1, y + 2))
-        {
-            _ceilingBoard[y + 2][x - 2].State = CeilingState.Visible;
-        }
-
-        // upper cell
-        if (y + 2 < GameSettings.BoardRealHeight && !board.IsWall(x, y + 1))
-        {
-            _ceilingBoard[y + 2][x].State = CeilingState.Visible;
-        }
-
-        // upper-right cell
-        if (x + 2 < GameSettings.BoardRealWidth &&
-            y + 2 < GameSettings.BoardRealHeight &&
-            !board.IsWall(x, y + 1) &&
-            !board.IsWall(x + 1, y) &&
-            !board.IsWall(x + 2, y + 1) &&
-            !board.IsWall(x + 1, y + 2))
-        {
-            _ceilingBoard[y + 2][x + 2].State = CeilingState.Visible;
-        }
-
-        // enabling for of war for cells we came from 
-        UpdateFogOfWar(position, previousPosition);
+    public static bool IsWallCell(int x, int y)
+    {
+        return (x % 2 == 0 && y % 2 == 1) ||
+               (x % 2 == 1 && y % 2 == 0);
     }
 
     void UpdateFogOfWar(Position position, Position previousPosition)

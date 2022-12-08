@@ -1,6 +1,8 @@
 using System.Drawing;
 using Debug = UnityEngine.Debug;
 
+using SM = NtlStudio.TreasureHunters.Model;
+
 namespace TreasureHunters
 {
     public class Player
@@ -14,10 +16,12 @@ namespace TreasureHunters
         }
 
         public EMoveDirection MoveDirection;
+        private SM.Player _serverPlayer;
 
-        public Player()
+        public Player(SM.Player player)
         {
-            PrevPosition = Position;
+            _serverPlayer = player;
+            PrevPosition = new Position(_serverPlayer.Position.X, _serverPlayer.Position.Y);
         }
 
         private Position _position = new Position(-1, -1);
@@ -47,7 +51,7 @@ namespace TreasureHunters
 
         public Position PrevPosition { private set; get; }
 
-        public string Name;
+        public string Name => _serverPlayer.Name;
         public UnityEngine.Color Color = UnityEngine.Color.white;
         public bool IsArmor;
         public bool IsTreasure;

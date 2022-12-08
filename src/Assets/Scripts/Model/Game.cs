@@ -1,16 +1,42 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using UnityEngine;
+
+using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
 {
     public class Game
     {
-        public Board CurrentBoard => CurrentPlayer.Board;
-        public Player CurrentPlayer => Players[_currentPlayer];
-        public int PlayersCount => GameSettings.PlayersCount;
+        private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
 
-        public readonly List<Player> Players = new();
+        public SM.GameField CurrentBoard => _gameState.GameField;
+
+        public SM.VisibleArea CurrentVisibleArea =>
+            _gameState.GetPlayerVisibleArea(_gameState.Players.ToList<SM.Player>()[_currentPlayer]);
+
+        public Player CurrentPlayer => Players[_currentPlayer];
+
+        public int PlayersCount => _gameState.Players.Count;
+
+        public List<Player> Players = new List<Player>();
         private int _currentPlayer = 0;
+
+        public void Init()
+        {
+            _gameState.RegisterPlayer("Player 1");
+            _gameState.RegisterPlayer("Player 2");
+
+
+            foreach (var p in _gameState.Players)
+            {
+                Players.Add(new Player(p));
+            }
+
+            Debug.Log("Game initialized successfully");
+        }
 
         public delegate void GameEvent();
 
@@ -18,6 +44,10 @@ namespace TreasureHunters
         public event GameEvent OnEndTurn;
         public event GameEvent OnPlayerClicked;
 
+        public bool IsCellVisible(int col, int row)
+        {
+            return Math.Abs(CurrentPlayer.Position.X - col) <= 1 && Math.Abs(CurrentPlayer.Position.Y - row) <= 1;
+        }
 
         public void EndTurn()
         {
@@ -28,7 +58,7 @@ namespace TreasureHunters
         {
             _currentPlayer++;
 
-            if (_currentPlayer >= GameSettings.PlayersCount)
+            if (_currentPlayer >= _gameState.Players.Count)
                 _currentPlayer = 0;
 
             OnStartTurn?.Invoke();
@@ -39,33 +69,5 @@ namespace TreasureHunters
             OnPlayerClicked?.Invoke();
         }
 
-        public void Init()
-        {
-            {
-                var board = new Board(Levels.Level01);
-                var player = new Player()
-                {
-                    Name = "Player 1",
-                    Color = UnityEngine.Color.blue,
-                    Board = board,
-                    Position = GameUtils.FindPlayerPosition(board)
-                };
-                Players.Add(player);
-            }
-
-            {
-                var board = new Board(Levels.Level01);
-                var player = new Player()
-                {
-                    Name = "Player 2",
-                    Color = UnityEngine.Color.yellow,
-                    Board = board,
-                    Position = GameUtils.FindPlayerPosition(board)
-                };
-                Players.Add(player);
-            }
-
-            Debug.Log("Game initialized successfully");
-        }
     }
 }

@@ -100,9 +100,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (shiftY != 0 || shiftX != 0)
         {
-            if (((0 == shiftX && 1 == math.abs(shiftY)) ||
-                 (1 == math.abs(shiftX) && 0 == shiftY)) &&
-                !board.IsWall(pos.X + shiftX, pos.Y + shiftY))
+            if ((0 == shiftX && 1 == math.abs(shiftY)) ||
+                 (1 == math.abs(shiftX) && 0 == shiftY))
             {
                 _destination = new Vector3(
                     transform.position.x + shiftX,
