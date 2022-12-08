@@ -1,3 +1,4 @@
+using NtlStudio.TreasureHunters.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,9 @@ namespace TreasureHunters
     {
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
 
+        public const int FieldWidth = SM.GameField.FieldWidth;
+        public const int FieldHeight = SM.GameField.FieldHeight;
+
         public SM.GameField CurrentBoard => _gameState.GameField;
 
         public SM.VisibleArea CurrentVisibleArea =>
@@ -24,11 +28,10 @@ namespace TreasureHunters
         public List<Player> Players = new List<Player>();
         private int _currentPlayer = 0;
 
-        public void Init()
+        public Game()
         {
             _gameState.RegisterPlayer("Player 1");
             _gameState.RegisterPlayer("Player 2");
-
 
             foreach (var p in _gameState.Players)
             {
