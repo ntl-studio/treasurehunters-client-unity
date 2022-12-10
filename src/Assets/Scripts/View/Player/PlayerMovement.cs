@@ -12,10 +12,7 @@ public class PlayerMovement : MonoBehaviour
         set
         {
             _game.CurrentPlayer.Position = value;
-            transform.position = new Vector3(
-                (value.X - 1.0f) / 2.0f,
-                (value.Y - 1.0f) / 2.0f
-            );
+            transform.position = new Vector3(value.X, value.Y);
         }
     }
 
@@ -111,8 +108,8 @@ public class PlayerMovement : MonoBehaviour
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
 
-                pos.X += 2 * shiftX;
-                pos.Y += 2 * shiftY;
+                pos.X += shiftX;
+                pos.Y += shiftY;
 
                 _game.CurrentPlayer.Position = pos;
 
