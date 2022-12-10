@@ -1,14 +1,22 @@
-using NtlStudio.TreasureHunters.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
 using UnityEngine;
 
 using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
 {
+    public enum PlayerAction
+    {
+        MoveRight,
+        MoveDown,
+        MoveLeft,
+        MoveUp,
+        SkipTurn,
+        ThrowGrenade,
+        FireGun,
+        None
+    }
     public class Game
     {
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
@@ -24,15 +32,25 @@ namespace TreasureHunters
             return _gameState.GameField[pos.X, pos.Y];
         }
 
-        public SM.VisibleArea CurrentVisibleArea =>
-            _gameState.GetPlayerVisibleArea(_gameState.Players.ToList<SM.Player>()[_currentPlayer]);
-
+        private int _currentPlayer = 0;
         public Player CurrentPlayer => Players[_currentPlayer];
 
         public int PlayersCount => _gameState.Players.Count;
 
         public List<Player> Players = new List<Player>();
-        private int _currentPlayer = 0;
+
+        public bool MakeTurn(PlayerAction playerAction)
+        {
+            var pos = CurrentPlayer.Position;
+
+            Vector2Int shift = GameUtils.ActionToVector2(playerAction);
+            pos.X += shift.x;
+            pos.Y += shift.y;
+
+            CurrentPlayer.Position = pos;
+
+            return true;
+        }
 
         public Game()
         {
@@ -56,11 +74,6 @@ namespace TreasureHunters
         public event GameEvent OnEndTurn;
         public event GameEvent OnPlayerClicked;
 
-        public bool IsCellVisible(int col, int row)
-        {
-            return Math.Abs(CurrentPlayer.Position.X - col) <= 1 && Math.Abs(CurrentPlayer.Position.Y - row) <= 1;
-        }
-
         public void EndTurn()
         {
             OnEndTurn?.Invoke();
@@ -80,6 +93,5 @@ namespace TreasureHunters
         {
             OnPlayerClicked?.Invoke();
         }
-
     }
 }
