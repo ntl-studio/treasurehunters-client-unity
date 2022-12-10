@@ -6,17 +6,6 @@ using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
 {
-    public enum PlayerAction
-    {
-        MoveRight,
-        MoveDown,
-        MoveLeft,
-        MoveUp,
-        SkipTurn,
-        ThrowGrenade,
-        FireGun,
-        None
-    }
     public class Game
     {
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
@@ -32,24 +21,15 @@ namespace TreasureHunters
             return _gameState.GameField[pos.X, pos.Y];
         }
 
-        private int _currentPlayer = 0;
-        public Player CurrentPlayer => Players[_currentPlayer];
+        public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
 
         public int PlayersCount => _gameState.Players.Count;
 
-        public List<Player> Players = new List<Player>();
+        public List<Player> Players = new();
 
-        public bool MakeTurn(PlayerAction playerAction)
+        public bool MakeTurn(SM.PlayerAction playerAction)
         {
-            var pos = CurrentPlayer.Position;
-
-            Vector2Int shift = GameUtils.ActionToVector2(playerAction);
-            pos.X += shift.x;
-            pos.Y += shift.y;
-
-            CurrentPlayer.Position = pos;
-
-            return true;
+            return _gameState.PerformAction(playerAction);
         }
 
         public Game()
@@ -81,11 +61,7 @@ namespace TreasureHunters
 
         public void StartNextTurn()
         {
-            _currentPlayer++;
-
-            if (_currentPlayer >= _gameState.Players.Count)
-                _currentPlayer = 0;
-
+            _gameState.EndTurn();
             OnStartTurn?.Invoke();
         }
 

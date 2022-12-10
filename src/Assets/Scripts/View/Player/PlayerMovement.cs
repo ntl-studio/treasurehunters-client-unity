@@ -1,7 +1,9 @@
+using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
 using VContainer;
+using Position = TreasureHunters.Position;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -96,21 +98,16 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
             playerAction = PlayerAction.MoveDown;
 
-        var board = _game.CurrentBoard;
-        var pos = _game.CurrentPlayer.Position;
-
-
         if (playerAction != PlayerAction.None)
         {
-            Vector2Int shift = GameUtils.ActionToVector2(playerAction);
-
-            _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
-
-            _direction = (_destination - transform.position).normalized;
-            _isMoving = true;
-
             if (_game.MakeTurn(playerAction))
             {
+                Vector2Int shift = GameUtils.ActionToVector2(playerAction);
+
+                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
+
+                _direction = (_destination - transform.position).normalized;
+                _isMoving = true;
                 GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
             }
         }

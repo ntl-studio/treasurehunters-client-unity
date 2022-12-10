@@ -127,12 +127,12 @@ public class BoardView : MonoBehaviour
                 _wallCells[row][col].SetRightWallVisible(false);
                 _wallCells[row][col].SetTopWallVisible(false);
 
-                _wallCells[row][col].SetBottomWallVisible(cell.HasFlag(FieldCell.TopWall));
+                _wallCells[row][col].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
                 _wallCells[row][col].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
 
                 if (row == Game.FieldHeight - 1)
                 {
-                    _wallCells[row][col].SetTopWallVisible(cell.HasFlag(FieldCell.BottomWall));
+                    _wallCells[row][col].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
                 }
                 
                 if (col == Game.FieldWidth - 1)
