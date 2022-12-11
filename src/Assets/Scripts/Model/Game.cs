@@ -8,6 +8,13 @@ namespace TreasureHunters
 {
     public class Game
     {
+        private static Game _instance;
+
+        public static Game Instance()
+        {
+            return _instance ??= new Game();
+        }
+
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
 
         public const int FieldWidth = SM.GameField.FieldWidth;
@@ -23,6 +30,19 @@ namespace TreasureHunters
 
         public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
 
+        public List<SM.PlayerMoveState> CurrentPlayerMoveStates =>
+            _gameState.Players[_gameState.CurrentPlayerIndex].PlayerMoveStates;
+
+        public Position PlayerPosition(int playerIndex)
+        {
+            var pos = _gameState.Players[playerIndex].Position;
+            return new Position(pos.X, pos.Y);
+        }
+        public string PlayerName(int playerIndex)
+        {
+            return _gameState.Players[playerIndex].Name;
+        }
+
         public int PlayersCount => _gameState.Players.Count;
 
         public List<Player> Players = new();
@@ -32,14 +52,15 @@ namespace TreasureHunters
             return _gameState.PerformAction(playerAction);
         }
 
-        public Game()
+        private Game()
         {
             _gameState.RegisterPlayer("Player 1");
             _gameState.RegisterPlayer("Player 2");
 
+            int index = 0;
             foreach (var p in _gameState.Players)
             {
-                Players.Add(new Player(p));
+                Players.Add(new Player(this, index++));
             }
 
             Players[0].Color = UnityEngine.Color.yellow;

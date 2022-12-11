@@ -1,14 +1,12 @@
 using TMPro;
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
 
 public class PlayerName : MonoBehaviour
 {
     private TextMeshProUGUI PlayerNameText;
 
-    [Inject] void InjectGame(Game game) { _game = game; }
-    private Game _game;
+    private static Game _game => Game.Instance();
 
     void Start()
     {

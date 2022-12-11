@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using TMPro;
-using TreasureHunters;
 using UnityEngine;
+
+using SM = NtlStudio.TreasureHunters.Model;
 
 public class ActionsListView : MonoBehaviour
 {
@@ -14,6 +15,18 @@ public class ActionsListView : MonoBehaviour
         Debug.Assert(ActionStateViewPrefab);
         Debug.Assert(ActionsParent);
         Debug.Assert(PlayerNameText);
+
+        var pos = transform.position;
+        for (int i = 0; i < SM.GameState.ActionsHistorySize; ++i)
+        {
+            var actionStateViewObj = Instantiate(ActionStateViewPrefab, transform, false);
+            actionStateViewObj.SetActive(false);
+
+            pos.x += 130;
+            actionStateViewObj.transform.position = pos;
+
+            _actionsList.Add(actionStateViewObj);
+        }
     }
 
     public void SetPlayerName(string playerName)
@@ -24,27 +37,15 @@ public class ActionsListView : MonoBehaviour
     private Vector3 _lastActionPosition;
     private readonly List<GameObject> _actionsList = new();
 
-    public void AddPlayerActionState(PlayerActionState playerStater)
+    public void UpdatePlayerActionStates(List<SM.PlayerMoveState> playerStates)
     {
-        var actionStateViewObj = Instantiate(ActionStateViewPrefab, transform, false);
-
-        var actionView = actionStateViewObj.GetComponent<PlayerActionStateView>();
-        Debug.Assert(actionView);
-        actionView.SetWallsVisibility(playerStater);
-
-        if (_actionsList.Count > 3)
+        for (int i = 0; i < playerStates.Count; ++i)
         {
-            Destroy(_actionsList[0]);
-            _actionsList.RemoveAt(0);
-        }
+            _actionsList[i].SetActive(true);
 
-        foreach (var action in _actionsList)
-        {
-            var pos = action.transform.position;
-            pos.x += 130;
-            action.transform.position = pos;
+            var stateVisibility = _actionsList[i].GetComponent<PlayerActionStateView>();
+            Debug.Assert(stateVisibility);
+            stateVisibility.SetWallsVisibility(playerStates[i]);
         }
-
-        _actionsList.Add(actionStateViewObj);
     }
 }

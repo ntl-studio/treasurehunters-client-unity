@@ -2,6 +2,8 @@ using TreasureHunters;
 using UnityEngine;
 using UnityEngine.UI;
 
+using SM = NtlStudio.TreasureHunters.Model;
+
 public class PlayerActionStateView : MonoBehaviour
 {
     public Image RightWallImage;
@@ -16,13 +18,13 @@ public class PlayerActionStateView : MonoBehaviour
         Debug.Assert(PlayerDirectionTransform);
     }
 
-    public void SetWallsVisibility(PlayerActionState playerState)
+    public void SetWallsVisibility(SM.PlayerMoveState playerState)
     {
-        RightWallImage.gameObject.SetActive(playerState.IsRightWall);
-        DownWallImage.gameObject.SetActive(playerState.IsDownWall);
-        LeftWallImage.gameObject.SetActive(playerState.IsLeftWall);
-        UpWallImage.gameObject.SetActive(playerState.IsUpWall);
+        RightWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.RightWall));
+        DownWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.BottomWall));
+        LeftWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.LeftWall));
+        UpWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.TopWall));
 
-        GameUtils.UpdateRotation(playerState.MoveDirection, PlayerDirectionTransform);
+        GameUtils.UpdateRotation(playerState.Direction, PlayerDirectionTransform);
     }
 }

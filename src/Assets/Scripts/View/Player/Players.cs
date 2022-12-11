@@ -2,18 +2,12 @@ using System;
 using System.Collections.Generic;
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
-using VContainer.Unity;
 
 public class Players : MonoBehaviour
 {
     public GameObject PlayerPrefab;
 
-    [Inject] void InjectGame(Game game) { _game = game; }
-    private Game _game;
-
-    [Inject] void InjectContainer(IObjectResolver container) { _container = container; }
-    private IObjectResolver _container;
+    private static Game _game => Game.Instance();
 
     private readonly Dictionary<string, GameObject> _playerViews = new();
 
@@ -25,13 +19,16 @@ public class Players : MonoBehaviour
         {
             var player = _game.Players[i];
 
-            var playerObj = _container.Instantiate(PlayerPrefab, transform);
+            var playerObj = Instantiate(PlayerPrefab, transform);
             playerObj.SetActive(false);
 
             var spriteRenderer = playerObj.GetComponent<SpriteRenderer>();
             Debug.Assert(spriteRenderer);
             spriteRenderer.color = player.Color;
 
+            var playerMovement = playerObj.GetComponent<PlayerMovement>();
+            Debug.Assert(playerMovement);
+            playerMovement.Player = player;
 
             _playerViews.Add(player.Name, playerObj);
         }

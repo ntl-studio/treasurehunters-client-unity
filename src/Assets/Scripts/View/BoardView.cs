@@ -27,8 +27,7 @@ public class BoardView : MonoBehaviour
     private readonly List<List<WallView>> _wallCells = new();
     private readonly List<List<CeilingCell>> _ceilingCells = new();
 
-    [Inject] void InjectGame(Game game) { _game = game; }
-    private Game _game;
+    private static Game _game => Game.Instance();
 
     void Start()
     {
