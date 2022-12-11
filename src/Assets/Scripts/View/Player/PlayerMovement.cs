@@ -1,7 +1,9 @@
+using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
 using VContainer;
+using Position = TreasureHunters.Position;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,10 +14,7 @@ public class PlayerMovement : MonoBehaviour
         set
         {
             _game.CurrentPlayer.Position = value;
-            transform.position = new Vector3(
-                (value.X - 1.0f) / 2.0f,
-                (value.Y - 1.0f) / 2.0f
-            );
+            transform.position = new Vector3(value.X, value.Y);
         }
     }
 
@@ -70,8 +69,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isMoving)
             return;
 
-        int shiftX = 0;
-        int shiftY = 0;
+        PlayerAction playerAction = PlayerAction.None;
 
         // left mouse click
         if (Input.GetMouseButtonDown(0))
@@ -82,40 +80,34 @@ public class PlayerMovement : MonoBehaviour
             if (math.abs(clickPos.x - playerPos.x) < 1.5f &&
                 math.abs(clickPos.y - playerPos.y) < 1.5f)
             {
-                shiftX = (int) math.round(clickPos.x - playerPos.x);
-                shiftY = (int) math.round(clickPos.y - playerPos.y);
+                var shiftX = (int) math.round(clickPos.x - playerPos.x);
+                var shiftY = (int) math.round(clickPos.y - playerPos.y);
+
+                if (shiftX > shiftY)
+                    playerAction = shiftX > 0 ? PlayerAction.MoveRight : PlayerAction.MoveLeft;
+                else
+                    playerAction = shiftY > 0 ? PlayerAction.MoveUp: PlayerAction.MoveDown;
             }
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            shiftX = -1;
+            playerAction = PlayerAction.MoveLeft;
         else if (Input.GetKeyDown(KeyCode.UpArrow))
-            shiftY = 1;
+            playerAction = PlayerAction.MoveUp;
         else if (Input.GetKeyDown(KeyCode.RightArrow))
-            shiftX = 1;
+            playerAction = PlayerAction.MoveRight;
         else if (Input.GetKeyDown(KeyCode.DownArrow))
-            shiftY = -1;
+            playerAction = PlayerAction.MoveDown;
 
-        var board = _game.CurrentBoard;
-        var pos = _game.CurrentPlayer.Position;
-
-        if (shiftY != 0 || shiftX != 0)
+        if (playerAction != PlayerAction.None)
         {
-            if ((0 == shiftX && 1 == math.abs(shiftY)) ||
-                 (1 == math.abs(shiftX) && 0 == shiftY))
+            if (_game.MakeTurn(playerAction))
             {
-                _destination = new Vector3(
-                    transform.position.x + shiftX,
-                    transform.position.y + shiftY,
-                    0);
+                Vector2Int shift = GameUtils.ActionToVector2(playerAction);
+
+                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
 
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
-
-                pos.X += 2 * shiftX;
-                pos.Y += 2 * shiftY;
-
-                _game.CurrentPlayer.Position = pos;
-
                 GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
             }
         }

@@ -13,7 +13,9 @@ namespace TreasureHunters
 
         public Player.EMoveDirection MoveDirection;
 
-        public PlayerActionState(Position position, SM.VisibleArea visibleArea, Player.EMoveDirection moveDirection)
+        private SM.FieldCell _cell;
+
+        public PlayerActionState(Position position, SM.FieldCell cell, Player.EMoveDirection moveDirection)
         {
             // TODO respect edge cases, like (x, y) is at the edge of the board
 
@@ -27,9 +29,9 @@ namespace TreasureHunters
             MoveDirection = moveDirection;
         }
 
-        public bool IsRightWall => IsWall(2, 1);
-        public bool IsDownWall => IsWall(1, 0);
-        public bool IsLeftWall => IsWall(0, 1);
-        public bool IsUpWall => IsWall(1, 2);
+        public bool IsRightWall => _cell.HasFlag(SM.FieldCell.RightWall);
+        public bool IsDownWall => _cell.HasFlag(SM.FieldCell.BottomWall);
+        public bool IsLeftWall => _cell.HasFlag(SM.FieldCell.LeftWall);
+        public bool IsUpWall => _cell.HasFlag(SM.FieldCell.TopWall);
     }
 }

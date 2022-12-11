@@ -12,7 +12,10 @@ using SM = NtlStudio.TreasureHunters.Model;
 public class BoardView : MonoBehaviour
 {
     public GameObject _floorPrefab;
+    public Transform _floorParent;
+
     public GameObject _wallPrefab;
+    public Transform _wallsParent;
 
     public GameObject _ceilingPrefab;
     public Transform _ceilingParent;
@@ -20,21 +23,20 @@ public class BoardView : MonoBehaviour
     public GameObject _cellLabelPrefab;
     public Transform _cellLabelsParent;
 
-    private readonly List<List<GameObject>> _gameBoard = new();
-    private readonly List<List<CeilingCell>> _ceilingBoard = new();
+    private readonly List<List<GameObject>> _floorCells = new();
+    private readonly List<List<WallView>> _wallCells = new();
+    private readonly List<List<CeilingCell>> _ceilingCells = new();
 
     [Inject] void InjectGame(Game game) { _game = game; }
     private Game _game;
 
-    void OnEnable()
-    {
-        _game.Init();
-    }
-
     void Start()
     {
         Debug.Assert(_floorPrefab);
+        Debug.Assert(_floorParent);
+
         Debug.Assert(_wallPrefab);
+        Debug.Assert(_wallsParent);
 
         Debug.Assert(_ceilingPrefab);
         Debug.Assert(_ceilingParent);
@@ -54,86 +56,52 @@ public class BoardView : MonoBehaviour
     // all walls are enabled.
     private void GenerateBoardSprites()
     {
-        for (var row = 0; row < GameSettings.BoardRealHeight; ++row)
+        for (var row = 0; row < Game.FieldHeight; ++row)
         {
-            var boardRowList = new List<GameObject>();
+            var floorRowList = new List<GameObject>();
+            var wallsRowList = new List<WallView>();
             var ceilingRowList = new List<CeilingCell>();
 
-            for (int col = 0; col < GameSettings.BoardRealWidth; col++)
+            for (int col = 0; col < Game.FieldWidth; col++)
             {
-                //empty element (not a wall, not a cell)
-                if (col % 2 == 0 && row % 2 == 0)
+                var pos = new Vector3(col, row, 0);
+
+                // creating floor cells
                 {
-                    boardRowList.Add(null);
-                    ceilingRowList.Add(null);
+                    var floorCell = Instantiate(_floorPrefab, pos, new Quaternion(), _floorParent);
+                    floorCell.name = row + " " + col + " floor";
+                    floorRowList.Add(floorCell);
                 }
-                // creating cells
-                else if (col % 2 == 1 && row % 2 == 1)
-                //else if (Board.IsWallCell(row, col))
-                {
-                    var pos = new Vector3(
-                        ((float)col - 1) / 2,
-                        ((float)row - 1) / 2,
-                        0);
 
-                    // creating floor cells
-                    {
-                        var floorCell = Instantiate(_floorPrefab, pos, new Quaternion(), transform);
-                        floorCell.name = row + " " + col + " cell";
-                        boardRowList.Add(floorCell);
-                    }
-
-                    // creating ceiling
-                    {
-                        var ceilingCell = Instantiate(_ceilingPrefab, pos, new Quaternion(), _ceilingParent);
-                        ceilingCell.name = row + " " + col + " ceiling";
-                        ceilingRowList.Add(ceilingCell.GetComponent<CeilingCell>());
-                    }
-
-                    // create debug labels
-                    {
-                        var cellLabel = Instantiate(_cellLabelPrefab, pos, new Quaternion(), _cellLabelsParent);
-                        cellLabel.name = row + " " + col + " label";
-                        cellLabel.GetComponent<CellLabel>().UpdateCellLabel(new Vector2Int(row / 2, col / 2));
-                    }
-                }
                 // creating walls
-                else if (BoardView.IsWallCell(row, col))
                 {
-                    var pos = new Vector3(
-                        ((float)col - 1) / 2,
-                        ((float)row - 1) / 2,
-                        0);
+                    var wallCell = Instantiate(_wallPrefab, pos, new Quaternion(), _wallsParent);
+                    wallCell.name = row + " " + col + " wall";
 
-                    var rot = new Quaternion().normalized;
+                    var wallView = wallCell.GetComponent<WallView>();
+                    Debug.Assert(wallView);
 
-                    string nameSuffix = " vertical";
-
-                    if (row % 2 == 0)
-                    {
-                        rot *= Quaternion.Euler(0, 0, 270);
-                        pos.x -= 0.5f;
-                        nameSuffix = " horizontal";
-                    }
-                    else
-                    {
-                        pos.y -= 0.5f;
-                    }
-
-                    var newObject = Instantiate(_wallPrefab, pos, rot, transform);
-                    newObject.name = row + " " + col + " wall" + nameSuffix;
-                    boardRowList.Add(newObject);
-
-                    ceilingRowList.Add(null);
+                    wallsRowList.Add(wallView);
                 }
-                else
+
+                // creating ceiling
                 {
-                    throw new Exception($"Invalid board col ${col} and row ${row} values");
+                    var ceilingCell = Instantiate(_ceilingPrefab, pos, new Quaternion(), _ceilingParent);
+                    ceilingCell.name = row + " " + col + " ceiling";
+                    ceilingRowList.Add(ceilingCell.GetComponent<CeilingCell>());
+                }
+
+                // create debug labels
+                {
+                    var cellLabel = Instantiate(_cellLabelPrefab, pos, new Quaternion(), _cellLabelsParent);
+                    cellLabel.name = row + " " + col + " label";
+                    cellLabel.GetComponent<CellLabel>().UpdateCellLabel(new Vector2Int(row, col));
                 }
             }
 
-            _gameBoard.Add(boardRowList);
-            _ceilingBoard.Add(ceilingRowList);
+            _floorCells.Add(floorRowList);
+            _wallCells.Add(wallsRowList);
+            _ceilingCells.Add(ceilingRowList);
         }
     }
 
@@ -145,70 +113,34 @@ public class BoardView : MonoBehaviour
     {
         var board = _game.CurrentBoard;
 
-        for (int row = 0; row < GameSettings.BoardRealWidth; ++row)
+        for (int row = 0; row < Game.FieldHeight; ++row)
         {
-            for (int col = 0; col < GameSettings.BoardRealWidth; ++col)
+            for (int col = 0; col < Game.FieldWidth; ++col)
             {
-                if (!BoardView.IsValidCell(col, row))
-                    continue;
+                // TODO: fix the distance function 
+                _ceilingCells[row][col].State = CeilingState.Visible;
 
-                if (BoardView.IsFloorCell(row, col))
+                SM.FieldCell cell = _game.CurrentBoard[col, row];
+
+                _wallCells[row][col].SetLeftWallVisible(false);
+                _wallCells[row][col].SetBottomWallVisible(false);
+                _wallCells[row][col].SetRightWallVisible(false);
+                _wallCells[row][col].SetTopWallVisible(false);
+
+                _wallCells[row][col].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
+                _wallCells[row][col].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
+
+                if (row == Game.FieldHeight - 1)
                 {
-                    _ceilingBoard[col][row].State = CeilingState.Visible;
-
-                    // TODO: fix the distance function 
-                    // _game.IsCellVisible(row, col) ? 
-                    //     CeilingState.Visible : CeilingState.Hidden;
+                    _wallCells[row][col].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
                 }
-
-                if (BoardView.IsWallCell(row, col))
+                
+                if (col == Game.FieldWidth - 1)
                 {
-                    // Convert wall position from View to the Model Up/Down/Left/Right wall
-                    int serverRow = (row - 1) / 2;
-                    int serverCol = (col - 1) / 2;
-
-                    SM.FieldCell cell = _game.CurrentBoard[serverCol, serverRow];
-
-                    // if this is row wall (horizontal)
-                    if (row % 2 == 0)
-                    {
-                        if (!cell.HasFlag(FieldCell.TopWall))
-                        {
-                            _gameBoard[col][row].SetActive(false);
-                        }
-                    }
-
-                    // if this is col wall (vertical)
-                    if (col % 2 == 0)
-                    {
-                        if (!cell.HasFlag(FieldCell.LeftWall))
-                        {
-                            _gameBoard[col][row].SetActive(false);
-                        }
-                    }
-
-                    // Debug.Log($"Client ({row}, {col}, server ({serverRow}, {serverCol}");
-
-                    // _gameBoard[col][row].SetActive(board.IsWall(row / 2, col / 2));
+                    _wallCells[row][col].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
                 }
             }
         }
-    }
-
-    public static bool IsValidCell(int x, int y)
-    {
-        return !(x % 2 == 0 && y % 2 == 0);
-    }
-
-    public static bool IsFloorCell(int x, int y)
-    {
-        return (x % 2 == 1 && y % 2 == 1);
-    }
-
-    public static bool IsWallCell(int x, int y)
-    {
-        return (x % 2 == 0 && y % 2 == 1) ||
-               (x % 2 == 1 && y % 2 == 0);
     }
 
     void UpdateFogOfWar(Position position, Position previousPosition)
@@ -224,13 +156,13 @@ public class BoardView : MonoBehaviour
         {
             if (previousPosition.X - 2 >= 0)
             {
-                _ceilingBoard[previousPosition.Y][previousPosition.X - 2].EnableFogIfVisible();
+                _ceilingCells[previousPosition.Y][previousPosition.X - 2].EnableFogIfVisible();
 
                 if (previousPosition.Y - 2 >= 0)
-                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
 
                 if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
-                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
             }
         }
 
@@ -239,13 +171,13 @@ public class BoardView : MonoBehaviour
         {
             if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
             {
-                _ceilingBoard[previousPosition.Y][previousPosition.X + 2].EnableFogIfVisible();
+                _ceilingCells[previousPosition.Y][previousPosition.X + 2].EnableFogIfVisible();
 
                 if (previousPosition.Y - 2 >= 0)
-                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
 
                 if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
-                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
 
@@ -254,13 +186,13 @@ public class BoardView : MonoBehaviour
         {
             if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
             {
-                _ceilingBoard[previousPosition.Y + 2][previousPosition.X].EnableFogIfVisible();
+                _ceilingCells[previousPosition.Y + 2][previousPosition.X].EnableFogIfVisible();
 
                 if (previousPosition.X - 2 >= 0)
-                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
 
                 if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
-                    _ceilingBoard[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
 
@@ -269,13 +201,13 @@ public class BoardView : MonoBehaviour
         {
             if (previousPosition.Y - 2 > 0)
             {
-                _ceilingBoard[previousPosition.Y - 2][previousPosition.X].EnableFogIfVisible();
+                _ceilingCells[previousPosition.Y - 2][previousPosition.X].EnableFogIfVisible();
 
                 if (previousPosition.X - 2 >= 0)
-                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
 
                 if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
-                    _ceilingBoard[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
+                    _ceilingCells[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
     }

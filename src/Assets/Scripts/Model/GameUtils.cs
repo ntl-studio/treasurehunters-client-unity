@@ -1,11 +1,40 @@
 using System;
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Model;
 using UnityEngine;
 
 namespace TreasureHunters
 {
     public static class GameUtils
     {
+        public static Vector2Int ActionToVector2(PlayerAction action)
+        {
+            var result = new Vector2Int(0, 0);
+
+            switch (action)
+            {
+                case PlayerAction.MoveRight:
+                    result.x += 1;
+                    break;
+                case PlayerAction.MoveDown:
+                    result.y -= 1;
+                    break;
+                case PlayerAction.MoveLeft:
+                    result.x -= 1;
+                    break;
+                case PlayerAction.MoveUp:
+                    result.y += 1;
+                    break;
+                case PlayerAction.SkipTurn:
+                    break;
+                case PlayerAction.ThrowGrenade:
+                case PlayerAction.FireGun:
+                    throw new Exception("Action not supported");
+            }
+
+            return result;
+        }
+
         public static IList<string> ReadLevelFromTextFile(string levelText)
         {
             var rawLines = new List<string>();
@@ -29,23 +58,6 @@ namespace TreasureHunters
             cleanLines.Reverse();
 
             return cleanLines;
-        }
-
-        public static Position FindPlayerPosition(Board board)
-        {
-            for (var row = 0; row < board.RealWidth; ++row)
-            {
-                for (var col = 0; col < board.RealHeight; ++col)
-                {
-                    if (board.IsPlayer(col, row))
-                    {
-                        return new Position(col, row);
-                    }
-                }
-            }
-
-            Debug.Assert(false, "Did not find player position on the board");
-            return new Position(-1, -1);
         }
 
         public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)

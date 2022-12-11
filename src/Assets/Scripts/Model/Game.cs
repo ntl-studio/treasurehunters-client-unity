@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
 using UnityEngine;
 
 using SM = NtlStudio.TreasureHunters.Model;
@@ -12,28 +10,40 @@ namespace TreasureHunters
     {
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
 
+        public const int FieldWidth = SM.GameField.FieldWidth;
+        public const int FieldHeight = SM.GameField.FieldHeight;
+
         public SM.GameField CurrentBoard => _gameState.GameField;
 
-        public SM.VisibleArea CurrentVisibleArea =>
-            _gameState.GetPlayerVisibleArea(_gameState.Players.ToList<SM.Player>()[_currentPlayer]);
+        public SM.FieldCell CurrentPlayerFieldCell()
+        {
+            var pos = CurrentPlayer.Position;
+            return _gameState.GameField[pos.X, pos.Y];
+        }
 
-        public Player CurrentPlayer => Players[_currentPlayer];
+        public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
 
         public int PlayersCount => _gameState.Players.Count;
 
-        public List<Player> Players = new List<Player>();
-        private int _currentPlayer = 0;
+        public List<Player> Players = new();
 
-        public void Init()
+        public bool MakeTurn(SM.PlayerAction playerAction)
+        {
+            return _gameState.PerformAction(playerAction);
+        }
+
+        public Game()
         {
             _gameState.RegisterPlayer("Player 1");
             _gameState.RegisterPlayer("Player 2");
-
 
             foreach (var p in _gameState.Players)
             {
                 Players.Add(new Player(p));
             }
+
+            Players[0].Color = UnityEngine.Color.yellow;
+            Players[1].Color = UnityEngine.Color.blue;
 
             Debug.Log("Game initialized successfully");
         }
@@ -44,11 +54,6 @@ namespace TreasureHunters
         public event GameEvent OnEndTurn;
         public event GameEvent OnPlayerClicked;
 
-        public bool IsCellVisible(int col, int row)
-        {
-            return Math.Abs(CurrentPlayer.Position.X - col) <= 1 && Math.Abs(CurrentPlayer.Position.Y - row) <= 1;
-        }
-
         public void EndTurn()
         {
             OnEndTurn?.Invoke();
@@ -56,11 +61,7 @@ namespace TreasureHunters
 
         public void StartNextTurn()
         {
-            _currentPlayer++;
-
-            if (_currentPlayer >= _gameState.Players.Count)
-                _currentPlayer = 0;
-
+            _gameState.EndTurn();
             OnStartTurn?.Invoke();
         }
 
@@ -68,6 +69,5 @@ namespace TreasureHunters
         {
             OnPlayerClicked?.Invoke();
         }
-
     }
 }
