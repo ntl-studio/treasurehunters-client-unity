@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using NtlStudio.TreasureHunters.Model;
 using UnityEngine;
 
+using SM = NtlStudio.TreasureHunters.Model;
+
 namespace TreasureHunters
 {
     public static class GameUtils
@@ -60,21 +62,21 @@ namespace TreasureHunters
             return cleanLines;
         }
 
-        public static void UpdateRotation(Player.EMoveDirection moveDirection, Transform transform)
+        public static void UpdateRotation(SM.MoveDirection moveDirection, Transform transform)
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
             switch (moveDirection)
             {
-                case Player.EMoveDirection.Right:
+                case MoveDirection.Right:
                     transform.rotation = Quaternion.Euler(0, 0, -90);
                     break;
-                case Player.EMoveDirection.Down:
+                case MoveDirection.Down:
                     transform.rotation = Quaternion.Euler(0, 0, 180);
                     break;
-                case Player.EMoveDirection.Left:
+                case MoveDirection.Left:
                     transform.rotation = Quaternion.Euler(0, 0, 90);
                     break;
-                case Player.EMoveDirection.Up:
+                case MoveDirection.Up:
                     break;
             }
         }

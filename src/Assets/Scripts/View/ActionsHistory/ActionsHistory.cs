@@ -3,14 +3,15 @@ using TreasureHunters;
 using UnityEngine;
 using VContainer;
 
+using SM = NtlStudio.TreasureHunters.Model;
+
 public class ActionsHistory : MonoBehaviour
 {
     public GameObject ActionsListViewPrefab; 
 
     private readonly Dictionary<string, ActionsListView> _actionViews= new();
 
-    [Inject] void InjectGame(Game game) { _game = game; }
-    private Game _game;
+    private static Game _game => Game.Instance();
 
     void Start()
     {
@@ -19,10 +20,7 @@ public class ActionsHistory : MonoBehaviour
         _game.OnEndTurn += () =>
         {
             var player = _game.CurrentPlayer;
-            var playerState = new PlayerActionState(
-                player.PrevPosition, _game.CurrentPlayerFieldCell(), player.MoveDirection);
-
-            AddActionState(player.Name, playerState);
+            UpdateStates(player.Name, _game.CurrentPlayerMoveStates);
         };
 
         Vector3 lastListPosition = transform.position;
@@ -42,12 +40,12 @@ public class ActionsHistory : MonoBehaviour
         }
     }
 
-    void AddActionState(string playerName, PlayerActionState actionState)
+    void UpdateStates(string playerName, List<SM.PlayerMoveState> actionStates)
     {
         if (_actionViews.ContainsKey(playerName))
         {
             var actionsView = _actionViews[playerName];
-            actionsView.AddPlayerActionState(actionState);
+            actionsView.UpdatePlayerActionStates(actionStates);
         }
         else
             Debug.Assert(false, $"Could not find a player {playerName}");

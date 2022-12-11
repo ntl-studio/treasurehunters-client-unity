@@ -2,31 +2,25 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
-using VContainer;
-using Position = TreasureHunters.Position;
+using Player = TreasureHunters.Player;
+
+using SM = NtlStudio.TreasureHunters.Model;
 
 public class PlayerMovement : MonoBehaviour
 {
     public bool AcceptInput = false;
-
-    public Position BoardPosition
-    {
-        set
-        {
-            _game.CurrentPlayer.Position = value;
-            transform.position = new Vector3(value.X, value.Y);
-        }
-    }
+    public Player Player;
 
     private bool _isMoving = false;
     private Vector3 _destination;
     private Vector3 _direction;
 
-    [Inject] void InjectGame(Game game) { _game = game; }
-    private Game _game;
+    private static Game _game => Game.Instance();
     
     void Start()
     {
+        Debug.Assert(Player != null);
+
         UpdateView();
     }
 
@@ -51,7 +45,6 @@ public class PlayerMovement : MonoBehaviour
                 _isMoving = false;
                 transform.position = _destination;
 
-
                 // tell them game we finished the move when animation finished playing
                 _game.EndTurn(); 
             }
@@ -60,8 +53,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateView()
     {
-        BoardPosition = _game.CurrentPlayer.Position;
-        GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
+        transform.position = new Vector3(Player.Position.X, Player.Position.Y);
+
+        var states = _game.CurrentPlayerMoveStates;
+        GameUtils.UpdateRotation(
+            states.Count > 0 ? states[0].Direction : SM.MoveDirection.None,
+            transform);
     }
 
     private void MovePlayer()
@@ -108,7 +105,11 @@ public class PlayerMovement : MonoBehaviour
 
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
-                GameUtils.UpdateRotation(_game.CurrentPlayer.MoveDirection, transform);
+                GameUtils.UpdateRotation(_game.CurrentPlayerMoveStates[0].Direction, transform);
+            }
+            else
+            {
+                Debug.Log("Could not move player");
             }
         }
     }
