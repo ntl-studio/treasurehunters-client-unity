@@ -132,25 +132,12 @@ public class BoardView : MonoBehaviour
 
                 if (!addFog)
                 {
-                    _wallCells[fieldY][fieldX].SetLeftWallVisible(false);
-                    _wallCells[fieldY][fieldX].SetBottomWallVisible(false);
-                    _wallCells[fieldY][fieldX].SetRightWallVisible(false);
-                    _wallCells[fieldY][fieldX].SetTopWallVisible(false);
-
                     FieldCell cell = _game.CurrentBoard[fieldX, fieldY];
 
-                    _wallCells[fieldY][fieldX].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
                     _wallCells[fieldY][fieldX].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
-
-                    if (fieldY == SM.VisibleArea.Height || fieldY == Game.FieldHeight - 1)
-                    {
-                        _wallCells[fieldY][fieldX].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
-                    }
-
-                    if (fieldX == SM.VisibleArea.Width || fieldX == Game.FieldWidth - 1)
-                    {
-                        _wallCells[fieldY][fieldX].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
-                    }
+                    _wallCells[fieldY][fieldX].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
+                    _wallCells[fieldY][fieldX].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
+                    _wallCells[fieldY][fieldX].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
 
                     _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
                 }
