@@ -39,9 +39,11 @@ namespace TreasureHunters
 
         public Position CurrentPlayerPreviousPosition()
         {
-            var pos = CurrentPlayerMoveStates[_gameState.CurrentPlayerIndex].Position;
+            var pos = CurrentPlayerMoveStates[0].Position;
             return new Position(pos.X, pos.Y);
         }
+
+        public int CurrentPlayerId => _gameState.CurrentPlayerIndex;
 
         public VisibleArea CurrentVisibleArea()
         {

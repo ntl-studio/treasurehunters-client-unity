@@ -1,38 +1,26 @@
+using NtlStudio.TreasureHunters.Model;
 using UnityEngine;
 
 public class WallView : MonoBehaviour
 {
-    public GameObject _rightWall;
-    public GameObject _bottomWall;
-    public GameObject _leftWall;
-    public GameObject _topWall;
+    public GameObject RightWall;
+    public GameObject BottomWall;
+    public GameObject LeftWall;
+    public GameObject TopWall;
 
     void Start()
     {
-        Debug.Assert(_rightWall);
-        Debug.Assert(_bottomWall);
-        Debug.Assert(_leftWall);
-        Debug.Assert(_topWall);
-
+        Debug.Assert(RightWall);
+        Debug.Assert(BottomWall);
+        Debug.Assert(LeftWall);
+        Debug.Assert(TopWall);
     }
 
-    public void SetRightWallVisible(bool isVisible)
+    public void SetWallsVisibility(FieldCell cell)
     {
-        _rightWall.SetActive(isVisible);
-    }
-
-    public void SetBottomWallVisible(bool isVisible)
-    {
-        _bottomWall.SetActive(isVisible);
-    }
-
-    public void SetLeftWallVisible(bool isVisible)
-    {
-        _leftWall.SetActive(isVisible);
-    }
-
-    public void SetTopWallVisible(bool isVisible)
-    {
-        _topWall.SetActive(isVisible);
+        LeftWall.SetActive(cell.HasFlag(FieldCell.LeftWall));
+        BottomWall.SetActive(cell.HasFlag(FieldCell.BottomWall));
+        RightWall.SetActive(cell.HasFlag(FieldCell.RightWall));
+        TopWall.SetActive(cell.HasFlag(FieldCell.TopWall));
     }
 }

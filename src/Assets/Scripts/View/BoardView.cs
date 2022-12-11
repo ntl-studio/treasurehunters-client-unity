@@ -9,6 +9,24 @@ using Debug = UnityEngine.Debug;
 using Position = TreasureHunters.Position;
 using SM = NtlStudio.TreasureHunters.Model;
 
+class PlayerBoardView
+{
+    public FieldCell[,] Board = new FieldCell[SM.GameField.FieldWidth, SM.GameField.FieldHeight];
+    public bool[,] Visited = new bool[SM.GameField.FieldWidth, SM.GameField.FieldHeight];
+
+    public PlayerBoardView()
+    {
+        for (int x = 0; x < SM.GameField.FieldWidth; ++x)
+        {
+            for (int y = 0; y < SM.GameField.FieldHeight; ++y)
+            {
+                Board[x, y] = FieldCell.Empty;
+                Visited[x, y] = false;
+            }
+        }
+    }
+}
+
 public class BoardView : MonoBehaviour
 {
     public GameObject _floorPrefab;
@@ -22,6 +40,8 @@ public class BoardView : MonoBehaviour
 
     public GameObject _cellLabelPrefab;
     public Transform _cellLabelsParent;
+
+    private List<PlayerBoardView> _playerBoards = new();
 
     private readonly List<List<GameObject>> _floorCells = new();
     private readonly List<List<WallView>> _wallCells = new();
@@ -43,16 +63,25 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelPrefab);
         Debug.Assert(_cellLabelsParent);
 
+        for (int i = 0; i < _game.PlayersCount; ++i)
+        {
+            _playerBoards.Add(new PlayerBoardView());
+        }
+
         GenerateBoardSprites();
 
-        _game.OnStartTurn += () => UpdateBoard();
+        _game.OnStartTurn += () =>
+        {
+            UpdateFullBoard();
+            UpdatePlayerVisibility();
+        };
         _game.OnEndTurn += () =>
         {
-            UpdateBoard(true);
-            UpdateBoard(false);
+            UpdatePlayerVisibility(true);
+            UpdatePlayerVisibility(false);
         };
 
-        UpdateBoard();
+        UpdatePlayerVisibility();
     }
 
     // Initializes all board sprites (floor tiles, walls, etc). By default the board will look like 
@@ -84,10 +113,7 @@ public class BoardView : MonoBehaviour
                     var wallView = wallCell.GetComponent<WallView>();
                     Debug.Assert(wallView);
 
-                    wallView.SetLeftWallVisible(false);
-                    wallView.SetBottomWallVisible(false);
-                    wallView.SetRightWallVisible(false);
-                    wallView.SetTopWallVisible(false);
+                    wallView.SetWallsVisibility(FieldCell.Empty);
 
                     wallsRowList.Add(wallView);
                 }
@@ -113,16 +139,38 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    public void UpdateBoard(bool addFog = false)
+    public void UpdateFullBoard()
+    {
+        int playerId = _game.CurrentPlayerId;
+
+        for (int x = 0; x < SM.GameField.FieldWidth; ++x)
+        {
+            for (int y = 0; y < SM.GameField.FieldHeight; ++y)
+            {
+                if (_playerBoards[playerId].Visited[x, y])
+                {
+                    FieldCell cell = _playerBoards[playerId].Board[x, y];
+                    _wallCells[y][x].SetWallsVisibility(cell);
+                    _ceilingCells[y][x].State = CeilingState.Fog;
+                }
+                else
+                {
+                    _ceilingCells[y][x].State = CeilingState.Hidden;
+                }
+            }
+        }
+    }
+
+    public void UpdatePlayerVisibility(bool addFog = false)
     {
         var position = addFog ? _game.CurrentPlayerPreviousPosition() : _game.CurrentPlayer.Position;
 
-        for (int row = 0; row < SM.VisibleArea.Width; ++row)
+        for (int x = 0; x < SM.VisibleArea.Width; ++x)
         {
-            for (int col = 0; col < SM.VisibleArea.Height; ++col)
+            for (int y = 0; y < SM.VisibleArea.Height; ++y)
             {
-                var fieldX = col + position.X - 1;
-                var fieldY = row + position.Y - 1;
+                var fieldX = y + position.X - 1;
+                var fieldY = x + position.Y - 1;
 
                 if (fieldX is < 0 or >= SM.GameField.FieldWidth ||
                     fieldY is < 0 or >= SM.GameField.FieldHeight)
@@ -133,13 +181,11 @@ public class BoardView : MonoBehaviour
                 if (!addFog)
                 {
                     FieldCell cell = _game.CurrentBoard[fieldX, fieldY];
-
-                    _wallCells[fieldY][fieldX].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
-                    _wallCells[fieldY][fieldX].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
-                    _wallCells[fieldY][fieldX].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
-                    _wallCells[fieldY][fieldX].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
-
+                    _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
                     _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
+
+                    _playerBoards[_game.CurrentPlayerId].Board[fieldX, fieldY] = cell;
+                    _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
                 }
                 else
                 {

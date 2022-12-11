@@ -48,10 +48,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30f294b116bde2c458316ea0017a1b1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rightWall: {fileID: 8824627552067730124}
-  _bottomWall: {fileID: 7766703031289510578}
-  _leftWall: {fileID: 7839917263989086732}
-  _topWall: {fileID: 6752163832774038207}
+  RightWall: {fileID: 8824627552067730124}
+  BottomWall: {fileID: 7766703031289510578}
+  LeftWall: {fileID: 7839917263989086732}
+  TopWall: {fileID: 6752163832774038207}
 --- !u!1 &6752163832774038207
 GameObject:
   m_ObjectHideFlags: 0
