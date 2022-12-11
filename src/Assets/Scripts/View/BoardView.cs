@@ -45,8 +45,12 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnStartTurn += UpdateBoard;
-        _game.OnEndTurn += UpdateBoard;
+        _game.OnStartTurn += () => UpdateBoard();
+        _game.OnEndTurn += () =>
+        {
+            UpdateBoard(true);
+            UpdateBoard(false);
+        };
 
         UpdateBoard();
     }
@@ -80,6 +84,11 @@ public class BoardView : MonoBehaviour
                     var wallView = wallCell.GetComponent<WallView>();
                     Debug.Assert(wallView);
 
+                    wallView.SetLeftWallVisible(false);
+                    wallView.SetBottomWallVisible(false);
+                    wallView.SetRightWallVisible(false);
+                    wallView.SetTopWallVisible(false);
+
                     wallsRowList.Add(wallView);
                 }
 
@@ -104,39 +113,50 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    // Go through the Board (that is associated with the player session) and update sprites visibility:
-    // 1) Walls on/off
-    // 2) Fog of war
-    // 3) Objects like grenades, treasure, etc
-    public void UpdateBoard()
+    public void UpdateBoard(bool addFog = false)
     {
-        var board = _game.CurrentBoard;
+        var position = addFog ? _game.CurrentPlayerPreviousPosition() : _game.CurrentPlayer.Position;
 
-        for (int row = 0; row < Game.FieldHeight; ++row)
+        for (int row = 0; row < SM.VisibleArea.Width; ++row)
         {
-            for (int col = 0; col < Game.FieldWidth; ++col)
+            for (int col = 0; col < SM.VisibleArea.Height; ++col)
             {
-                // TODO: fix the distance function 
-                _ceilingCells[row][col].State = CeilingState.Visible;
+                var fieldX = col + position.X - 1;
+                var fieldY = row + position.Y - 1;
 
-                SM.FieldCell cell = _game.CurrentBoard[col, row];
-
-                _wallCells[row][col].SetLeftWallVisible(false);
-                _wallCells[row][col].SetBottomWallVisible(false);
-                _wallCells[row][col].SetRightWallVisible(false);
-                _wallCells[row][col].SetTopWallVisible(false);
-
-                _wallCells[row][col].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
-                _wallCells[row][col].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
-
-                if (row == Game.FieldHeight - 1)
+                if (fieldX is < 0 or >= SM.GameField.FieldWidth ||
+                    fieldY is < 0 or >= SM.GameField.FieldHeight)
                 {
-                    _wallCells[row][col].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
+                    continue;
                 }
-                
-                if (col == Game.FieldWidth - 1)
+
+                if (!addFog)
                 {
-                    _wallCells[row][col].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
+                    _wallCells[fieldY][fieldX].SetLeftWallVisible(false);
+                    _wallCells[fieldY][fieldX].SetBottomWallVisible(false);
+                    _wallCells[fieldY][fieldX].SetRightWallVisible(false);
+                    _wallCells[fieldY][fieldX].SetTopWallVisible(false);
+
+                    FieldCell cell = _game.CurrentBoard[fieldX, fieldY];
+
+                    _wallCells[fieldY][fieldX].SetBottomWallVisible(cell.HasFlag(FieldCell.BottomWall));
+                    _wallCells[fieldY][fieldX].SetLeftWallVisible(cell.HasFlag(FieldCell.LeftWall));
+
+                    if (fieldY == SM.VisibleArea.Height || fieldY == Game.FieldHeight - 1)
+                    {
+                        _wallCells[fieldY][fieldX].SetTopWallVisible(cell.HasFlag(FieldCell.TopWall));
+                    }
+
+                    if (fieldX == SM.VisibleArea.Width || fieldX == Game.FieldWidth - 1)
+                    {
+                        _wallCells[fieldY][fieldX].SetRightWallVisible(cell.HasFlag(FieldCell.RightWall));
+                    }
+
+                    _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
+                }
+                else
+                {
+                    _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
                 }
             }
         }

@@ -1,3 +1,4 @@
+using NtlStudio.TreasureHunters.Model;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,6 +30,25 @@ namespace TreasureHunters
         }
 
         public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
+
+        public Position CurrentPlayerPosition()
+        {
+            var pos = _gameState.Players[_gameState.CurrentPlayerIndex].Position;
+            return new Position(pos.X, pos.Y);
+        }
+
+        public Position CurrentPlayerPreviousPosition()
+        {
+            var pos = CurrentPlayerMoveStates[_gameState.CurrentPlayerIndex].Position;
+            return new Position(pos.X, pos.Y);
+        }
+
+        public VisibleArea CurrentVisibleArea()
+        {
+            var field = _gameState.GameField;
+            var player = _gameState.Players[_gameState.CurrentPlayerIndex];
+            return field.GetVisibleArea(player.Position);
+        }
 
         public List<SM.PlayerMoveState> CurrentPlayerMoveStates =>
             _gameState.Players[_gameState.CurrentPlayerIndex].PlayerMoveStates;
