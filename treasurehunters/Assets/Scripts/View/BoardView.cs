@@ -77,8 +77,8 @@ public class BoardView : MonoBehaviour
         };
         _game.OnEndTurn += () =>
         {
-            UpdatePlayerVisibility(true);
-            UpdatePlayerVisibility(false);
+            FogVisitedAreas();
+            UpdatePlayerVisibility();
         };
 
         UpdatePlayerVisibility();
@@ -161,16 +161,38 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    public void UpdatePlayerVisibility(bool addFog = false)
+    public void FogVisitedAreas()
     {
-        var position = addFog ? _game.CurrentPlayerPreviousPosition() : _game.CurrentPlayer.Position;
+        var position = _game.CurrentPlayerPreviousPosition();
 
         for (int x = 0; x < SM.VisibleArea.Width; ++x)
         {
             for (int y = 0; y < SM.VisibleArea.Height; ++y)
             {
-                var fieldX = y + position.X - 1;
-                var fieldY = x + position.Y - 1;
+                var fieldX = x + position.X - 1;
+                var fieldY = y + position.Y - 1;
+
+                if (fieldX is >= 0 and < SM.GameField.FieldWidth &&
+                    fieldY is >= 0 and < SM.GameField.FieldHeight)
+                {
+                    if (_playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY])
+                        _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
+                }
+            }
+        }
+    }
+
+    public void UpdatePlayerVisibility()
+    {
+        var position = _game.CurrentPlayer.Position;
+        var visibleArea = _game.CurrentVisibleArea();
+
+        for (int x = 0; x < SM.VisibleArea.Width; ++x)
+        {
+            for (int y = 0; y < SM.VisibleArea.Height; ++y)
+            {
+                var fieldX = x + position.X - 1;
+                var fieldY = y + position.Y - 1;
 
                 if (fieldX is < 0 or >= SM.GameField.FieldWidth ||
                     fieldY is < 0 or >= SM.GameField.FieldHeight)
@@ -178,19 +200,15 @@ public class BoardView : MonoBehaviour
                     continue;
                 }
 
-                if (!addFog)
-                {
-                    FieldCell cell = _game.CurrentBoard[fieldX, fieldY];
-                    _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
-                    _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
+                var cell = visibleArea[x, y];
+                if (cell.HasFlag(FieldCell.Invisible))
+                    continue;
 
-                    _playerBoards[_game.CurrentPlayerId].Board[fieldX, fieldY] = cell;
-                    _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
-                }
-                else
-                {
-                    _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
-                }
+                _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
+                _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
+
+                _playerBoards[_game.CurrentPlayerId].Board[fieldX, fieldY] = cell;
+                _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
             }
         }
     }

@@ -16,6 +16,23 @@ namespace TreasureHunters
             return _instance ??= new Game();
         }
 
+        private Game()
+        {
+            _gameState.RegisterPlayer("Player 1");
+            _gameState.RegisterPlayer("Player 2");
+
+            int index = 0;
+            foreach (var p in _gameState.Players)
+            {
+                Players.Add(new Player(this, index++));
+            }
+
+            Players[0].Color = UnityEngine.Color.yellow;
+            Players[1].Color = UnityEngine.Color.blue;
+
+            Debug.Log("Game initialized successfully");
+        }
+
         private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
 
         public const int FieldWidth = SM.GameField.FieldWidth;
@@ -74,22 +91,6 @@ namespace TreasureHunters
             return _gameState.PerformAction(playerAction);
         }
 
-        private Game()
-        {
-            _gameState.RegisterPlayer("Player 1");
-            _gameState.RegisterPlayer("Player 2");
-
-            int index = 0;
-            foreach (var p in _gameState.Players)
-            {
-                Players.Add(new Player(this, index++));
-            }
-
-            Players[0].Color = UnityEngine.Color.yellow;
-            Players[1].Color = UnityEngine.Color.blue;
-
-            Debug.Log("Game initialized successfully");
-        }
 
         public delegate void GameEvent();
 
