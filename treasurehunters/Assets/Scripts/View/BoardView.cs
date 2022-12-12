@@ -37,6 +37,8 @@ public class BoardView : MonoBehaviour
     public GameObject _cellLabelPrefab;
     public Transform _cellLabelsParent;
 
+    public GameObject _treasure;
+
     private List<PlayerBoardView> _playerBoards = new();
 
     private readonly List<List<GameObject>> _floorCells = new();
@@ -68,13 +70,20 @@ public class BoardView : MonoBehaviour
 
         _game.OnStartTurn += () =>
         {
-            UpdateFullBoard();
+            UpdateBoardAfterPreviousTurn();
             UpdatePlayerVisibility();
         };
         _game.OnEndTurn += () =>
         {
             FogVisitedAreas();
             UpdatePlayerVisibility();
+        };
+
+        _game.OnShowTreasureEvent += (bool isVisible) =>
+        {
+            _treasure.SetActive(isVisible);
+            var pos = _game.TreasurePosition();
+            _treasure.transform.position = new Vector3(pos.X, pos.Y);
         };
 
         UpdatePlayerVisibility();
@@ -92,7 +101,7 @@ public class BoardView : MonoBehaviour
 
             for (int col = 0; col < Game.FieldWidth; col++)
             {
-                var pos = new Vector3(col, row, 0);
+                var pos = new Vector3(col, row);
 
                 // creating floor cells
                 {
@@ -135,7 +144,10 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    public void UpdateFullBoard()
+    // Hides all cells visible to the previous player
+    // Enables all cells visible to the current player, including areas visited before
+    // (covered in fog of war)
+    public void UpdateBoardAfterPreviousTurn()
     {
         int playerId = _game.CurrentPlayerId;
 
@@ -183,6 +195,9 @@ public class BoardView : MonoBehaviour
         var position = _game.CurrentPlayer.Position;
         var visibleArea = _game.CurrentVisibleArea();
 
+        if (!_game.IsTreasureAlwaysVisible)
+            _treasure.SetActive(false);
+
         for (int x = 0; x < SM.VisibleArea.Width; ++x)
         {
             for (int y = 0; y < SM.VisibleArea.Height; ++y)
@@ -199,6 +214,12 @@ public class BoardView : MonoBehaviour
                 var cell = visibleArea[x, y];
                 if (cell.HasFlag(FieldCell.Invisible))
                     continue;
+
+                if (cell.HasFlag(FieldCell.Treasure))
+                {
+                    _treasure.transform.position = new Vector3(fieldX, fieldY, 0);
+                    _treasure.SetActive(true);
+                }    
 
                 _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
                 _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;

@@ -113,5 +113,20 @@ namespace TreasureHunters
         {
             OnPlayerClicked?.Invoke();
         }
+
+        public delegate void ShowTreasureEvent(bool isVisible);
+        public event ShowTreasureEvent OnShowTreasureEvent;
+        public void ShowTreasure(bool isVisible)
+        {
+            IsTreasureAlwaysVisible = isVisible;
+            OnShowTreasureEvent?.Invoke(isVisible);
+        }
+        public bool IsTreasureAlwaysVisible { get; private set; }
+
+        public Position TreasurePosition()
+        {
+            var pos = _gameState.TreasurePosition;
+            return new Position(pos.X, pos.Y);
+        }
     }
 }

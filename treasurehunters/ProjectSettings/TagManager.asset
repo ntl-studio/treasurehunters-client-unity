@@ -50,6 +50,9 @@ TagManager:
   - name: Ceiling
     uniqueID: 1110914381
     locked: 0
+  - name: Items
+    uniqueID: 2441957285
+    locked: 0
   - name: DebugLabels
     uniqueID: 655689773
     locked: 0
