@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
 
@@ -43,14 +44,33 @@ public class Players : MonoBehaviour
     {
         var currentPlayer = _game.CurrentPlayer;
 
+        var visibilityArea = _game.CurrentVisibleArea();
+
         foreach (var player in _game.Players)
         {
+            _playerViews[player.Name].SetActive(false);
+
             bool namesMatch = player.Name == currentPlayer.Name;
 
-            _playerViews[player.Name].SetActive(
-                namesMatch ||
-                   (Math.Abs(player.Position.X - currentPlayer.Position.X) <= 2 &&
-                    Math.Abs(player.Position.Y - currentPlayer.Position.Y) <= 2));
+            if (namesMatch)
+            {
+                _playerViews[player.Name].SetActive(true);
+            }
+            else
+            {
+                var currPos = currentPlayer.Position;
+                var pos = player.Position;
+
+                if (Math.Abs(pos.X - currPos.X) <= 1 &&
+                    Math.Abs(pos.Y - currPos.Y) <= 1)
+                {
+                    if (!visibilityArea[Math.Abs(currPos.X - pos.X - 1), Math.Abs(currPos.Y - pos.Y - 1)]
+                            .HasFlag(FieldCell.Invisible))
+                    {
+                        _playerViews[player.Name].SetActive(true);
+                    }
+                }
+            }
 
             _playerViews[player.Name].GetComponent<PlayerMovement>().AcceptInput =
                 namesMatch;
