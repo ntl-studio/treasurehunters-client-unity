@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
 using Debug = UnityEngine.Debug;
-
-using Position = TreasureHunters.Position;
 using SM = NtlStudio.TreasureHunters.Model;
 
 class PlayerBoardView
@@ -209,75 +205,6 @@ public class BoardView : MonoBehaviour
 
                 _playerBoards[_game.CurrentPlayerId].Board[fieldX, fieldY] = cell;
                 _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
-            }
-        }
-    }
-
-    void UpdateFogOfWar(Position position, Position previousPosition)
-    {
-        if (position == previousPosition)
-            return;
-
-        var x = position.X;
-        var y = position.Y;
-
-        // moving right
-        if (x > previousPosition.X)
-        {
-            if (previousPosition.X - 2 >= 0)
-            {
-                _ceilingCells[previousPosition.Y][previousPosition.X - 2].EnableFogIfVisible();
-
-                if (previousPosition.Y - 2 >= 0)
-                    _ceilingCells[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
-
-                if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
-                    _ceilingCells[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
-            }
-        }
-
-        // moving left
-        if (x < previousPosition.X)
-        {
-            if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
-            {
-                _ceilingCells[previousPosition.Y][previousPosition.X + 2].EnableFogIfVisible();
-
-                if (previousPosition.Y - 2 >= 0)
-                    _ceilingCells[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
-
-                if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
-                    _ceilingCells[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
-            }
-        }
-
-        // moving down
-        if (y < previousPosition.Y)
-        {
-            if (previousPosition.Y + 2 < GameSettings.BoardRealHeight)
-            {
-                _ceilingCells[previousPosition.Y + 2][previousPosition.X].EnableFogIfVisible();
-
-                if (previousPosition.X - 2 >= 0)
-                    _ceilingCells[previousPosition.Y + 2][previousPosition.X - 2].EnableFogIfVisible();
-
-                if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
-                    _ceilingCells[previousPosition.Y + 2][previousPosition.X + 2].EnableFogIfVisible();
-            }
-        }
-
-        // moving up
-        if (y > previousPosition.Y)
-        {
-            if (previousPosition.Y - 2 > 0)
-            {
-                _ceilingCells[previousPosition.Y - 2][previousPosition.X].EnableFogIfVisible();
-
-                if (previousPosition.X - 2 >= 0)
-                    _ceilingCells[previousPosition.Y - 2][previousPosition.X - 2].EnableFogIfVisible();
-
-                if (previousPosition.X + 2 < GameSettings.BoardRealWidth)
-                    _ceilingCells[previousPosition.Y - 2][previousPosition.X + 2].EnableFogIfVisible();
             }
         }
     }
