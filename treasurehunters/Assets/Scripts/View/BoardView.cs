@@ -80,7 +80,7 @@ public class BoardView : MonoBehaviour
             UpdateTreasurePosition(_game.TreasurePosition());
         };
 
-        _game.OnShowTreasureEvent += (bool isVisible) =>
+        _game.OnShowTreasureEvent += isVisible =>
         {
             _treasure.SetActive(isVisible);
         };
