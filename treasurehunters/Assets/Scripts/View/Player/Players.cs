@@ -35,7 +35,7 @@ public class Players : MonoBehaviour
         }
 
         _game.OnStartTurn += UpdatePlayersVisibility;
-        _game.OnEndTurn += UpdatePlayersVisibility;
+        _game.OnEndMove += UpdatePlayersVisibility;
 
         UpdatePlayersVisibility();
     }

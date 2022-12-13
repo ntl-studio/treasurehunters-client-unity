@@ -16,7 +16,7 @@ public class PlayerName : MonoBehaviour
 
         UpdatePlayerName();
         _game.OnStartTurn += UpdatePlayerName;
-        _game.OnEndTurn += UpdatePlayerName;
+        _game.OnEndMove += UpdatePlayerName;
     }
 
     void UpdatePlayerName()

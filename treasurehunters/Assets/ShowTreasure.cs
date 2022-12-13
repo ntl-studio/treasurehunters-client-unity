@@ -5,13 +5,13 @@ using UnityEngine.UI;
 public class ShowTreasure : MonoBehaviour
 {
     private Toggle _toggle;
+    private static Game _game => Game.Instance();
+
     void Start()
     {
         _toggle = gameObject.GetComponent<Toggle>();
         Debug.Assert(_toggle);
     }
-
-    private static Game _game => Game.Instance();
 
     public void Show()
     {

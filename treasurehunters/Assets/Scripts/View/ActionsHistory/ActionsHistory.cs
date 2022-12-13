@@ -17,7 +17,7 @@ public class ActionsHistory : MonoBehaviour
     {
         Debug.Assert(ActionsListViewPrefab);
 
-        _game.OnEndTurn += () =>
+        _game.OnEndMove += () =>
         {
             var player = _game.CurrentPlayer;
             UpdateStates(player.Name, _game.CurrentPlayerMoveStates);

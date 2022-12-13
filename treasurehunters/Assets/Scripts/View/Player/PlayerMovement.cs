@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = _destination;
 
                 // tell them game we finished the move when animation finished playing
-                _game.EndTurn(); 
+                _game.EndMove(); 
             }
         }
     }

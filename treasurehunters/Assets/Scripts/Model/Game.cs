@@ -69,6 +69,8 @@ namespace TreasureHunters
             return field.GetVisibleArea(player.Position);
         }
 
+        public bool CurrentPlayerHasTreasure => _gameState.Players[CurrentPlayerId].HasTreasure;
+
         public List<SM.PlayerMoveState> CurrentPlayerMoveStates =>
             _gameState.Players[_gameState.CurrentPlayerIndex].PlayerMoveStates;
 
@@ -91,16 +93,14 @@ namespace TreasureHunters
             return _gameState.PerformAction(playerAction);
         }
 
-
         public delegate void GameEvent();
-
         public event GameEvent OnStartTurn;
-        public event GameEvent OnEndTurn;
+        public event GameEvent OnEndMove;
         public event GameEvent OnPlayerClicked;
 
-        public void EndTurn()
+        public void EndMove()
         {
-            OnEndTurn?.Invoke();
+            OnEndMove?.Invoke();
         }
 
         public void StartNextTurn()
@@ -116,11 +116,13 @@ namespace TreasureHunters
 
         public delegate void ShowTreasureEvent(bool isVisible);
         public event ShowTreasureEvent OnShowTreasureEvent;
+
         public void ShowTreasure(bool isVisible)
         {
             IsTreasureAlwaysVisible = isVisible;
             OnShowTreasureEvent?.Invoke(isVisible);
         }
+
         public bool IsTreasureAlwaysVisible { get; private set; }
 
         public Position TreasurePosition()

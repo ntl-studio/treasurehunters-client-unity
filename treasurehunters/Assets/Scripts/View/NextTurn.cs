@@ -14,7 +14,7 @@ public class NextTurn : MonoBehaviour
         Debug.Assert(_game != null);
 
         NextTurnPanel.SetActive(false);
-        _game.OnEndTurn += () => NextTurnPanel.SetActive(true);
+        _game.OnEndMove += () => NextTurnPanel.SetActive(true);
     }
 
     void Update()

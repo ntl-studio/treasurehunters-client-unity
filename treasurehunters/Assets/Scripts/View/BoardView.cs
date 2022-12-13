@@ -3,6 +3,7 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Position = TreasureHunters.Position;
 using SM = NtlStudio.TreasureHunters.Model;
 
 class PlayerBoardView
@@ -73,17 +74,17 @@ public class BoardView : MonoBehaviour
             UpdateBoardAfterPreviousTurn();
             UpdatePlayerVisibility();
         };
-        _game.OnEndTurn += () =>
+
+        _game.OnEndMove += () =>
         {
             FogVisitedAreas();
             UpdatePlayerVisibility();
+            UpdateTreasurePosition(_game.TreasurePosition());
         };
 
         _game.OnShowTreasureEvent += (bool isVisible) =>
         {
             _treasure.SetActive(isVisible);
-            var pos = _game.TreasurePosition();
-            _treasure.transform.position = new Vector3(pos.X, pos.Y);
         };
 
         UpdatePlayerVisibility();
@@ -217,7 +218,7 @@ public class BoardView : MonoBehaviour
 
                 if (cell.HasFlag(FieldCell.Treasure))
                 {
-                    _treasure.transform.position = new Vector3(fieldX, fieldY, 0);
+                    UpdateTreasurePosition(fieldX, fieldY);
                     _treasure.SetActive(true);
                 }    
 
@@ -228,5 +229,15 @@ public class BoardView : MonoBehaviour
                 _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
             }
         }
+    }
+
+    void UpdateTreasurePosition(Position pos)
+    {
+        UpdateTreasurePosition(pos.X, pos.Y);
+    }
+
+    void UpdateTreasurePosition(int x, int y)
+    {
+        _treasure.transform.position = new Vector3(x, y);
     }
 }
