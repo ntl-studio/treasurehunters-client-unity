@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum CeilingState
@@ -34,14 +32,6 @@ public class CeilingCell : MonoBehaviour
             _state = value;
         }
         get => _state;
-    }
-
-    public void EnableFogIfVisible()
-    {
-        if (State == CeilingState.Visible)
-        {
-            State = CeilingState.Fog;
-        }
     }
 
     private void SetAlpha(float alpha)

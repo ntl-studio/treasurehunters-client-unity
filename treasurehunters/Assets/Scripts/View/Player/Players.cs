@@ -8,7 +8,7 @@ public class Players : MonoBehaviour
 {
     public GameObject PlayerPrefab;
 
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     private readonly Dictionary<string, GameObject> _playerViews = new();
 
@@ -16,9 +16,9 @@ public class Players : MonoBehaviour
     {
         Debug.Assert(PlayerPrefab);
 
-        for (int i = 0; i < _game.PlayersCount; ++i)
+        for (int i = 0; i < Game.PlayersCount; ++i)
         {
-            var player = _game.Players[i];
+            var player = Game.Players[i];
 
             var playerObj = Instantiate(PlayerPrefab, transform);
             playerObj.SetActive(false);
@@ -34,19 +34,19 @@ public class Players : MonoBehaviour
             _playerViews.Add(player.Name, playerObj);
         }
 
-        _game.OnStartTurn += UpdatePlayersVisibility;
-        _game.OnEndTurn += UpdatePlayersVisibility;
+        Game.OnStartTurn += UpdatePlayersVisibility;
+        Game.OnEndMove += UpdatePlayersVisibility;
 
         UpdatePlayersVisibility();
     }
 
     void UpdatePlayersVisibility()
     {
-        var currentPlayer = _game.CurrentPlayer;
+        var currentPlayer = Game.CurrentPlayer;
 
-        var visibilityArea = _game.CurrentVisibleArea();
+        var visibilityArea = Game.CurrentVisibleArea();
 
-        foreach (var player in _game.Players)
+        foreach (var player in Game.Players)
         {
             _playerViews[player.Name].SetActive(false);
 

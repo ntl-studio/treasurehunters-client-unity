@@ -21,7 +21,7 @@ public class ScreenLogger : MonoBehaviour
     }
 
     string myLog;
-    Queue myLogQueue = new Queue();
+    Queue myLogQueue = new();
 
     void HandleLog(string logString, string stackTrace, LogType type)
     {

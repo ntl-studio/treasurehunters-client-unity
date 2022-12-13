@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
 
 using SM = NtlStudio.TreasureHunters.Model;
 
@@ -17,7 +16,7 @@ public class ActionsHistory : MonoBehaviour
     {
         Debug.Assert(ActionsListViewPrefab);
 
-        _game.OnEndTurn += () =>
+        _game.OnEndMove += () =>
         {
             var player = _game.CurrentPlayer;
             UpdateStates(player.Name, _game.CurrentPlayerMoveStates);

@@ -1,20 +1,19 @@
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
 
 public class NextTurn : MonoBehaviour
 {
     public GameObject NextTurnPanel;
 
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     void Start()
     {
         Debug.Assert(NextTurnPanel);
-        Debug.Assert(_game != null);
+        Debug.Assert(Game != null);
 
         NextTurnPanel.SetActive(false);
-        _game.OnEndTurn += () => NextTurnPanel.SetActive(true);
+        Game.OnEndMove += () => NextTurnPanel.SetActive(true);
     }
 
     void Update()
@@ -22,7 +21,7 @@ public class NextTurn : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return))
         {
             NextTurnPanel.SetActive(false);
-            _game.StartNextTurn();
+            Game.StartNextTurn();
         }
     }
 }

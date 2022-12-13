@@ -4,18 +4,16 @@ using Unity.Mathematics;
 using UnityEngine;
 using Player = TreasureHunters.Player;
 
-using SM = NtlStudio.TreasureHunters.Model;
-
 public class PlayerMovement : MonoBehaviour
 {
     public bool AcceptInput = false;
     public Player Player;
 
-    private bool _isMoving = false;
+    private bool _isMoving;
     private Vector3 _destination;
     private Vector3 _direction;
 
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
     
     void Start()
     {
@@ -34,11 +32,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_isMoving)
         {
-            const float MOVEMENT_SPEED = 5.0f;
+            const float movementSpeed = 5.0f;
 
             if (math.distancesq(transform.position, _destination) > 0.01f)
             {
-                transform.position += _direction * Time.deltaTime * MOVEMENT_SPEED;
+                transform.position += _direction * Time.deltaTime * movementSpeed;
             }
             else
             {
@@ -46,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = _destination;
 
                 // tell them game we finished the move when animation finished playing
-                _game.EndTurn(); 
+                Game.EndMove(); 
             }
         }
     }
@@ -55,9 +53,9 @@ public class PlayerMovement : MonoBehaviour
     {
         transform.position = new Vector3(Player.Position.X, Player.Position.Y);
 
-        var states = _game.CurrentPlayerMoveStates;
+        var states = Game.CurrentPlayerMoveStates;
         GameUtils.UpdateRotation(
-            states.Count > 0 ? states[0].Direction : SM.MoveDirection.None,
+            states.Count > 0 ? states[0].Direction : MoveDirection.None,
             transform);
     }
 
@@ -97,7 +95,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerAction != PlayerAction.None)
         {
-            if (_game.MakeTurn(playerAction))
+            if (Game.MakeTurn(playerAction))
             {
                 Vector2Int shift = GameUtils.ActionToVector2(playerAction);
 
@@ -105,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
 
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
-                GameUtils.UpdateRotation(_game.CurrentPlayerMoveStates[0].Direction, transform);
+                GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
             }
             else
             {
