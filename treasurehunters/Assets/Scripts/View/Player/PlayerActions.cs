@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerActions : MonoBehaviour
 {
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     public void GrenadeAction()
     {
@@ -18,6 +18,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        _game.StartNextTurn();
+        Game.StartNextTurn();
     }
 }

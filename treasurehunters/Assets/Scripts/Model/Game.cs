@@ -27,32 +27,18 @@ namespace TreasureHunters
                 Players.Add(new Player(this, index++));
             }
 
-            Players[0].Color = UnityEngine.Color.yellow;
-            Players[1].Color = UnityEngine.Color.blue;
+            Players[0].Color = Color.yellow;
+            Players[1].Color = Color.blue;
 
             Debug.Log("Game initialized successfully");
         }
 
-        private SM.GameState _gameState = new SM.GameState(Guid.NewGuid());
+        private readonly GameState _gameState = new(Guid.NewGuid());
 
-        public const int FieldWidth = SM.GameField.FieldWidth;
-        public const int FieldHeight = SM.GameField.FieldHeight;
-
-        public SM.GameField CurrentBoard => _gameState.GameField;
-
-        public SM.FieldCell CurrentPlayerFieldCell()
-        {
-            var pos = CurrentPlayer.Position;
-            return _gameState.GameField[pos.X, pos.Y];
-        }
+        public const int FieldWidth = GameField.FieldWidth;
+        public const int FieldHeight = GameField.FieldHeight;
 
         public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
-
-        public Position CurrentPlayerPosition()
-        {
-            var pos = _gameState.Players[_gameState.CurrentPlayerIndex].Position;
-            return new Position(pos.X, pos.Y);
-        }
 
         public Position CurrentPlayerPreviousPosition()
         {
@@ -71,7 +57,7 @@ namespace TreasureHunters
 
         public bool CurrentPlayerHasTreasure => _gameState.Players[CurrentPlayerId].HasTreasure;
 
-        public List<SM.PlayerMoveState> CurrentPlayerMoveStates =>
+        public List<PlayerMoveState> CurrentPlayerMoveStates =>
             _gameState.Players[_gameState.CurrentPlayerIndex].PlayerMoveStates;
 
         public Position PlayerPosition(int playerIndex)
@@ -88,7 +74,7 @@ namespace TreasureHunters
 
         public List<Player> Players = new();
 
-        public bool MakeTurn(SM.PlayerAction playerAction)
+        public bool MakeTurn(PlayerAction playerAction)
         {
             return _gameState.PerformAction(playerAction);
         }

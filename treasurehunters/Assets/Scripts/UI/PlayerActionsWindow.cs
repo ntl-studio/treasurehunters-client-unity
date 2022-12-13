@@ -5,15 +5,15 @@ public class PlayerActionsWindow : MonoBehaviour
 {
     public GameObject ActionsWindow;
 
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     void Start()
     {
-        Debug.Assert(_game != null);
+        Debug.Assert(Game != null);
         Debug.Assert(ActionsWindow);
 
         ActionsWindow.SetActive(false);
 
-        _game.OnPlayerClicked += () => ActionsWindow.SetActive(true);
+        Game.OnPlayerClicked += () => ActionsWindow.SetActive(true);
     }
 }

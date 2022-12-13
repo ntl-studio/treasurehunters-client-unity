@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class ShowTreasure : MonoBehaviour
 {
     private Toggle _toggle;
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     void Start()
     {
@@ -15,6 +15,6 @@ public class ShowTreasure : MonoBehaviour
 
     public void Show()
     {
-        _game.ShowTreasure(_toggle.isOn);
+        Game.ShowTreasure(_toggle.isOn);
     }
 }

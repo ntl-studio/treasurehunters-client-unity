@@ -4,18 +4,17 @@ using TreasureHunters;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Position = TreasureHunters.Position;
-using SM = NtlStudio.TreasureHunters.Model;
 
 class PlayerBoardView
 {
-    public FieldCell[,] Board = new FieldCell[SM.GameField.FieldWidth, SM.GameField.FieldHeight];
-    public bool[,] Visited = new bool[SM.GameField.FieldWidth, SM.GameField.FieldHeight];
+    public FieldCell[,] Board = new FieldCell[GameField.FieldWidth, GameField.FieldHeight];
+    public bool[,] Visited = new bool[GameField.FieldWidth, GameField.FieldHeight];
 
     public PlayerBoardView()
     {
-        for (int x = 0; x < SM.GameField.FieldWidth; ++x)
+        for (int x = 0; x < GameField.FieldWidth; ++x)
         {
-            for (int y = 0; y < SM.GameField.FieldHeight; ++y)
+            for (int y = 0; y < GameField.FieldHeight; ++y)
             {
                 Board[x, y] = FieldCell.Empty;
                 Visited[x, y] = false;
@@ -40,9 +39,8 @@ public class BoardView : MonoBehaviour
 
     public GameObject _treasure;
 
-    private List<PlayerBoardView> _playerBoards = new();
+    private readonly List<PlayerBoardView> _playerBoards = new();
 
-    private readonly List<List<GameObject>> _floorCells = new();
     private readonly List<List<WallView>> _wallCells = new();
     private readonly List<List<CeilingCell>> _ceilingCells = new();
 
@@ -96,7 +94,6 @@ public class BoardView : MonoBehaviour
     {
         for (var row = 0; row < Game.FieldHeight; ++row)
         {
-            var floorRowList = new List<GameObject>();
             var wallsRowList = new List<WallView>();
             var ceilingRowList = new List<CeilingCell>();
 
@@ -108,7 +105,6 @@ public class BoardView : MonoBehaviour
                 {
                     var floorCell = Instantiate(_floorPrefab, pos, new Quaternion(), _floorParent);
                     floorCell.name = row + " " + col + " floor";
-                    floorRowList.Add(floorCell);
                 }
 
                 // creating walls
@@ -139,7 +135,6 @@ public class BoardView : MonoBehaviour
                 }
             }
 
-            _floorCells.Add(floorRowList);
             _wallCells.Add(wallsRowList);
             _ceilingCells.Add(ceilingRowList);
         }
@@ -152,9 +147,9 @@ public class BoardView : MonoBehaviour
     {
         int playerId = _game.CurrentPlayerId;
 
-        for (int x = 0; x < SM.GameField.FieldWidth; ++x)
+        for (int x = 0; x < GameField.FieldWidth; ++x)
         {
-            for (int y = 0; y < SM.GameField.FieldHeight; ++y)
+            for (int y = 0; y < GameField.FieldHeight; ++y)
             {
                 if (_playerBoards[playerId].Visited[x, y])
                 {
@@ -174,15 +169,15 @@ public class BoardView : MonoBehaviour
     {
         var position = _game.CurrentPlayerPreviousPosition();
 
-        for (int x = 0; x < SM.VisibleArea.Width; ++x)
+        for (int x = 0; x < VisibleArea.Width; ++x)
         {
-            for (int y = 0; y < SM.VisibleArea.Height; ++y)
+            for (int y = 0; y < VisibleArea.Height; ++y)
             {
                 var fieldX = x + position.X - 1;
                 var fieldY = y + position.Y - 1;
 
-                if (fieldX is >= 0 and < SM.GameField.FieldWidth &&
-                    fieldY is >= 0 and < SM.GameField.FieldHeight)
+                if (fieldX is >= 0 and < GameField.FieldWidth &&
+                    fieldY is >= 0 and < GameField.FieldHeight)
                 {
                     if (_playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY])
                         _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
@@ -199,15 +194,15 @@ public class BoardView : MonoBehaviour
         if (!_game.IsTreasureAlwaysVisible)
             _treasure.SetActive(false);
 
-        for (int x = 0; x < SM.VisibleArea.Width; ++x)
+        for (int x = 0; x < VisibleArea.Width; ++x)
         {
-            for (int y = 0; y < SM.VisibleArea.Height; ++y)
+            for (int y = 0; y < VisibleArea.Height; ++y)
             {
                 var fieldX = x + position.X - 1;
                 var fieldY = y + position.Y - 1;
 
-                if (fieldX is < 0 or >= SM.GameField.FieldWidth ||
-                    fieldY is < 0 or >= SM.GameField.FieldHeight)
+                if (fieldX is < 0 or >= GameField.FieldWidth ||
+                    fieldY is < 0 or >= GameField.FieldHeight)
                 {
                     continue;
                 }

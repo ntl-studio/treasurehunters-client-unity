@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class PlayerName : MonoBehaviour
 {
-    private TextMeshProUGUI PlayerNameText;
+    private TextMeshProUGUI _playerNameText;
 
-    private static Game _game => Game.Instance();
+    private static Game Game => Game.Instance();
 
     void Start()
     {
-        Debug.Assert(_game != null);
+        Debug.Assert(Game != null);
 
-        PlayerNameText = GetComponent<TextMeshProUGUI>();
+        _playerNameText = GetComponent<TextMeshProUGUI>();
 
         UpdatePlayerName();
-        _game.OnStartTurn += UpdatePlayerName;
-        _game.OnEndMove += UpdatePlayerName;
+        Game.OnStartTurn += UpdatePlayerName;
+        Game.OnEndMove += UpdatePlayerName;
     }
 
     void UpdatePlayerName()
     {
-        PlayerNameText.text = _game.CurrentPlayer.Name +
-                              " (" + _game.CurrentPlayer.Position.X + ", "
-                              + _game.CurrentPlayer.Position.Y + ")";
+        _playerNameText.text = Game.CurrentPlayer.Name +
+                              " (" + Game.CurrentPlayer.Position.X + ", "
+                              + Game.CurrentPlayer.Position.Y + ")";
     }
 }
