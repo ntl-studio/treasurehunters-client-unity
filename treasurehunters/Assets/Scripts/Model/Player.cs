@@ -1,5 +1,3 @@
-using VContainer;
-
 namespace TreasureHunters
 {
     public class Player

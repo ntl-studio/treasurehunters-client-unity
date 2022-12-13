@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using TreasureHunters;
 using UnityEngine;
-using VContainer;
 
 using SM = NtlStudio.TreasureHunters.Model;
 
