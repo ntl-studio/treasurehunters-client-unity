@@ -18,11 +18,11 @@ namespace TreasureHunters
 
         private GameClient()
         {
-            _gameState.RegisterPlayer("Player 1");
-            _gameState.RegisterPlayer("Player 2");
+            _game.RegisterPlayer("Player 1");
+            _game.RegisterPlayer("Player 2");
 
             int index = 0;
-            foreach (var p in _gameState.Players)
+            foreach (var p in _game.Players)
             {
                 Players.Add(new Player(this, index++));
             }
@@ -33,12 +33,12 @@ namespace TreasureHunters
             Debug.Log("Game initialized successfully");
         }
 
-        private readonly Game _gameState = new(Guid.NewGuid());
+        private readonly Game _game = new(Guid.NewGuid());
 
         public const int FieldWidth = GameField.FieldWidth;
         public const int FieldHeight = GameField.FieldHeight;
 
-        public Player CurrentPlayer => Players[_gameState.CurrentPlayerIndex];
+        public Player CurrentPlayer => Players[_game.CurrentPlayerIndex];
 
         public Position CurrentPlayerPreviousPosition()
         {
@@ -46,37 +46,37 @@ namespace TreasureHunters
             return new Position(pos.X, pos.Y);
         }
 
-        public int CurrentPlayerId => _gameState.CurrentPlayerIndex;
+        public int CurrentPlayerId => _game.CurrentPlayerIndex;
 
         public VisibleArea CurrentVisibleArea()
         {
-            var field = _gameState.GameField;
-            var player = _gameState.Players[_gameState.CurrentPlayerIndex];
+            var field = _game.GameField;
+            var player = _game.Players[_game.CurrentPlayerIndex];
             return field.GetVisibleArea(player.Position);
         }
 
-        public bool CurrentPlayerHasTreasure => _gameState.Players[CurrentPlayerId].HasTreasure;
+        public bool CurrentPlayerHasTreasure => _game.Players[CurrentPlayerId].HasTreasure;
 
         public List<PlayerMoveState> CurrentPlayerMoveStates =>
-            _gameState.Players[_gameState.CurrentPlayerIndex].PlayerMoveStates;
+            _game.Players[_game.CurrentPlayerIndex].PlayerMoveStates;
 
         public Position PlayerPosition(int playerIndex)
         {
-            var pos = _gameState.Players[playerIndex].Position;
+            var pos = _game.Players[playerIndex].Position;
             return new Position(pos.X, pos.Y);
         }
         public string PlayerName(int playerIndex)
         {
-            return _gameState.Players[playerIndex].Name;
+            return _game.Players[playerIndex].Name;
         }
 
-        public int PlayersCount => _gameState.Players.Count;
+        public int PlayersCount => _game.Players.Count;
 
         public List<Player> Players = new();
 
         public bool MakeTurn(PlayerAction playerAction)
         {
-            return _gameState.PerformAction(playerAction);
+            return _game.PerformAction(playerAction);
         }
 
         public delegate void GameEvent();
@@ -91,7 +91,7 @@ namespace TreasureHunters
 
         public void StartNextTurn()
         {
-            _gameState.EndTurn();
+            _game.EndTurn();
             OnStartTurn?.Invoke();
         }
 
@@ -113,7 +113,7 @@ namespace TreasureHunters
 
         public Position TreasurePosition()
         {
-            var pos = _gameState.TreasurePosition;
+            var pos = _game.TreasurePosition;
             return new Position(pos.X, pos.Y);
         }
     }
