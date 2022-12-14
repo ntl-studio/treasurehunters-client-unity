@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-using SM = NtlStudio.TreasureHunters.Model;
-
 namespace TreasureHunters
 {
     public class GameClient
@@ -73,6 +71,8 @@ namespace TreasureHunters
         public int PlayersCount => _game.Players.Count;
 
         public List<Player> Players = new();
+
+        public GameState State => _game.State;
 
         public bool MakeTurn(PlayerAction playerAction)
         {

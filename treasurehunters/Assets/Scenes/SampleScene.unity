@@ -357,6 +357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NextTurnPanel: {fileID: 369810145}
+  Message: {fileID: 1632992882}
 --- !u!1 &274841075
 GameObject:
   m_ObjectHideFlags: 0
