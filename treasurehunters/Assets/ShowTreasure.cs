@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class ShowTreasure : MonoBehaviour
 {
     private Toggle _toggle;
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {

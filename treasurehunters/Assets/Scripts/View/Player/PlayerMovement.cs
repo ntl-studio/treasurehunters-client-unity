@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
     
     void Start()
     {

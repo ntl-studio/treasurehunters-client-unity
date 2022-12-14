@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerClick : MonoBehaviour
 {
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     private void OnMouseDown()
     {

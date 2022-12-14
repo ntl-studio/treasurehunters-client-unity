@@ -17,7 +17,7 @@ public class ActionsListView : MonoBehaviour
         Debug.Assert(PlayerNameText);
 
         var pos = transform.position;
-        for (int i = 0; i < SM.GameState.ActionsHistorySize; ++i)
+        for (int i = 0; i < SM.Game.ActionsHistorySize; ++i)
         {
             var actionStateViewObj = Instantiate(ActionStateViewPrefab, transform, false);
             actionStateViewObj.SetActive(false);

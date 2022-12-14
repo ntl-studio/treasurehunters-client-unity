@@ -5,11 +5,10 @@ public class PlayerActionsWindow : MonoBehaviour
 {
     public GameObject ActionsWindow;
 
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
-        Debug.Assert(Game != null);
         Debug.Assert(ActionsWindow);
 
         ActionsWindow.SetActive(false);

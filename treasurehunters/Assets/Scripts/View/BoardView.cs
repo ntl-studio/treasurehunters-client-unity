@@ -44,7 +44,7 @@ public class BoardView : MonoBehaviour
     private readonly List<List<WallView>> _wallCells = new();
     private readonly List<List<CeilingCell>> _ceilingCells = new();
 
-    private static Game _game => Game.Instance();
+    private static GameClient _game => GameClient.Instance();
 
     void Start()
     {
@@ -92,12 +92,12 @@ public class BoardView : MonoBehaviour
     // all walls are enabled.
     private void GenerateBoardSprites()
     {
-        for (var row = 0; row < Game.FieldHeight; ++row)
+        for (var row = 0; row < GameClient.FieldHeight; ++row)
         {
             var wallsRowList = new List<WallView>();
             var ceilingRowList = new List<CeilingCell>();
 
-            for (int col = 0; col < Game.FieldWidth; col++)
+            for (int col = 0; col < GameClient.FieldWidth; col++)
             {
                 var pos = new Vector3(col, row);
 

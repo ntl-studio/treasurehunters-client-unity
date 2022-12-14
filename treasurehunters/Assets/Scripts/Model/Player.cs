@@ -2,9 +2,9 @@ namespace TreasureHunters
 {
     public class Player
     {
-        private readonly Game _game;
+        private readonly GameClient _game;
         private readonly int _playerIndex;
-        public Player(Game game, int playerIndex)
+        public Player(GameClient game, int playerIndex)
         {
             _game = game;
             _playerIndex = playerIndex;

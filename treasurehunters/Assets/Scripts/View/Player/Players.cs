@@ -8,7 +8,7 @@ public class Players : MonoBehaviour
 {
     public GameObject PlayerPrefab;
 
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     private readonly Dictionary<string, GameObject> _playerViews = new();
 

@@ -5,13 +5,13 @@ public class PlayerItems : MonoBehaviour
 {
     public GameObject TreasureImage;
 
-    private static Game _game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
         Debug.Assert(TreasureImage);
         TreasureImage.SetActive(false);
-        _game.OnStartTurn += () => TreasureImage.SetActive(_game.CurrentPlayerHasTreasure);
-        _game.OnEndMove+= () => TreasureImage.SetActive(_game.CurrentPlayerHasTreasure);
+        Game.OnStartTurn += () => TreasureImage.SetActive(Game.CurrentPlayerHasTreasure);
+        Game.OnEndMove+= () => TreasureImage.SetActive(Game.CurrentPlayerHasTreasure);
     }
 }

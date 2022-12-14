@@ -5,12 +5,11 @@ public class NextTurn : MonoBehaviour
 {
     public GameObject NextTurnPanel;
 
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
         Debug.Assert(NextTurnPanel);
-        Debug.Assert(Game != null);
 
         NextTurnPanel.SetActive(false);
         Game.OnEndMove += () => NextTurnPanel.SetActive(true);

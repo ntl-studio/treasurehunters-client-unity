@@ -7,16 +7,16 @@ using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
 {
-    public class Game
+    public class GameClient
     {
-        private static Game _instance;
+        private static GameClient _instance;
 
-        public static Game Instance()
+        public static GameClient Instance()
         {
-            return _instance ??= new Game();
+            return _instance ??= new GameClient();
         }
 
-        private Game()
+        private GameClient()
         {
             _gameState.RegisterPlayer("Player 1");
             _gameState.RegisterPlayer("Player 2");
@@ -33,7 +33,7 @@ namespace TreasureHunters
             Debug.Log("Game initialized successfully");
         }
 
-        private readonly GameState _gameState = new(Guid.NewGuid());
+        private readonly Game _gameState = new(Guid.NewGuid());
 
         public const int FieldWidth = GameField.FieldWidth;
         public const int FieldHeight = GameField.FieldHeight;

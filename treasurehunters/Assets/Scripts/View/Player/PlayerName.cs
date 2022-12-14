@@ -6,12 +6,10 @@ public class PlayerName : MonoBehaviour
 {
     private TextMeshProUGUI _playerNameText;
 
-    private static Game Game => Game.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
-        Debug.Assert(Game != null);
-
         _playerNameText = GetComponent<TextMeshProUGUI>();
 
         UpdatePlayerName();
