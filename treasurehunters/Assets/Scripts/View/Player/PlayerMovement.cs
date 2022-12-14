@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
                 var shiftX = (int) math.round(clickPos.x - playerPos.x);
                 var shiftY = (int) math.round(clickPos.y - playerPos.y);
 
-                if (shiftX > shiftY)
+                if (math.abs(shiftX) > math.abs(shiftY))
                     playerAction = shiftX > 0 ? PlayerAction.MoveRight : PlayerAction.MoveLeft;
                 else
                     playerAction = shiftY > 0 ? PlayerAction.MoveUp: PlayerAction.MoveDown;
