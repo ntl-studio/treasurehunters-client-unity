@@ -1,15 +1,19 @@
 using JsonObjects;
+using TreasureHunters;
 using UnityEngine;
 
 public class GamesList : MonoBehaviour
 {
     public GameObject GamesListItemPrefab;
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
         Debug.Assert(GamesListItemPrefab);
 
         ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
+
+        Game.OnGameStarted += () => gameObject.SetActive(false);
     }
 
     public void UpdateGamesList(GamesJson games)
@@ -26,7 +30,7 @@ public class GamesList : MonoBehaviour
 
             gamesListItem.GameId = game.id;
             gamesListItem.GameState = game.state;
-            // gamesListItem.NumberOfPlayers = game.number_of_players; // TODO: add to the API
+            gamesListItem.NumberOfPlayers = game.playerscount.ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
 using TMPro;
+using TreasureHunters;
 using UnityEngine;
 
 public class GamesListItem : MonoBehaviour
@@ -19,13 +20,18 @@ public class GamesListItem : MonoBehaviour
     public string NumberOfPlayers { set => NumberOfPlayersText.text = value; }
     public string GameState { set => GameStateText.text = value; }
 
+    private GameClient Game => GameClient.Instance();
+
     public void JoinGame()
     {
         ServerConnection.Instance().JoinGameAsync(GameIdText.text, "Player 1",
-            (isJoined) =>
+            (isJoined, gameId, playerName, sessionId) =>
             {
                 if (isJoined)
-                    Debug.Log("Joined");
+                {
+                    Debug.Log($"Joined to the game {gameId} as {playerName}");
+                    Game.JoinGame(gameId, playerName, sessionId);
+                }
                 else
                     Debug.Log("Did not join");
             });

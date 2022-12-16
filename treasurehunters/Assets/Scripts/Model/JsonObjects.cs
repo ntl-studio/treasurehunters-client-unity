@@ -5,12 +5,19 @@ namespace JsonObjects
     {
         public string id;
         public string state;
+        public int playerscount;
     }
 
     [System.Serializable]
     public class GamesJson
     {
         public GameJson[] games;
+    }
+
+    [System.Serializable]
+    class GameDataJson
+    {
+        public GameJson data;
     }
 
     [System.Serializable]
@@ -22,7 +29,7 @@ namespace JsonObjects
     [System.Serializable]
     class PlayersJson
     {
-        public string[] name;
+        public string sessionid;
     }
 
     [System.Serializable]

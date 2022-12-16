@@ -52,12 +52,14 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
-    public void JoinGameAsync(string gameId, string playerName, Action<bool> callback)
+    public void JoinGameAsync(string gameId, string playerName, 
+        Action<bool, string, string, string> joinGameCallback)
     {
-        StartCoroutine(JoinGame(gameId, playerName, callback));
+        StartCoroutine(JoinGame(gameId, playerName, joinGameCallback));
     }
 
-    private IEnumerator JoinGame(string gameId, string playerName, Action<bool> callback)
+    private IEnumerator JoinGame(string gameId, string playerName, 
+        Action<bool, string, string, string> joinGameCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
         UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
@@ -75,8 +77,9 @@ public class ServerConnection : MonoBehaviour
                 Debug.Assert(true);
             }
             else
-            { 
-                callback(playersData.successful);
+            {
+                joinGameCallback(playersData.successful, gameId,
+                    playerName, playersData.data.sessionid);
             }
         }
         else
@@ -85,4 +88,36 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
+    public void GetGameStateAsync(string gameId, Action<string> gameStateCallback)
+    {
+        StartCoroutine(GetGameState(gameId, gameStateCallback));
+    }
+
+    public IEnumerator GetGameState(string gameId, Action<string> gameStateCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}";
+        UnityWebRequest request = UnityWebRequest.Get(uri);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var gameData = JsonUtility.FromJson<GameDataJson>(jsonText);
+            if (gameData == null)
+            {
+                Debug.Log($"Could not read game from json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            {
+                gameStateCallback(gameData.data.state);
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
 }

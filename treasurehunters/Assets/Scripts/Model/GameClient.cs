@@ -1,5 +1,6 @@
 using NtlStudio.TreasureHunters.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -80,9 +81,34 @@ namespace TreasureHunters
         }
 
         public delegate void GameEvent();
+
+        public event GameEvent OnJoinGame;
+        public event GameEvent OnGameStarted;
         public event GameEvent OnStartTurn;
         public event GameEvent OnEndMove;
         public event GameEvent OnPlayerClicked;
+
+        public string GameId
+        {
+            get
+            {
+                Debug.Assert(_gameId.Length != 0);
+                return _gameId;
+            }
+        }
+
+        private string _gameId;
+        private string _playerName;
+        private string _sessionId;
+
+        public void JoinGame(string gameId, string playerName, string sessionId)
+        {
+            _gameId = gameId;
+            _playerName = playerName;
+            _sessionId = sessionId;
+
+            OnJoinGame?.Invoke();
+        }
 
         public void EndMove()
         {
@@ -99,6 +125,8 @@ namespace TreasureHunters
         {
             OnPlayerClicked?.Invoke();
         }
+
+        public void StartGame() { OnGameStarted?.Invoke(); }
 
         public delegate void ShowTreasureEvent(bool isVisible);
         public event ShowTreasureEvent OnShowTreasureEvent;
