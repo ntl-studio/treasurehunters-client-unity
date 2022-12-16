@@ -1,14 +1,14 @@
 namespace JsonObjects
 {
     [System.Serializable]
-    class GameJson
+    public class GameJson
     {
         public string id;
         public string state;
     }
 
     [System.Serializable]
-    class GamesJson
+    public class GamesJson
     {
         public GameJson[] games;
     }
