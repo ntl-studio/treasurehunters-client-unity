@@ -1,6 +1,7 @@
 using TMPro;
 using TreasureHunters;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GamesListItem : MonoBehaviour
 {
@@ -8,15 +9,22 @@ public class GamesListItem : MonoBehaviour
     public TextMeshProUGUI NumberOfPlayersText;
     public TextMeshProUGUI GameStateText;
 
+    public GameObject StartGameButton;
+
     // Start is called before the first frame update
     void Start()
     {
         Debug.Assert(GameIdText);
         Debug.Assert(NumberOfPlayersText);
         Debug.Assert(GameStateText);
+        Debug.Assert(StartGameButton);
     }
 
-    public string GameId { set => GameIdText.text = value; }
+    public string GameId 
+    { 
+        set => GameIdText.text = value;
+        get => GameIdText.text;
+    }
     public string NumberOfPlayers { set => NumberOfPlayersText.text = value; }
     public string GameState { set => GameStateText.text = value; }
 
@@ -34,6 +42,16 @@ public class GamesListItem : MonoBehaviour
                 }
                 else
                     Debug.Log("Did not join");
+            });
+    }
+
+    public void StartGame()
+    {
+        ServerConnection.Instance()
+            .StartGameAsync(GameId, () =>
+            {
+                Debug.Log($"Game {GameId} started");
+                StartGameButton.GetComponent<Button>().interactable = false;
             });
     }
 }

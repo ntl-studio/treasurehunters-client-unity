@@ -38,4 +38,16 @@ namespace JsonObjects
         public PlayersJson data;
         public bool successful;
     }
+
+    [System.Serializable]
+    class GameStateJson
+    {
+        public string state;
+    }
+
+    [System.Serializable]
+    class GameStateDataJson
+    {
+        public GameStateJson data;
+    }
 }

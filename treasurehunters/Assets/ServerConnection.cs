@@ -120,4 +120,37 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
+
+    public void StartGameAsync(string gameId, Action startGameCallback)
+    {
+        StartCoroutine(StartGame(gameId, startGameCallback));
+    }
+    private IEnumerator StartGame(string gameId, Action startGameCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/start";
+        UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var gameStateData = JsonUtility.FromJson<GameStateDataJson>(jsonText);
+            if (gameStateData == null)
+            {
+                Debug.Log($"Could not read game state from json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            {
+                startGameCallback();
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
+
 }
