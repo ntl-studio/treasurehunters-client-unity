@@ -14,8 +14,21 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class DataJson
+    class GamesDataJson
     {
         public GamesJson data;
+    }
+
+    [System.Serializable]
+    class PlayersJson
+    {
+        public string[] name;
+    }
+
+    [System.Serializable]
+    class PlayersDataJson
+    {
+        public PlayersJson data;
+        public bool successful;
     }
 }

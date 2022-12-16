@@ -352,7 +352,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8661530492944430636}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5225825175907934597}
+        m_TargetAssemblyTypeName: GamesListItem, Assembly-CSharp
+        m_MethodName: JoinGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8661530493062821483
 GameObject:
   m_ObjectHideFlags: 0

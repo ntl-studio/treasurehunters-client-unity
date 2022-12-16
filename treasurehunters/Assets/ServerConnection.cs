@@ -28,12 +28,6 @@ public class ServerConnection : MonoBehaviour
         StartCoroutine(GetData("https://localhost:7209/api/v1/games", updateUICallBack));
     }
 
-    public bool JoinGame(string gameId)
-    {
-        // TODO
-        return false;
-    }
-
     private IEnumerator GetData(string uri, Action<GamesJson> callback)
     {
         UnityWebRequest request = UnityWebRequest.Get(uri);
@@ -43,7 +37,7 @@ public class ServerConnection : MonoBehaviour
         {
             var jsonText = request.downloadHandler.text;
 
-            var games = JsonUtility.FromJson<DataJson>(jsonText);
+            var games = JsonUtility.FromJson<GamesDataJson>(jsonText);
             if (games == null)
             {
                 Debug.Log($"Could not read games form the json: {jsonText}");
@@ -57,4 +51,38 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
+
+    public void JoinGameAsync(string gameId, string playerName, Action<bool> callback)
+    {
+        StartCoroutine(JoinGame(gameId, playerName, callback));
+    }
+
+    private IEnumerator JoinGame(string gameId, string playerName, Action<bool> callback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
+        UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var playersData = JsonUtility.FromJson<PlayersDataJson>(jsonText);
+            if (playersData == null)
+            {
+                Debug.Log($"Could not read players list form json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            { 
+                callback(playersData.successful);
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
+
 }
