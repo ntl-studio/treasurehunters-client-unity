@@ -6,6 +6,7 @@ namespace JsonObjects
         public string id;
         public string state;
         public int playerscount;
+        public string[] players;
     }
 
     [System.Serializable]

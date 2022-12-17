@@ -18,6 +18,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        Game.StartNextTurn();
+        Game.StartTurn();
     }
 }

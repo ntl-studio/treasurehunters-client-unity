@@ -84,8 +84,6 @@ public class BoardView : MonoBehaviour
         {
             _treasure.SetActive(isVisible);
         };
-
-        UpdatePlayerVisibility();
     }
 
     // Initializes all board sprites (floor tiles, walls, etc). By default the board will look like 
@@ -167,7 +165,7 @@ public class BoardView : MonoBehaviour
 
     public void FogVisitedAreas()
     {
-        var position = _game.CurrentPlayerPreviousPosition();
+        var position = _game.PreviousPosition;
 
         for (int x = 0; x < VisibleArea.Width; ++x)
         {
@@ -188,7 +186,7 @@ public class BoardView : MonoBehaviour
 
     public void UpdatePlayerVisibility()
     {
-        var position = _game.CurrentPlayer.Position;
+        var position = _game.Position;
         var visibleArea = _game.CurrentVisibleArea();
 
         if (!_game.IsTreasureAlwaysVisible)

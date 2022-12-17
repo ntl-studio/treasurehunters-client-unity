@@ -2,7 +2,7 @@ using TMPro;
 using TreasureHunters;
 using UnityEngine;
 
-public class PlayerName : MonoBehaviour
+public class PlayerNameLabel : MonoBehaviour
 {
     private TextMeshProUGUI _playerNameText;
 
@@ -19,8 +19,8 @@ public class PlayerName : MonoBehaviour
 
     void UpdatePlayerName()
     {
-        _playerNameText.text = Game.CurrentPlayer.Name +
-                              " (" + Game.CurrentPlayer.Position.X + ", "
-                              + Game.CurrentPlayer.Position.Y + ")";
+        _playerNameText.text = Game.PlayerName +
+                              " (" + Game.Position.X + ", "
+                              + Game.Position.Y + ")";
     }
 }

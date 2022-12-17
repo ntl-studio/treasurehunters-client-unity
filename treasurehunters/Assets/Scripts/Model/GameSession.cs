@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
@@ -10,51 +9,39 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
-        Game.OnJoinGame += () => StartCoroutine(CheckGameState());
-        Game.OnGameStarted += () => StartCoroutine(CheckGameState());
+        Game.OnJoinGame += () => StartCoroutine(WaitForGameStart());
+        Game.OnGameStarted += () => StartCoroutine(WaitForTurn());
     }
 
-    IEnumerator CheckGameState()
+    IEnumerator WaitForGameStart()
     {
-        bool isRunning = false;
-
-        while (!isRunning)
+        while (Game.State == GameClientState.WaitingForGameStart)
         {
             ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state) =>
             {
                 if (state == GameState.Running.ToString())
-                {
-                    isRunning = true;
-                    Debug.Log("Starting the game");
-                    Game.StartGame();
-                }
+                    Game.State = GameClientState.WaitingForTurn;
                 else
                     Debug.Log($"Waiting for game to start. Current state is {state}.");
             });
 
-            if (!isRunning)
-                yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(2);
         }
     }
 
     IEnumerator WaitForTurn()
     {
-        while (Game.WaitingForTurn)
+        while (Game.State == GameClientState.WaitingForTurn)
         {
             ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (playerName) =>
             {
-                if (playerName == Game._playerName)
-                {
-                    Game.WaitingForTurn = false;
-                    Debug.Log("Your turn");
-                    Game.StartNextTurn();
-                }
+                if (playerName == Game.PlayerName)
+                    Game.State = GameClientState.YourTurn;
                 else
                     Debug.Log($"Waiting for your turn. Current player is {playerName}.");
             });
 
-            if (Game.WaitingForTurn)
-                yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(2);
         }
     }
 }

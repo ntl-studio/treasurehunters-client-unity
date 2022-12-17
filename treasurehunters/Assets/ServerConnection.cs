@@ -25,10 +25,10 @@ public class ServerConnection : MonoBehaviour
 
     public void UpdateGamesListAsync(Action<GamesJson> updateUICallBack)
     {
-        StartCoroutine(GetData("https://localhost:7209/api/v1/games", updateUICallBack));
+        StartCoroutine(GetGamesList("https://localhost:7209/api/v1/games", updateUICallBack));
     }
 
-    private IEnumerator GetData(string uri, Action<GamesJson> callback)
+    private IEnumerator GetGamesList(string uri, Action<GamesJson> gameListCallback)
     {
         UnityWebRequest request = UnityWebRequest.Get(uri);
         yield return request.SendWebRequest();
@@ -44,7 +44,7 @@ public class ServerConnection : MonoBehaviour
                 Debug.Assert(true);
             }
 
-            callback(games.data);
+            gameListCallback(games.data);
         }
         else
         {
@@ -93,7 +93,7 @@ public class ServerConnection : MonoBehaviour
         StartCoroutine(GetGameState(gameId, gameStateCallback));
     }
 
-    public IEnumerator GetGameState(string gameId, Action<string> gameStateCallback)
+    private IEnumerator GetGameState(string gameId, Action<string> gameStateCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}";
         UnityWebRequest request = UnityWebRequest.Get(uri);
@@ -184,5 +184,4 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
-
 }

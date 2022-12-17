@@ -36,21 +36,17 @@ public class Players : MonoBehaviour
 
         Game.OnStartTurn += UpdatePlayersVisibility;
         Game.OnEndMove += UpdatePlayersVisibility;
-
-        UpdatePlayersVisibility();
     }
 
     void UpdatePlayersVisibility()
     {
-        var currentPlayer = Game.CurrentPlayer;
-
         var visibilityArea = Game.CurrentVisibleArea();
 
         foreach (var player in Game.Players)
         {
             _playerViews[player.Name].SetActive(false);
 
-            bool namesMatch = player.Name == currentPlayer.Name;
+            bool namesMatch = player.Name == Game.PlayerName;
 
             if (namesMatch)
             {
@@ -58,7 +54,7 @@ public class Players : MonoBehaviour
             }
             else
             {
-                var currPos = currentPlayer.Position;
+                var currPos = Game.Position;
                 var pos = player.Position;
 
                 if (Math.Abs(pos.X - currPos.X) <= 1 &&

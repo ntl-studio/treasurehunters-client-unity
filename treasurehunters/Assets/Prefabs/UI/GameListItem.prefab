@@ -501,7 +501,9 @@ MonoBehaviour:
   GameIdText: {fileID: 8661530494190853742}
   NumberOfPlayersText: {fileID: 9131305708958028338}
   GameStateText: {fileID: 4677170850419550192}
+  JoinButtonText: {fileID: 8661530493062821481}
   StartGameButton: {fileID: 5382267105605073702}
+  AllowRejoin: 0
 --- !u!1 &8661530492944430639
 GameObject:
   m_ObjectHideFlags: 0

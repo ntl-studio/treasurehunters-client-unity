@@ -32,7 +32,7 @@ public class NextTurn : MonoBehaviour
             (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
         {
             NextTurnPanel.SetActive(false);
-            Game.StartNextTurn();
+            Game.StartTurn();
         }
     }
 }

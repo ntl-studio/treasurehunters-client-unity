@@ -28,7 +28,55 @@ namespace TreasureHunters
             return _instance ??= new GameClient();
         }
 
-        public GameClientState State = GameClientState.NotConnected;
+        private const string PlayerNameKey = "PlayerName";
+
+        private GameClient()
+        {
+            if (PlayerPrefs.HasKey(PlayerNameKey))
+                _playerName = PlayerPrefs.GetString(PlayerNameKey);
+        }
+
+        private GameClientState _state;
+        public GameClientState State {
+            set
+            {
+                var oldState = _state;
+                _state = value;
+
+                if (oldState != value)
+                {
+                    Debug.Log($"State: {_state}");
+
+                    switch (_state)
+                    {
+                        case GameClientState.NotConnected:
+                        case GameClientState.WaitingForGameStart:
+                            break;
+                        case GameClientState.WaitingForTurn:
+                            if (oldState == GameClientState.WaitingForGameStart)
+                                StartGame();
+                            break;
+                        case GameClientState.YourTurn:
+                            if (oldState == GameClientState.WaitingForGameStart)
+                                StartGame();
+                            break;
+                        case GameClientState.GameOver:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+            get => _state;
+        }
+
+        public delegate void GameEvent();
+
+        public event GameEvent OnJoinGame;      // NotConnected -> WaitingForGameStart
+        public event GameEvent OnGameStarted;   // WaitingForGameStater -> WaitingForTurn
+        public event GameEvent OnStartTurn;     // WaitingForTurn -> YourTurn
+        public event GameEvent OnEndMove;       // YourTurn -> WaitingForTurn
+        public event GameEvent OnPlayerClicked; // no state change
 
         private readonly Game _game = new(Guid.NewGuid());
 
@@ -45,12 +93,6 @@ namespace TreasureHunters
             }
         }
 
-        public Position CurrentPlayerPreviousPosition()
-        {
-            var pos = CurrentPlayerMoveStates[0].Position;
-            return new Position(pos.X, pos.Y);
-        }
-
         public int CurrentPlayerId => _game.CurrentPlayerIndex;
 
         public VisibleArea CurrentVisibleArea()
@@ -63,7 +105,7 @@ namespace TreasureHunters
         public bool CurrentPlayerHasTreasure => _game.Players[CurrentPlayerId].HasTreasure;
 
         public List<PlayerMoveState> CurrentPlayerMoveStates =>
-            _game.Players[_game.CurrentPlayerIndex].PlayerMoveStates;
+            _game.PlayerMoveStates[_game.CurrentPlayerIndex];
 
         public Position PlayerPosition(int playerIndex)
         {
@@ -71,7 +113,7 @@ namespace TreasureHunters
             return new Position(pos.X, pos.Y);
         } 
 
-        public string PlayerName(int playerIndex)
+        public string PlayerNameOld(int playerIndex)
         {
             return _game.Players[playerIndex].Name;
         }
@@ -85,14 +127,6 @@ namespace TreasureHunters
             return _game.PerformAction(playerAction);
         }
 
-        public delegate void GameEvent();
-
-        public event GameEvent OnJoinGame;
-        public event GameEvent OnGameStarted;
-        public event GameEvent OnStartTurn;
-        public event GameEvent OnEndMove;
-        public event GameEvent OnPlayerClicked;
-
         public string GameId
         {
             get
@@ -103,18 +137,31 @@ namespace TreasureHunters
         }
 
         private string _gameId;
-        public string _playerName;
-        private string _sessionId;
 
-        public bool WaitingForTurn;
+        private string _playerName;
+
+        public string PlayerName
+        {
+            set
+            {
+                _playerName = value;
+                PlayerPrefs.SetString(PlayerNameKey, _playerName);
+
+            }
+            get => _playerName;
+        }
+
+        private string _sessionId;
+        public Position Position;
+        public Position PreviousPosition;
 
         public void JoinGame(string gameId, string playerName, string sessionId)
         {
             _gameId = gameId;
-            _playerName = playerName;
+            PlayerName = playerName;
             _sessionId = sessionId;
 
-            WaitingForTurn = true;
+            State = GameClientState.WaitingForGameStart;
 
             OnJoinGame?.Invoke();
         }
@@ -124,7 +171,7 @@ namespace TreasureHunters
             OnEndMove?.Invoke();
         }
 
-        public void StartNextTurn()
+        public void StartTurn()
         {
             _game.EndTurn();
             OnStartTurn?.Invoke();
@@ -135,7 +182,11 @@ namespace TreasureHunters
             OnPlayerClicked?.Invoke();
         }
 
-        public void StartGame() { OnGameStarted?.Invoke(); }
+        public void StartGame()
+        {
+            Debug.Log("Starting the game");
+            OnGameStarted?.Invoke();
+        }
 
         public delegate void ShowTreasureEvent(bool isVisible);
         public event ShowTreasureEvent OnShowTreasureEvent;

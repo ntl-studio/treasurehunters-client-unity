@@ -18,8 +18,7 @@ public class ActionsHistory : MonoBehaviour
 
         Game.OnEndMove += () =>
         {
-            var player = Game.CurrentPlayer;
-            UpdateStates(player.Name, Game.CurrentPlayerMoveStates);
+            UpdateStates(Game.PlayerName, Game.CurrentPlayerMoveStates);
         };
 
         Vector3 lastListPosition = transform.position;

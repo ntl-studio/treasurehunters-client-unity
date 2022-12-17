@@ -1,3 +1,4 @@
+using System.Linq;
 using JsonObjects;
 using TreasureHunters;
 using UnityEngine;
@@ -29,8 +30,11 @@ public class GamesList : MonoBehaviour
             Debug.Assert(gamesListItem);
 
             gamesListItem.GameId = game.id;
-            gamesListItem.GameState = game.state;
+            gamesListItem.State = game.state;
             gamesListItem.NumberOfPlayers = game.playerscount.ToString();
+
+            if (game.players.Any(p => p == Game.PlayerName))
+                gamesListItem.AllowRejoin = true;
         }
     }
 }
