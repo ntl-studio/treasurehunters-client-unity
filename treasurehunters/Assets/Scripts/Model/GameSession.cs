@@ -11,6 +11,7 @@ public class GameSession : MonoBehaviour
     void Start()
     {
         Game.OnJoinGame += () => StartCoroutine(CheckGameState());
+        Game.OnGameStarted += () => StartCoroutine(CheckGameState());
     }
 
     IEnumerator CheckGameState()
@@ -32,6 +33,27 @@ public class GameSession : MonoBehaviour
             });
 
             if (!isRunning)
+                yield return new WaitForSeconds(2);
+        }
+    }
+
+    IEnumerator WaitForTurn()
+    {
+        while (Game.WaitingForTurn)
+        {
+            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (playerName) =>
+            {
+                if (playerName == Game._playerName)
+                {
+                    Game.WaitingForTurn = false;
+                    Debug.Log("Your turn");
+                    Game.StartNextTurn();
+                }
+                else
+                    Debug.Log($"Waiting for your turn. Current player is {playerName}.");
+            });
+
+            if (Game.WaitingForTurn)
                 yield return new WaitForSeconds(2);
         }
     }

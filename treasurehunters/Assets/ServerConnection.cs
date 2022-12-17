@@ -153,4 +153,36 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
+    public void GetCurrentPlayerAsync(string gameId, Action<string> currentPlayerCallback)
+    {
+        StartCoroutine(GetCurrentPlayer(gameId, currentPlayerCallback));
+    }
+    private IEnumerator GetCurrentPlayer(string gameId, Action<string> currentPlayerCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/currentplayer";
+        UnityWebRequest request = UnityWebRequest.Get(uri);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var currentPlayer = JsonUtility.FromJson<CurrentPlayerDataJson>(jsonText);
+            if (currentPlayer == null)
+            {
+                Debug.Log($"Could not read current player from json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            {
+                currentPlayerCallback(currentPlayer.data.name);
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
+
 }

@@ -1,11 +1,24 @@
 using NtlStudio.TreasureHunters.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace TreasureHunters
 {
+    public enum GameClientState
+    {
+        NotConnected,           // Opened the app, the list of games is available
+
+        WaitingForGameStart,    // Joined one of the games in the list, the list is still visible
+
+        WaitingForTurn,         // The game has started (you started it or someone else),
+                                // you are waiting for other players to make a move
+
+        YourTurn,               // It is your turn, you can move the player
+
+        GameOver                // Someone won the game (it could be you)
+    }
+
     public class GameClient
     {
         private static GameClient _instance;
@@ -15,29 +28,22 @@ namespace TreasureHunters
             return _instance ??= new GameClient();
         }
 
-        private GameClient()
-        {
-            _game.RegisterPlayer("Player 1");
-            _game.RegisterPlayer("Player 2");
-
-            int index = 0;
-            foreach (var p in _game.Players)
-            {
-                Players.Add(new Player(this, index++));
-            }
-
-            Players[0].Color = Color.yellow;
-            Players[1].Color = Color.blue;
-
-            Debug.Log("Game initialized successfully");
-        }
+        public GameClientState State = GameClientState.NotConnected;
 
         private readonly Game _game = new(Guid.NewGuid());
 
         public const int FieldWidth = GameField.FieldWidth;
         public const int FieldHeight = GameField.FieldHeight;
 
-        public Player CurrentPlayer => Players[_game.CurrentPlayerIndex];
+        private Player _player;
+        public Player CurrentPlayer
+        {
+            get
+            {
+                Debug.Assert(_player != null);
+                return Players[_game.CurrentPlayerIndex];
+            }
+        }
 
         public Position CurrentPlayerPreviousPosition()
         {
@@ -63,7 +69,8 @@ namespace TreasureHunters
         {
             var pos = _game.Players[playerIndex].Position;
             return new Position(pos.X, pos.Y);
-        }
+        } 
+
         public string PlayerName(int playerIndex)
         {
             return _game.Players[playerIndex].Name;
@@ -72,8 +79,6 @@ namespace TreasureHunters
         public int PlayersCount => _game.Players.Count;
 
         public List<Player> Players = new();
-
-        public GameState State => _game.State;
 
         public bool MakeTurn(PlayerAction playerAction)
         {
@@ -98,14 +103,18 @@ namespace TreasureHunters
         }
 
         private string _gameId;
-        private string _playerName;
+        public string _playerName;
         private string _sessionId;
+
+        public bool WaitingForTurn;
 
         public void JoinGame(string gameId, string playerName, string sessionId)
         {
             _gameId = gameId;
             _playerName = playerName;
             _sessionId = sessionId;
+
+            WaitingForTurn = true;
 
             OnJoinGame?.Invoke();
         }

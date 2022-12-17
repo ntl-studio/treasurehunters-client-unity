@@ -19,7 +19,7 @@ public class NextTurn : MonoBehaviour
         Game.OnEndMove += () =>
         {
             NextTurnPanel.SetActive(true);
-            if (Game.State == GameState.Finished)
+            if (Game.State == GameClientState.GameOver)
             {
                 Message.text = "You won";
             }
@@ -28,7 +28,7 @@ public class NextTurn : MonoBehaviour
 
     void Update()
     {
-        if (Game.State == GameState.Running &&
+        if (Game.State == GameClientState.YourTurn &&
             (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
         {
             NextTurnPanel.SetActive(false);

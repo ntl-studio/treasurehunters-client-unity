@@ -50,4 +50,17 @@ namespace JsonObjects
     {
         public GameStateJson data;
     }
+
+    [System.Serializable]
+    class CurrentPlayerJson
+    {
+        public int index;
+        public string name;
+    }
+
+    [System.Serializable]
+    class CurrentPlayerDataJson
+    {
+        public CurrentPlayerJson data;
+    }
 }
