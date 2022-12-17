@@ -67,7 +67,7 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnStartTurn += () =>
+        _game.OnUpdateVisibleArea += () =>
         {
             UpdateBoardAfterPreviousTurn();
             UpdatePlayerVisibility();

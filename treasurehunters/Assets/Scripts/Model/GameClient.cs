@@ -45,7 +45,7 @@ namespace TreasureHunters
 
                 if (oldState != value)
                 {
-                    Debug.Log($"State: {_state}");
+                    Debug.Log($"State changed from {oldState} to {_state}");
 
                     switch (_state)
                     {
@@ -53,12 +53,14 @@ namespace TreasureHunters
                         case GameClientState.WaitingForGameStart:
                             break;
                         case GameClientState.WaitingForTurn:
-                            if (oldState == GameClientState.WaitingForGameStart)
-                                StartGame();
+                            if (oldState == GameClientState.WaitingForGameStart ||
+                                oldState == GameClientState.NotConnected)
+                            {
+                                OnGameStarted?.Invoke();
+                            }
                             break;
                         case GameClientState.YourTurn:
-                            if (oldState == GameClientState.WaitingForGameStart)
-                                StartGame();
+                            OnStartTurn?.Invoke();
                             break;
                         case GameClientState.GameOver:
                             break;
@@ -77,6 +79,7 @@ namespace TreasureHunters
         public event GameEvent OnStartTurn;     // WaitingForTurn -> YourTurn
         public event GameEvent OnEndMove;       // YourTurn -> WaitingForTurn
         public event GameEvent OnPlayerClicked; // no state change
+        public event GameEvent OnUpdateVisibleArea; // no state change
 
         private readonly Game _game = new(Guid.NewGuid());
 
@@ -95,14 +98,29 @@ namespace TreasureHunters
 
         public int CurrentPlayerId => _game.CurrentPlayerIndex;
 
-        public VisibleArea CurrentVisibleArea()
+        private VisibleArea _visibleArea;
+
+        public void SetVisibleArea(int[] cells)
         {
-            var field = _game.GameField;
-            var player = _game.Players[_game.CurrentPlayerIndex];
-            return field.GetVisibleArea(player.Position);
+            FieldCell[,] fieldCells = new FieldCell[VisibleArea.Width, VisibleArea.Height];
+
+            for (int x = 0; x < VisibleArea.Width; ++x)
+            {
+                for (int y = 0; y < VisibleArea.Height; ++y)
+                    fieldCells[x, y] = (FieldCell)cells[y * 3 + x];
+            }
+            _visibleArea = new VisibleArea(fieldCells);
+
+            OnUpdateVisibleArea?.Invoke();
         }
 
-        public bool CurrentPlayerHasTreasure => _game.Players[CurrentPlayerId].HasTreasure;
+        public VisibleArea CurrentVisibleArea()
+        {
+            Debug.Assert(_visibleArea != null);
+            return _visibleArea;
+        }
+
+        public bool CurrentPlayerHasTreasure => false;
 
         public List<PlayerMoveState> CurrentPlayerMoveStates =>
             _game.PlayerMoveStates[_game.CurrentPlayerIndex];
@@ -118,7 +136,7 @@ namespace TreasureHunters
             return _game.Players[playerIndex].Name;
         }
 
-        public int PlayersCount => _game.Players.Count;
+        public int PlayersCount = 1;
 
         public List<Player> Players = new();
 
@@ -155,13 +173,15 @@ namespace TreasureHunters
         public Position Position;
         public Position PreviousPosition;
 
-        public void JoinGame(string gameId, string playerName, string sessionId)
+        public void JoinGame(string gameId, string sessionId, bool started = false)
         {
             _gameId = gameId;
-            PlayerName = playerName;
             _sessionId = sessionId;
 
-            State = GameClientState.WaitingForGameStart;
+            if (!started)
+                State = GameClientState.WaitingForGameStart;
+            else
+                State = GameClientState.WaitingForTurn;
 
             OnJoinGame?.Invoke();
         }
@@ -180,12 +200,6 @@ namespace TreasureHunters
         public void PlayerClicked()
         {
             OnPlayerClicked?.Invoke();
-        }
-
-        public void StartGame()
-        {
-            Debug.Log("Starting the game");
-            OnGameStarted?.Invoke();
         }
 
         public delegate void ShowTreasureEvent(bool isVisible);

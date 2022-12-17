@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Model;
+
 namespace JsonObjects
 {
     [System.Serializable]
@@ -63,5 +66,17 @@ namespace JsonObjects
     class CurrentPlayerDataJson
     {
         public CurrentPlayerJson data;
+    }
+
+    [System.Serializable]
+    class VisibleAreaJson
+    {
+        public int[] visiblearea;
+    }
+
+    [System.Serializable]
+    class VisibleAreaDataJson 
+    {
+        public VisibleAreaJson data;
     }
 }

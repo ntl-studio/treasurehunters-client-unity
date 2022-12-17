@@ -10,6 +10,10 @@ public class GameSession : MonoBehaviour
     void Start()
     {
         Game.OnJoinGame += () => StartCoroutine(WaitForGameStart());
+        Game.OnStartTurn += () =>
+            ServerConnection.Instance().GetVisibleAreaAsync(
+                Game.GameId, Game.PlayerName, (cells) => Game.SetVisibleArea(cells));
+
         Game.OnGameStarted += () => StartCoroutine(WaitForTurn());
     }
 

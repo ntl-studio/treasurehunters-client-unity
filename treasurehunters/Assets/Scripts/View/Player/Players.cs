@@ -34,7 +34,7 @@ public class Players : MonoBehaviour
             _playerViews.Add(player.Name, playerObj);
         }
 
-        Game.OnStartTurn += UpdatePlayersVisibility;
+        Game.OnUpdateVisibleArea += UpdatePlayersVisibility;
         Game.OnEndMove += UpdatePlayersVisibility;
     }
 

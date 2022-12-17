@@ -50,7 +50,7 @@ public class GamesListItem : MonoBehaviour
                     if (isJoined)
                     {
                         Debug.Log($"Joined to the game {gameId} as {playerName}");
-                        Game.JoinGame(gameId, playerName, sessionId);
+                        Game.JoinGame(gameId, sessionId);
                     }
                     else
                         Debug.Log("Did not join");
@@ -61,9 +61,9 @@ public class GamesListItem : MonoBehaviour
             ServerConnection.Instance().GetGameStateAsync(GameIdText.text, (state) =>
             {
                 if (state == GameState.NotStarted.ToString())
-                    Game.State = GameClientState.WaitingForGameStart;
+                    Game.JoinGame(GameIdText.text, "", started: false);
                 else if (state == GameState.Running.ToString())
-                    Game.State = GameClientState.WaitingForTurn;
+                    Game.JoinGame(GameIdText.text, "", started: true);
                 else
                     throw new Exception($"Game state {state} not supported");
 
