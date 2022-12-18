@@ -92,4 +92,16 @@ namespace JsonObjects
     {
         public PlayerPositionJson data;
     }
+
+    [System.Serializable]
+    class PlayerActionResultJson
+    {
+        public bool successful;
+    }
+
+    [System.Serializable]
+    class PlayerActionResultDataJson
+    {
+        public PlayerActionResultJson data;
+    }
 }

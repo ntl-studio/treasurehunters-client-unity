@@ -81,7 +81,9 @@ namespace TreasureHunters
         public event GameEvent OnPlayerClicked; // no state change
         public event GameEvent OnUpdateVisibleArea; // no state change
 
-        public event GameEvent OnActionCompleted;     // When the server confirmed that action was performed
+        public delegate void PlayerActionEvent(bool actionResult);
+
+        public event PlayerActionEvent OnPlayerActionCompleted;     // When the server confirmed that action was performed
 
         private readonly Game _game = new(Guid.NewGuid());
 
@@ -131,9 +133,11 @@ namespace TreasureHunters
 
         public List<Player> Players = new();
 
-        public bool MakeTurn(PlayerAction playerAction)
+        public void PerformAction(PlayerAction playerAction)
         {
-            return _game.PerformAction(playerAction);
+            ServerConnection.Instance().PerformActionAsync(
+                GameId, PlayerName, playerAction.ToString(),
+                actionResult => OnPlayerActionCompleted?.Invoke(actionResult) );
         }
 
         public string GameId

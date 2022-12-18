@@ -20,6 +20,26 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };
+
+        Game.OnPlayerActionCompleted += (actionResult) =>
+        {
+            if (actionResult)
+            {
+                Vector2Int shift = GameUtils.ActionToVector2(_lastAction);
+
+                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
+
+                _direction = (_destination - transform.position).normalized;
+                _isMoving = true;
+                GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
+            }
+            else
+            {
+                Debug.Log("Could not move player");
+            }
+
+            _lastAction = PlayerAction.None;
+        };
     }
 
     void Update()
@@ -59,6 +79,8 @@ public class PlayerMovement : MonoBehaviour
             transform);
     }
 
+    private PlayerAction _lastAction = PlayerAction.None;
+
     private void MovePlayer()
     {
         if (_isMoving)
@@ -93,22 +115,11 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
             playerAction = PlayerAction.MoveDown;
 
+        _lastAction = playerAction;
+
         if (playerAction != PlayerAction.None)
         {
-            if (Game.MakeTurn(playerAction))
-            {
-                Vector2Int shift = GameUtils.ActionToVector2(playerAction);
-
-                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
-
-                _direction = (_destination - transform.position).normalized;
-                _isMoving = true;
-                GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
-            }
-            else
-            {
-                Debug.Log("Could not move player");
-            }
+            Game.PerformAction(playerAction);
         }
     }
 }

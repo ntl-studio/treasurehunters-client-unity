@@ -252,4 +252,38 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
+
+    public void PerformActionAsync(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
+    {
+        StartCoroutine(PerformAction(gameId, playerName, actionName, performActionCallback));
+    }
+
+    private IEnumerator PerformAction(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
+        UnityWebRequest request = UnityWebRequest.Put(uri, String.Empty);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var playerActionResult = JsonUtility.FromJson<PlayerActionResultDataJson>(jsonText);
+            if (playerActionResult == null)
+            {
+                Debug.Log($"Could not read action result from json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            {
+                performActionCallback(playerActionResult.data.successful);
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
+
 }
