@@ -9,6 +9,9 @@ namespace TreasureHunters
     {
         NotConnected,           // Opened the app, the list of games is available
 
+        Joining,                // Asked to join the game, waiting to join (getting details
+                                // from server, initializing the board)
+
         WaitingForGameStart,    // Joined one of the games in the list, the list is still visible
 
         WaitingForTurn,         // The game has started (you started it or someone else),
@@ -34,10 +37,14 @@ namespace TreasureHunters
         {
             if (PlayerPrefs.HasKey(PlayerNameKey))
                 _playerName = PlayerPrefs.GetString(PlayerNameKey);
+
+
+            AddCallbacksDebug();
         }
 
-        private GameClientState _state;
-        public GameClientState State {
+        private GameClientState _state = GameClientState.NotConnected;
+        public GameClientState State
+        {
             set
             {
                 var oldState = _state;
@@ -50,9 +57,15 @@ namespace TreasureHunters
                     switch (_state)
                     {
                         case GameClientState.NotConnected:
+                            break;
+                        case GameClientState.Joining:
+                            OnStartJoiningGame?.Invoke();
+                            break;
                         case GameClientState.WaitingForGameStart:
+                            OnFinishJoiningGame?.Invoke();
                             break;
                         case GameClientState.WaitingForTurn:
+                            OnFinishJoiningGame?.Invoke();
                             if (oldState == GameClientState.WaitingForGameStart ||
                                 oldState == GameClientState.NotConnected)
                             {
@@ -74,12 +87,24 @@ namespace TreasureHunters
 
         public delegate void GameEvent();
 
-        public event GameEvent OnJoinGame;      // NotConnected -> WaitingForGameStart
-        public event GameEvent OnStartGame;   // WaitingForGameStater -> WaitingForTurn
-        public event GameEvent OnStartTurn;     // WaitingForTurn -> YourTurn
-        public event GameEvent OnEndMove;       // YourTurn -> WaitingForTurn
-        public event GameEvent OnPlayerClicked; // no state change
-        public event GameEvent OnUpdateVisibleArea; // no state change
+        public event GameEvent OnStartJoiningGame;       // NotConnected -> WaitingForGameStart
+        public event GameEvent OnFinishJoiningGame;      // NotConnected -> WaitingForGameStart
+        public event GameEvent OnStartGame;              // WaitingForGameStater -> WaitingForTurn
+        public event GameEvent OnStartTurn;              // WaitingForTurn -> YourTurn
+        public event GameEvent OnEndMove;                // YourTurn -> WaitingForTurn
+        public event GameEvent OnPlayerClicked;          // no state change
+        public event GameEvent OnUpdateVisibleArea;      // no state change
+
+        private void AddCallbacksDebug()
+        {
+            OnStartJoiningGame += () => Debug.Log("OnStartJoiningGame");
+            OnFinishJoiningGame += () => Debug.Log("OnFinishJoiningGame");
+            OnStartGame += () => Debug.Log("OnStartGame");
+            OnStartTurn += () => Debug.Log("OnStartTurn");
+            OnEndMove  += () => Debug.Log("OnEndGame");
+            OnPlayerClicked += () => Debug.Log("OnPlayerClicked");
+            OnUpdateVisibleArea += () => Debug.Log("OnUpdateVisibleArea");
+        }
 
         public delegate void PlayerActionEvent(bool actionResult);
 
@@ -170,16 +195,17 @@ namespace TreasureHunters
 
         public void JoinGame(string gameId, int playersCount, string sessionId, bool started = false)
         {
+            Debug.Log($"Joined game {gameId}");
             _gameId = gameId;
             _sessionId = sessionId;
             PlayersCount = playersCount;
+
+            OnStartJoiningGame?.Invoke();
 
             if (!started)
                 State = GameClientState.WaitingForGameStart;
             else
                 State = GameClientState.WaitingForTurn;
-
-            OnJoinGame?.Invoke();
         }
 
         public void EndMove()

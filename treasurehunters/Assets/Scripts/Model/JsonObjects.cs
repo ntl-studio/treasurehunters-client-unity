@@ -69,28 +69,17 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class VisibleAreaJson
+    class PlayerInfoJson
     {
+        public int x;
+        public int y;
         public int[] visiblearea;
     }
 
     [System.Serializable]
-    class VisibleAreaDataJson 
+    class PlayerInfoDataJson
     {
-        public VisibleAreaJson data;
-    }
-
-    [System.Serializable]
-    class PlayerPositionJson
-    {
-        public int x;
-        public int y;
-    }
-
-    [System.Serializable]
-    class PlayerPositionDataJson
-    {
-        public PlayerPositionJson data;
+        public PlayerInfoJson data;
     }
 
     [System.Serializable]

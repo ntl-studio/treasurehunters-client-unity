@@ -187,44 +187,11 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
-    public void GetVisibleAreaAsync(string gameId, string playerName, Action<int[]> getVisibleAreaCallback)
+    public void GetPlayerInfoAsync(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
     {
-        StartCoroutine(GetVisibleArea(gameId, playerName, getVisibleAreaCallback));
+        StartCoroutine(GetPlayerInfo(gameId, playerName, getPlayerInfoCallback));
     }
-    private IEnumerator GetVisibleArea(string gameId, string playerName, Action<int[]> getVisibleAreaCallback)
-    {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/visiblearea/{playerName}";
-        UnityWebRequest request = UnityWebRequest.Get(uri);
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var visibleArea = JsonUtility.FromJson<VisibleAreaDataJson>(jsonText);
-            if (visibleArea == null)
-            {
-                Debug.Log($"Could not read current player from json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                var cells = visibleArea.data.visiblearea;
-                getVisibleAreaCallback(cells);
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
-    }
-
-    public void GetPlayerPositionAsync(string gameId, string playerName, Func<int, int, IEnumerator> getPlayerPositionCallback)
-    {
-        StartCoroutine(GetPlayerPosition(gameId, playerName, getPlayerPositionCallback));
-    }
-    private IEnumerator GetPlayerPosition(string gameId, string playerName, Func<int, int, IEnumerator> getPlayerPositionCallback)
+    private IEnumerator GetPlayerInfo(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
         UnityWebRequest request = UnityWebRequest.Get(uri);
@@ -235,16 +202,16 @@ public class ServerConnection : MonoBehaviour
         {
             var jsonText = request.downloadHandler.text;
 
-            var playerPosition = JsonUtility.FromJson<PlayerPositionDataJson>(jsonText);
-            if (playerPosition == null)
+            var playerInfo = JsonUtility.FromJson<PlayerInfoDataJson>(jsonText);
+            if (playerInfo == null)
             {
                 Debug.Log($"Could not read player position from json: {jsonText}");
                 Debug.Assert(true);
             }
             else
             {
-                var position = playerPosition.data;
-                getPlayerPositionCallback(position.x, position.y);
+                var data = playerInfo.data;
+                getPlayerInfoCallback(data.x, data.y, data.visiblearea);
             }
         }
         else

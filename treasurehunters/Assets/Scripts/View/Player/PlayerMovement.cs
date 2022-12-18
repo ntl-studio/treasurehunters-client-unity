@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
-        Game.OnStartGame += () =>
+        Game.OnFinishJoiningGame += () =>
         {
             transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };

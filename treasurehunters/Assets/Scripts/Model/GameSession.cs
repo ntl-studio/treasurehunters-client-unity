@@ -9,26 +9,19 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
-        Game.OnJoinGame += () => StartCoroutine(WaitForGameStart());
-
+        Game.OnStartJoiningGame += () => StartCoroutine(GetPlayerDetails());
+        Game.OnFinishJoiningGame += () => StartCoroutine(WaitForGameStart());
         Game.OnStartGame += () => StartCoroutine(WaitForTurn());
+    }
 
-        Game.OnStartTurn += () =>
-            ServerConnection.Instance().GetVisibleAreaAsync(
-                Game.GameId, Game.PlayerName, (cells) => Game.SetVisibleArea(cells));
+    IEnumerator GetPlayerDetails()
+    {
+        ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName, UpdatePositionCallback);
+        yield return null;
     }
 
     IEnumerator WaitForGameStart()
     {
-        ServerConnection.Instance().GetPlayerPositionAsync(Game.GameId, Game.PlayerName, UpdatePositionCallback);
-
-        yield return null;
-    }
-
-    IEnumerator UpdatePositionCallback(int x, int y)
-    {
-        Game.PlayerPosition = new TreasureHunters.Position(x, y);
-
         while (Game.State == GameClientState.WaitingForGameStart)
         {
             ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state, playersCount) =>
@@ -41,6 +34,15 @@ public class GameSession : MonoBehaviour
 
             yield return new WaitForSeconds(2);
         }
+
+        yield return null;
+    }
+
+    void UpdatePositionCallback(int x, int y, int[] visibleArea)
+    {
+        Game.PlayerPosition = new TreasureHunters.Position(x, y);
+        Game.SetVisibleArea(visibleArea);
+        Game.State = GameClientState.WaitingForGameStart;
     }
 
     IEnumerator WaitForTurn()
