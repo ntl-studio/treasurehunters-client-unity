@@ -44,13 +44,13 @@ public class GamesListItem : MonoBehaviour
         // If we join the game for the first time (player name is not in the players list)
         if (!AllowRejoin)
         {
-            ServerConnection.Instance().JoinGameAsync(GameIdText.text, "P1",
-                (isJoined, gameId, playerName, sessionId) =>
+            ServerConnection.Instance().JoinGameAsync(GameIdText.text,
+                (isJoined, gameId, playersCount, sessionId) =>
                 {
                     if (isJoined)
                     {
-                        Debug.Log($"Joined to the game {gameId} as {playerName}");
-                        Game.JoinGame(gameId, sessionId);
+                        Debug.Log($"Joined to the game {gameId}");
+                        Game.JoinGame(gameId, playersCount, sessionId);
                     }
                     else
                         Debug.Log("Did not join");
@@ -58,12 +58,12 @@ public class GamesListItem : MonoBehaviour
         }
         else
         {
-            ServerConnection.Instance().GetGameStateAsync(GameIdText.text, (state) =>
+            ServerConnection.Instance().GetGameStateAsync(GameIdText.text, (state, playersCount) =>
             {
                 if (state == GameState.NotStarted.ToString())
-                    Game.JoinGame(GameIdText.text, "", started: false);
+                    Game.JoinGame(GameIdText.text, playersCount, "", started: false);
                 else if (state == GameState.Running.ToString())
-                    Game.JoinGame(GameIdText.text, "", started: true);
+                    Game.JoinGame(GameIdText.text, playersCount, "", started: true);
                 else
                     throw new Exception($"Game state {state} not supported");
 

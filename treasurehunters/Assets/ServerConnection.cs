@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using JsonObjects;
 using NtlStudio.TreasureHunters.Model;
+using TreasureHunters;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class ServerConnection : MonoBehaviour
 {
     private static ServerConnection _instance;
+    private static GameClient Game => GameClient.Instance();
 
     public static ServerConnection Instance()
     {
@@ -53,16 +55,16 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
-    public void JoinGameAsync(string gameId, string playerName, 
-        Action<bool, string, string, string> joinGameCallback)
+    public delegate void JoinGameCallbackAction(bool joined, string gameId, int playersCount, string sessionId);
+
+    public void JoinGameAsync(string gameId, JoinGameCallbackAction joinGameCallback)
     {
-        StartCoroutine(JoinGame(gameId, playerName, joinGameCallback));
+        StartCoroutine(JoinGame(gameId, joinGameCallback));
     }
 
-    private IEnumerator JoinGame(string gameId, string playerName, 
-        Action<bool, string, string, string> joinGameCallback)
+    private IEnumerator JoinGame(string gameId, JoinGameCallbackAction joinGameCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{Game.PlayerName}";
         UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
 
         yield return request.SendWebRequest();
@@ -79,8 +81,7 @@ public class ServerConnection : MonoBehaviour
             }
             else
             {
-                joinGameCallback(playersData.successful, gameId,
-                    playerName, playersData.data.sessionid);
+                joinGameCallback(playersData.successful, gameId, 1, playersData.data.sessionid);
             }
         }
         else
@@ -89,12 +90,12 @@ public class ServerConnection : MonoBehaviour
         }
     }
 
-    public void GetGameStateAsync(string gameId, Action<string> gameStateCallback)
+    public void GetGameStateAsync(string gameId, Action<string, int> gameStateCallback)
     {
         StartCoroutine(GetGameState(gameId, gameStateCallback));
     }
 
-    private IEnumerator GetGameState(string gameId, Action<string> gameStateCallback)
+    private IEnumerator GetGameState(string gameId, Action<string, int> gameStateCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}";
         UnityWebRequest request = UnityWebRequest.Get(uri);
@@ -113,7 +114,7 @@ public class ServerConnection : MonoBehaviour
             }
             else
             {
-                gameStateCallback(gameData.data.state);
+                gameStateCallback(gameData.data.state, gameData.data.playerscount);
             }
         }
         else
@@ -218,5 +219,4 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
-
 }

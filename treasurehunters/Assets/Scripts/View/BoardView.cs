@@ -39,7 +39,7 @@ public class BoardView : MonoBehaviour
 
     public GameObject _treasure;
 
-    private readonly List<PlayerBoardView> _playerBoards = new();
+    private readonly PlayerBoardView _playerBoard = new();
 
     private readonly List<List<WallView>> _wallCells = new();
     private readonly List<List<CeilingCell>> _ceilingCells = new();
@@ -60,16 +60,11 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelPrefab);
         Debug.Assert(_cellLabelsParent);
 
-        for (int i = 0; i < _game.PlayersCount; ++i)
-        {
-            _playerBoards.Add(new PlayerBoardView());
-        }
-
         GenerateBoardSprites();
 
         _game.OnUpdateVisibleArea += () =>
         {
-            UpdateBoardAfterPreviousTurn();
+            // UpdateBoardAfterPreviousTurn();
             UpdatePlayerVisibility();
         };
 
@@ -149,9 +144,9 @@ public class BoardView : MonoBehaviour
         {
             for (int y = 0; y < GameField.FieldHeight; ++y)
             {
-                if (_playerBoards[playerId].Visited[x, y])
+                if (_playerBoard.Visited[x, y])
                 {
-                    FieldCell cell = _playerBoards[playerId].Board[x, y];
+                    FieldCell cell = _playerBoard.Board[x, y];
                     _wallCells[y][x].SetWallsVisibility(cell);
                     _ceilingCells[y][x].State = CeilingState.Fog;
                 }
@@ -177,7 +172,7 @@ public class BoardView : MonoBehaviour
                 if (fieldX is >= 0 and < GameField.FieldWidth &&
                     fieldY is >= 0 and < GameField.FieldHeight)
                 {
-                    if (_playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY])
+                    if (_playerBoard.Visited[fieldX, fieldY])
                         _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
                 }
             }
@@ -218,8 +213,8 @@ public class BoardView : MonoBehaviour
                 _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
                 _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;
 
-                _playerBoards[_game.CurrentPlayerId].Board[fieldX, fieldY] = cell;
-                _playerBoards[_game.CurrentPlayerId].Visited[fieldX, fieldY] = true;
+                _playerBoard.Board[fieldX, fieldY] = cell;
+                _playerBoard.Visited[fieldX, fieldY] = true;
             }
         }
     }

@@ -21,7 +21,7 @@ public class GameSession : MonoBehaviour
     {
         while (Game.State == GameClientState.WaitingForGameStart)
         {
-            ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state) =>
+            ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state, playersCount) =>
             {
                 if (state == GameState.Running.ToString())
                     Game.State = GameClientState.WaitingForTurn;

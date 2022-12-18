@@ -136,7 +136,7 @@ namespace TreasureHunters
             return _game.Players[playerIndex].Name;
         }
 
-        public int PlayersCount = 1;
+        public int PlayersCount = -1;
 
         public List<Player> Players = new();
 
@@ -173,10 +173,11 @@ namespace TreasureHunters
         public Position Position;
         public Position PreviousPosition;
 
-        public void JoinGame(string gameId, string sessionId, bool started = false)
+        public void JoinGame(string gameId, int playersCount, string sessionId, bool started = false)
         {
             _gameId = gameId;
             _sessionId = sessionId;
+            PlayersCount = playersCount;
 
             if (!started)
                 State = GameClientState.WaitingForGameStart;
