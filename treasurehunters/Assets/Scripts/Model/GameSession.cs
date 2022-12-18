@@ -10,15 +10,25 @@ public class GameSession : MonoBehaviour
     void Start()
     {
         Game.OnJoinGame += () => StartCoroutine(WaitForGameStart());
+
+        Game.OnStartGame += () => StartCoroutine(WaitForTurn());
+
         Game.OnStartTurn += () =>
             ServerConnection.Instance().GetVisibleAreaAsync(
                 Game.GameId, Game.PlayerName, (cells) => Game.SetVisibleArea(cells));
-
-        Game.OnGameStarted += () => StartCoroutine(WaitForTurn());
     }
 
     IEnumerator WaitForGameStart()
     {
+        ServerConnection.Instance().GetPlayerPositionAsync(Game.GameId, Game.PlayerName, UpdatePositionCallback);
+
+        yield return null;
+    }
+
+    IEnumerator UpdatePositionCallback(int x, int y)
+    {
+        Game.PlayerPosition = new TreasureHunters.Position(x, y);
+
         while (Game.State == GameClientState.WaitingForGameStart)
         {
             ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state, playersCount) =>

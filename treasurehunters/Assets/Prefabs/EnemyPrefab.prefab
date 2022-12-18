@@ -11,10 +11,8 @@ GameObject:
   - component: {fileID: 4014059945718007177}
   - component: {fileID: 4014059945718007176}
   - component: {fileID: 4014059945718007172}
-  - component: {fileID: 4014059945718007178}
-  - component: {fileID: 4014059945718007179}
   m_Layer: 0
-  m_Name: PlayerPrefab
+  m_Name: EnemyPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,28 +111,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.6666667, y: 0.6666667}
   m_EdgeRadius: 0
---- !u!114 &4014059945718007178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4014059945718007183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe0779bd48f3afa41afb3dcb30215b22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AcceptInput: 0
---- !u!114 &4014059945718007179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4014059945718007183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b6381dafd464b9459156e871b9d5b9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

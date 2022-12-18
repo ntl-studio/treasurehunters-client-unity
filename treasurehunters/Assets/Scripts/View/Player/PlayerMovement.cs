@@ -7,7 +7,6 @@ using Player = TreasureHunters.Player;
 public class PlayerMovement : MonoBehaviour
 {
     public bool AcceptInput = false;
-    public Player Player;
 
     private bool _isMoving;
     private Vector3 _destination;
@@ -17,9 +16,10 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
-        Debug.Assert(Player != null);
-
-        UpdateView();
+        Game.OnStartGame += () =>
+        {
+            transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
+        };
     }
 
     void Update()
@@ -51,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateView()
     {
-        transform.position = new Vector3(Player.Position.X, Player.Position.Y);
+        transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
 
         var states = Game.CurrentPlayerMoveStates;
         GameUtils.UpdateRotation(

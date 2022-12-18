@@ -15,7 +15,7 @@ public class GamesList : MonoBehaviour
         ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
 
         Game.OnJoinGame += () => gameObject.SetActive(false);
-        Game.OnGameStarted += () => gameObject.SetActive(false);
+        Game.OnStartGame += () => gameObject.SetActive(false);
     }
 
     public void UpdateGamesList(GamesJson games)

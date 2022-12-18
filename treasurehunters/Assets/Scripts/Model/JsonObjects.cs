@@ -79,4 +79,17 @@ namespace JsonObjects
     {
         public VisibleAreaJson data;
     }
+
+    [System.Serializable]
+    class PlayerPositionJson
+    {
+        public int x;
+        public int y;
+    }
+
+    [System.Serializable]
+    class PlayerPositionDataJson
+    {
+        public PlayerPositionJson data;
+    }
 }

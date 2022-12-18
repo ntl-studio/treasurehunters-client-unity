@@ -13,8 +13,6 @@ namespace TreasureHunters
 
         public Position PreviousPosition = new Position(-1, -1);
 
-        public Position Position => _game.PlayerPosition(_playerIndex);
-
         public string Name => _game.PlayerName;
 
         public UnityEngine.Color Color = UnityEngine.Color.white;

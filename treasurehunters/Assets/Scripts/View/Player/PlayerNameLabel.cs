@@ -20,7 +20,7 @@ public class PlayerNameLabel : MonoBehaviour
     void UpdatePlayerName()
     {
         _playerNameText.text = Game.PlayerName +
-                              " (" + Game.Position.X + ", "
-                              + Game.Position.Y + ")";
+                              " (" + Game.PlayerPosition.X + ", "
+                              + Game.PlayerPosition.Y + ")";
     }
 }

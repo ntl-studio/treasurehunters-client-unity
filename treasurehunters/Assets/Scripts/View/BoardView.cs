@@ -181,7 +181,7 @@ public class BoardView : MonoBehaviour
 
     public void UpdatePlayerVisibility()
     {
-        var position = _game.Position;
+        var position = _game.PlayerPosition;
         var visibleArea = _game.CurrentVisibleArea();
 
         if (!_game.IsTreasureAlwaysVisible)

@@ -219,4 +219,37 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
+
+    public void GetPlayerPositionAsync(string gameId, string playerName, Func<int, int, IEnumerator> getPlayerPositionCallback)
+    {
+        StartCoroutine(GetPlayerPosition(gameId, playerName, getPlayerPositionCallback));
+    }
+    private IEnumerator GetPlayerPosition(string gameId, string playerName, Func<int, int, IEnumerator> getPlayerPositionCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
+        UnityWebRequest request = UnityWebRequest.Get(uri);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            var jsonText = request.downloadHandler.text;
+
+            var playerPosition = JsonUtility.FromJson<PlayerPositionDataJson>(jsonText);
+            if (playerPosition == null)
+            {
+                Debug.Log($"Could not read player position from json: {jsonText}");
+                Debug.Assert(true);
+            }
+            else
+            {
+                var position = playerPosition.data;
+                getPlayerPositionCallback(position.x, position.y);
+            }
+        }
+        else
+        {
+            Debug.Log(request.error);
+        }
+    }
 }

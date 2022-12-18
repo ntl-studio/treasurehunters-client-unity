@@ -56,7 +56,7 @@ namespace TreasureHunters
                             if (oldState == GameClientState.WaitingForGameStart ||
                                 oldState == GameClientState.NotConnected)
                             {
-                                OnGameStarted?.Invoke();
+                                OnStartGame?.Invoke();
                             }
                             break;
                         case GameClientState.YourTurn:
@@ -75,26 +75,18 @@ namespace TreasureHunters
         public delegate void GameEvent();
 
         public event GameEvent OnJoinGame;      // NotConnected -> WaitingForGameStart
-        public event GameEvent OnGameStarted;   // WaitingForGameStater -> WaitingForTurn
+        public event GameEvent OnStartGame;   // WaitingForGameStater -> WaitingForTurn
         public event GameEvent OnStartTurn;     // WaitingForTurn -> YourTurn
         public event GameEvent OnEndMove;       // YourTurn -> WaitingForTurn
         public event GameEvent OnPlayerClicked; // no state change
         public event GameEvent OnUpdateVisibleArea; // no state change
 
+        public event GameEvent OnActionCompleted;     // When the server confirmed that action was performed
+
         private readonly Game _game = new(Guid.NewGuid());
 
         public const int FieldWidth = GameField.FieldWidth;
         public const int FieldHeight = GameField.FieldHeight;
-
-        private Player _player;
-        public Player CurrentPlayer
-        {
-            get
-            {
-                Debug.Assert(_player != null);
-                return Players[_game.CurrentPlayerIndex];
-            }
-        }
 
         public int CurrentPlayerId => _game.CurrentPlayerIndex;
 
@@ -125,11 +117,8 @@ namespace TreasureHunters
         public List<PlayerMoveState> CurrentPlayerMoveStates =>
             _game.PlayerMoveStates[_game.CurrentPlayerIndex];
 
-        public Position PlayerPosition(int playerIndex)
-        {
-            var pos = _game.Players[playerIndex].Position;
-            return new Position(pos.X, pos.Y);
-        } 
+
+        public Position PlayerPosition;
 
         public string PlayerNameOld(int playerIndex)
         {
@@ -137,6 +126,8 @@ namespace TreasureHunters
         }
 
         public int PlayersCount = -1;
+
+        public Dictionary<string, Position> Enemies = new();
 
         public List<Player> Players = new();
 
@@ -170,7 +161,7 @@ namespace TreasureHunters
         }
 
         private string _sessionId;
-        public Position Position;
+
         public Position PreviousPosition;
 
         public void JoinGame(string gameId, int playersCount, string sessionId, bool started = false)
