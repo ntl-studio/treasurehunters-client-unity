@@ -12,6 +12,8 @@ namespace TreasureHunters
         Joining,                // Asked to join the game, waiting to join (getting details
                                 // from server, initializing the board)
 
+        Joined, 
+
         WaitingForGameStart,    // Joined one of the games in the list, the list is still visible
 
         WaitingForTurn,         // The game has started (you started it or someone else),
@@ -60,6 +62,11 @@ namespace TreasureHunters
                             break;
                         case GameClientState.Joining:
                             OnStartJoiningGame?.Invoke();
+                            break;
+                        case GameClientState.Joined:
+                            State = !_isStarted 
+                                ? GameClientState.WaitingForGameStart 
+                                : GameClientState.WaitingForTurn;
                             break;
                         case GameClientState.WaitingForGameStart:
                             OnFinishJoiningGame?.Invoke();
@@ -193,19 +200,16 @@ namespace TreasureHunters
 
         public Position PreviousPosition;
 
+        private bool _isStarted;
         public void JoinGame(string gameId, int playersCount, string sessionId, bool started = false)
         {
             Debug.Log($"Joined game {gameId}");
             _gameId = gameId;
             _sessionId = sessionId;
             PlayersCount = playersCount;
+            _isStarted = started;
 
-            OnStartJoiningGame?.Invoke();
-
-            if (!started)
-                State = GameClientState.WaitingForGameStart;
-            else
-                State = GameClientState.WaitingForTurn;
+            State = GameClientState.Joining;
         }
 
         public void EndMove()

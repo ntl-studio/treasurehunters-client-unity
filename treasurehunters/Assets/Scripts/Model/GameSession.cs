@@ -42,6 +42,7 @@ public class GameSession : MonoBehaviour
     {
         Game.PlayerPosition = new TreasureHunters.Position(x, y);
         Game.SetVisibleArea(visibleArea);
+
         Game.State = GameClientState.WaitingForGameStart;
     }
 

@@ -21,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
             transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };
 
+        Game.OnStartTurn += () => { AcceptInput = true; };
+
         Game.OnPlayerActionCompleted += (actionResult) =>
         {
             if (actionResult)
@@ -32,6 +34,8 @@ public class PlayerMovement : MonoBehaviour
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
                 GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
+
+                AcceptInput = false;
             }
             else
             {

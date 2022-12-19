@@ -66,7 +66,6 @@ public class GamesListItem : MonoBehaviour
                     Game.JoinGame(GameIdText.text, playersCount, "", started: true);
                 else
                     throw new Exception($"Game state {state} not supported");
-
             });
         }
     }
