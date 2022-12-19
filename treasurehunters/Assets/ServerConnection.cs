@@ -244,7 +244,7 @@ public class ServerConnection : MonoBehaviour
             }
             else
             {
-                performActionCallback(playerActionResult.data.successful);
+                performActionCallback(playerActionResult.successful);
             }
         }
         else

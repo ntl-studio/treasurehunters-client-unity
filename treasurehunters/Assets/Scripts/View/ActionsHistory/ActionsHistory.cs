@@ -17,8 +17,8 @@ public class ActionsHistory : MonoBehaviour
         Debug.Assert(ActionsListViewPrefab);
 
         Game.OnEndMove += () =>
-        {
-            UpdateStates(Game.PlayerName, Game.CurrentPlayerMoveStates);
+        { 
+            // UpdateStates(Game.PlayerName, Game.CurrentPlayerMoveStates);
         };
 
         Vector3 lastListPosition = transform.position;

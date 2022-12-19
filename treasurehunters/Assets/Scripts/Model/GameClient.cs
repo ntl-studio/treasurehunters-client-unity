@@ -64,20 +64,18 @@ namespace TreasureHunters
                             OnStartJoiningGame?.Invoke();
                             break;
                         case GameClientState.Joined:
+                            OnFinishJoiningGame?.Invoke();
                             State = !_isStarted 
                                 ? GameClientState.WaitingForGameStart 
                                 : GameClientState.WaitingForTurn;
                             break;
                         case GameClientState.WaitingForGameStart:
-                            OnFinishJoiningGame?.Invoke();
                             break;
                         case GameClientState.WaitingForTurn:
-                            OnFinishJoiningGame?.Invoke();
-                            if (oldState == GameClientState.WaitingForGameStart ||
-                                oldState == GameClientState.NotConnected)
-                            {
+                            if (oldState is GameClientState.Joined or GameClientState.NotConnected)
                                 OnStartGame?.Invoke();
-                            }
+                            else
+                                OnStartWaitForTurn?.Invoke();
                             break;
                         case GameClientState.YourTurn:
                             OnStartTurn?.Invoke();
@@ -94,13 +92,16 @@ namespace TreasureHunters
 
         public delegate void GameEvent();
 
-        public event GameEvent OnStartJoiningGame;       // NotConnected -> WaitingForGameStart
-        public event GameEvent OnFinishJoiningGame;      // NotConnected -> WaitingForGameStart
-        public event GameEvent OnStartGame;              // WaitingForGameStater -> WaitingForTurn
-        public event GameEvent OnStartTurn;              // WaitingForTurn -> YourTurn
-        public event GameEvent OnEndMove;                // YourTurn -> WaitingForTurn
-        public event GameEvent OnPlayerClicked;          // no state change
-        public event GameEvent OnUpdateVisibleArea;      // no state change
+        public event GameEvent OnStartJoiningGame;
+        public event GameEvent OnFinishJoiningGame;
+        public event GameEvent OnStartGame;
+        public event GameEvent OnStartTurn;
+        public event GameEvent OnStartWaitForTurn;
+        public event GameEvent OnEndMove;
+
+        public event GameEvent OnPlayerClicked;
+        public event GameEvent OnUpdateVisibleArea;
+        public event GameEvent OnUpdatePlayerPosition;
 
         private void AddCallbacksDebug()
         {
@@ -108,7 +109,7 @@ namespace TreasureHunters
             OnFinishJoiningGame += () => Debug.Log("OnFinishJoiningGame");
             OnStartGame += () => Debug.Log("OnStartGame");
             OnStartTurn += () => Debug.Log("OnStartTurn");
-            OnEndMove  += () => Debug.Log("OnEndGame");
+            OnEndMove += () => Debug.Log("OnEndMove");
             OnPlayerClicked += () => Debug.Log("OnPlayerClicked");
             OnUpdateVisibleArea += () => Debug.Log("OnUpdateVisibleArea");
         }
@@ -152,7 +153,16 @@ namespace TreasureHunters
             _game.PlayerMoveStates[_game.CurrentPlayerIndex];
 
 
-        public Position PlayerPosition;
+        private Position _playerPosition;
+        public Position PlayerPosition
+        {
+            get => _playerPosition;
+            set
+            {
+                _playerPosition = value;
+                OnUpdatePlayerPosition?.Invoke();
+            }
+        }
 
         public string PlayerNameOld(int playerIndex)
         {

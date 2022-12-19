@@ -83,14 +83,9 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerActionResultJson
-    {
-        public bool successful;
-    }
-
-    [System.Serializable]
     class PlayerActionResultDataJson
     {
-        public PlayerActionResultJson data;
+        public string data;
+        public bool successful;
     }
 }

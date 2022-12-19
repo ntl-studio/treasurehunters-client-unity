@@ -9,14 +9,27 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
-        Game.OnStartJoiningGame += () => StartCoroutine(GetPlayerDetails());
+        Game.OnStartJoiningGame += () => 
+            StartCoroutine(GetPlayerDetails(GameClientState.Joined));
+
         Game.OnFinishJoiningGame += () => StartCoroutine(WaitForGameStart());
+
         Game.OnStartGame += () => StartCoroutine(WaitForTurn());
+
+        Game.OnStartWaitForTurn += () => StartCoroutine(GetPlayerDetails(GameClientState.WaitingForTurn));
     }
 
-    IEnumerator GetPlayerDetails()
+    IEnumerator GetPlayerDetails(GameClientState nextState)
     {
-        ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName, UpdatePositionCallback);
+        ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName,
+            (x, y, visibleArea) =>
+            {
+                Debug.Log($"Updating player position to ({x}, {y})");
+                Game.PlayerPosition = new TreasureHunters.Position(x, y);
+                Game.SetVisibleArea(visibleArea);
+                Game.State = nextState;
+            });
+
         yield return null;
     }
 
