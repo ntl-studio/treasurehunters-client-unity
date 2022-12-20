@@ -13,7 +13,7 @@ public class PlayerNameLabel : MonoBehaviour
         _playerNameText = GetComponent<TextMeshProUGUI>();
 
         UpdatePlayerName();
-        Game.OnStartTurn += UpdatePlayerName;
+        Game.OnYourTurn += UpdatePlayerName;
         Game.OnEndMove += UpdatePlayerName;
     }
 

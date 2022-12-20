@@ -9,17 +9,16 @@ namespace TreasureHunters
     {
         NotConnected,           // Opened the app, the list of games is available
 
-        Joining,                // Asked to join the game, waiting to join (getting details
-                                // from server, initializing the board)
-
         Joined, 
 
-        WaitingForGameStart,    // Joined one of the games in the list, the list is still visible
+        WaitingForStart,    // Joined one of the games in the list, the list is still visible
 
         WaitingForTurn,         // The game has started (you started it or someone else),
                                 // you are waiting for other players to make a move
 
         YourTurn,               // It is your turn, you can move the player
+
+        MakingMove,
 
         GameOver                // Someone won the game (it could be you)
     }
@@ -60,25 +59,20 @@ namespace TreasureHunters
                     {
                         case GameClientState.NotConnected:
                             break;
-                        case GameClientState.Joining:
-                            OnStartJoiningGame?.Invoke();
-                            break;
                         case GameClientState.Joined:
-                            OnFinishJoiningGame?.Invoke();
-                            State = !_isStarted 
-                                ? GameClientState.WaitingForGameStart 
-                                : GameClientState.WaitingForTurn;
+                            OnJoined?.Invoke();
                             break;
-                        case GameClientState.WaitingForGameStart:
+                        case GameClientState.WaitingForStart:
+                            OnWaitingForStart?.Invoke();
                             break;
                         case GameClientState.WaitingForTurn:
-                            if (oldState is GameClientState.Joined or GameClientState.NotConnected)
-                                OnStartGame?.Invoke();
-                            else
-                                OnStartWaitForTurn?.Invoke();
+                            OnWaitingForTurn?.Invoke();
                             break;
                         case GameClientState.YourTurn:
-                            OnStartTurn?.Invoke();
+                            OnYourTurn?.Invoke();
+                            break;
+                        case GameClientState.MakingMove:
+                            Debug.LogError("Should not be assigning MakingMove state directory");
                             break;
                         case GameClientState.GameOver:
                             break;
@@ -91,12 +85,14 @@ namespace TreasureHunters
         }
 
         public delegate void GameEvent();
+        public delegate void GameEventBool(bool value);
 
-        public event GameEvent OnStartJoiningGame;
-        public event GameEvent OnFinishJoiningGame;
-        public event GameEvent OnStartGame;
-        public event GameEvent OnStartTurn;
-        public event GameEvent OnStartWaitForTurn;
+        public event GameEvent OnJoined;
+        public event GameEvent OnWaitingForStart;
+        public event GameEvent OnYourTurn;
+        public event GameEventBool OnMakingMove;
+
+        public event GameEvent OnWaitingForTurn;
         public event GameEvent OnEndMove;
 
         public event GameEvent OnPlayerClicked;
@@ -105,18 +101,16 @@ namespace TreasureHunters
 
         private void AddCallbacksDebug()
         {
-            OnStartJoiningGame += () => Debug.Log("OnStartJoiningGame");
-            OnFinishJoiningGame += () => Debug.Log("OnFinishJoiningGame");
-            OnStartGame += () => Debug.Log("OnStartGame");
-            OnStartTurn += () => Debug.Log("OnStartTurn");
+            OnJoined += () => Debug.Log("OnJoined");
+            OnWaitingForStart += () => Debug.Log("OnWaitingForStart");
+            OnYourTurn += () => Debug.Log("OnYourTurn");
             OnEndMove += () => Debug.Log("OnEndMove");
+
             OnPlayerClicked += () => Debug.Log("OnPlayerClicked");
+
             OnUpdateVisibleArea += () => Debug.Log("OnUpdateVisibleArea");
+            OnUpdatePlayerPosition += () => Debug.Log("OnUpdatePlayerPosition");
         }
-
-        public delegate void PlayerActionEvent(bool actionResult);
-
-        public event PlayerActionEvent OnPlayerActionCompleted;     // When the server confirmed that action was performed
 
         private readonly Game _game = new(Guid.NewGuid());
 
@@ -179,7 +173,7 @@ namespace TreasureHunters
         {
             ServerConnection.Instance().PerformActionAsync(
                 GameId, PlayerName, playerAction.ToString(),
-                actionResult => OnPlayerActionCompleted?.Invoke(actionResult) );
+                actionResult => OnMakingMove?.Invoke(actionResult) );
         }
 
         public string GameId
@@ -219,7 +213,7 @@ namespace TreasureHunters
             PlayersCount = playersCount;
             _isStarted = started;
 
-            State = GameClientState.Joining;
+            State = GameClientState.Joined;
         }
 
         public void EndMove()
@@ -230,7 +224,7 @@ namespace TreasureHunters
         public void StartTurn()
         {
             _game.EndTurn();
-            OnStartTurn?.Invoke();
+            OnYourTurn?.Invoke();
         }
 
         public void PlayerClicked()

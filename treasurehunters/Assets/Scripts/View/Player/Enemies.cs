@@ -29,7 +29,6 @@ public class Enemies : MonoBehaviour
         }
 
         Game.OnUpdateVisibleArea += UpdateEnemiesVisibility;
-        Game.OnEndMove += UpdateEnemiesVisibility;
     }
 
     void UpdateEnemiesVisibility()

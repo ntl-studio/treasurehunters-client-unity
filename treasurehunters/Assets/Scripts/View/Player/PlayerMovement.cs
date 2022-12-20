@@ -16,14 +16,14 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
-        Game.OnStartTurn += () => { AcceptInput = true; };
+        Game.OnYourTurn += () => { AcceptInput = true; };
 
         Game.OnUpdatePlayerPosition += () =>
         {
             transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };
 
-        Game.OnPlayerActionCompleted += (actionResult) =>
+        Game.OnMakingMove += (actionResult) =>
         {
             if (actionResult)
             {
@@ -34,8 +34,6 @@ public class PlayerMovement : MonoBehaviour
                 _direction = (_destination - transform.position).normalized;
                 _isMoving = true;
                 // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
-
-                Game.State = GameClientState.WaitingForTurn;
 
                 AcceptInput = false;
             }
