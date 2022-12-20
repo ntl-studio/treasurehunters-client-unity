@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using JsonObjects;
 using TreasureHunters;
@@ -12,13 +13,28 @@ public class GamesList : MonoBehaviour
     {
         Debug.Assert(GamesListItemPrefab);
 
-        ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
+        UpdateGamesList();
 
+        Game.OnUpdateCurrentPlayerName += UpdateGamesList;
         Game.OnJoined += () => gameObject.SetActive(false);
     }
 
+    public void UpdateGamesList()
+    {
+        ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
+    }
+
+    private List<GameObject> _games = new List<GameObject>();
+
     public void UpdateGamesList(GamesJson games)
     {
+        foreach (var game in _games)
+        {
+            Destroy(game);
+        }
+
+        _games.Clear();
+
         var pos = transform.position;
         foreach (var game in games.games)
         {
@@ -35,6 +51,8 @@ public class GamesList : MonoBehaviour
 
             if (game.players.Any(p => p == Game.PlayerName))
                 gamesListItem.AllowRejoin = true;
+
+            _games.Add(obj);
         }
     }
 }

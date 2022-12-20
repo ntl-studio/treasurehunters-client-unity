@@ -16,14 +16,19 @@ public class NextTurn : MonoBehaviour
         Debug.Assert(Message);
 
         NextTurnPanel.SetActive(false);
-        Game.OnEndMove += () =>
+
+        Game.OnWaitingForStart += () =>
         {
             NextTurnPanel.SetActive(true);
-            if (Game.State == GameClientState.GameOver)
-            {
-                Message.text = "You won";
-            }
+            Message.text = "Waiting for the game start";
         };
+
+        Game.OnJoined += () => { Message.text = "You joined the game"; };
+
+        Game.OnWaitingForTurn += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
+        Game.OnUpdateCurrentPlayerName += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
+
+        Game.OnYourTurn += () => { Message.text = "Your turn!"; };
     }
 
     void Update()

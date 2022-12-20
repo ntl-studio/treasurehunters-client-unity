@@ -63,9 +63,14 @@ public class GameSession : MonoBehaviour
             ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (playerName) =>
             {
                 if (playerName == Game.PlayerName)
+                {
                     Game.State = GameClientState.YourTurn;
+                }
                 else
+                {
+                    Game.CurrentPlayerName = playerName;
                     Debug.Log($"Waiting for your turn. Current player is {playerName}.");
+                }
             });
 
             yield return new WaitForSeconds(2);

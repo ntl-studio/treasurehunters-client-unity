@@ -33,6 +33,7 @@ public class ServerConnection : MonoBehaviour
 
     private IEnumerator GetGamesList(string uri, Action<GamesJson> gameListCallback)
     {
+        Debug.Log($"Sending request: {uri}");
         UnityWebRequest request = UnityWebRequest.Get(uri);
         yield return request.SendWebRequest();
 

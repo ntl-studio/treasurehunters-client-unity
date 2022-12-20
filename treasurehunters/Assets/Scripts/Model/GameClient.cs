@@ -98,6 +98,7 @@ namespace TreasureHunters
         public event GameEvent OnPlayerClicked;
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
+        public event GameEvent OnUpdateCurrentPlayerName;
 
         private void AddCallbacksDebug()
         {
@@ -118,6 +119,19 @@ namespace TreasureHunters
         public const int FieldHeight = GameField.FieldHeight;
 
         public int CurrentPlayerId => _game.CurrentPlayerIndex;
+
+
+        private string _currentPlayerName;
+
+        public string CurrentPlayerName
+        {
+            set
+            {
+                _currentPlayerName = value; 
+                OnUpdateCurrentPlayerName?.Invoke();
+            }
+            get => _currentPlayerName;
+        }
 
         private VisibleArea _visibleArea;
 
