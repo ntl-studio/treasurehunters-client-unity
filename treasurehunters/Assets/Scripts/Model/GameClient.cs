@@ -209,7 +209,7 @@ namespace TreasureHunters
             {
                 _playerName = value;
                 PlayerPrefs.SetString(PlayerNameKey, _playerName);
-
+                OnUpdateCurrentPlayerName?.Invoke();
             }
             get => _playerName;
         }
