@@ -77,65 +77,14 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    private IEnumerator GetCurrentPlayer(string gameId, Action<string> currentPlayerCallback)
-    {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/currentplayer";
-        UnityWebRequest request = UnityWebRequest.Get(uri);
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var currentPlayer = JsonUtility.FromJson<CurrentPlayerDataJson>(jsonText);
-            if (currentPlayer == null)
-            {
-                Debug.Log($"Could not read current player from json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                currentPlayerCallback(currentPlayer.data.name);
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
-    }
-
     public void GetPlayerInfoAsync(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
     {
-        StartCoroutine(GetPlayerInfo(gameId, playerName, getPlayerInfoCallback));
-    }
-    private IEnumerator GetPlayerInfo(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
-    {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
-        UnityWebRequest request = UnityWebRequest.Get(uri);
 
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var playerInfo = JsonUtility.FromJson<PlayerInfoDataJson>(jsonText);
-            if (playerInfo == null)
-            {
-                Debug.Log($"Could not read player position from json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                var data = playerInfo.data;
-                getPlayerInfoCallback(data.x, data.y, data.visiblearea);
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
+        StartCoroutine(WebRequest<PlayerInfoDataJson>(uri, (playerInfo) =>
+            { getPlayerInfoCallback(playerInfo.data.x, playerInfo.data.y, playerInfo.data.visiblearea); },
+            RequestType.Get
+        ));
     }
 
     public void PerformActionAsync(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
