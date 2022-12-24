@@ -5,6 +5,14 @@ using TreasureHunters;
 using UnityEngine;
 using UnityEngine.Networking;
 
+using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson>;
+using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
+using GameStateDataJson = JsonObjects.DataJson<JsonObjects.GameStateJson>;
+using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
+using PlayerActionResultDataJson = JsonObjects.DataJson<string>;
+using PlayerInfoDataJson = JsonObjects.DataJson<JsonObjects.PlayerInfoJson>;
+using PlayersDataJson =  JsonObjects.DataJson<JsonObjects.PlayersJson>;
+
 public class ServerConnection : MonoBehaviour
 {
     private static ServerConnection _instance;

@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using NtlStudio.TreasureHunters.Model;
-
 namespace JsonObjects
 {
+
     [System.Serializable]
     public class GameJson
     {
@@ -11,23 +9,11 @@ namespace JsonObjects
         public int playerscount;
         public string[] players;
     }
-
+    
     [System.Serializable]
     public class GamesJson
     {
         public GameJson[] games;
-    }
-
-    [System.Serializable]
-    class GameDataJson
-    {
-        public GameJson data;
-    }
-
-    [System.Serializable]
-    class GamesDataJson
-    {
-        public GamesJson data;
     }
 
     [System.Serializable]
@@ -37,22 +23,9 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayersDataJson
-    {
-        public PlayersJson data;
-        public bool successful;
-    }
-
-    [System.Serializable]
     class GameStateJson
     {
         public string state;
-    }
-
-    [System.Serializable]
-    class GameStateDataJson
-    {
-        public GameStateJson data;
     }
 
     [System.Serializable]
@@ -60,12 +33,6 @@ namespace JsonObjects
     {
         public int index;
         public string name;
-    }
-
-    [System.Serializable]
-    class CurrentPlayerDataJson
-    {
-        public CurrentPlayerJson data;
     }
 
     [System.Serializable]
@@ -77,15 +44,9 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerInfoDataJson
+    class DataJson<T>
     {
-        public PlayerInfoJson data;
-    }
-
-    [System.Serializable]
-    class PlayerActionResultDataJson
-    {
-        public string data;
+        public T data;
         public bool successful;
     }
 }
