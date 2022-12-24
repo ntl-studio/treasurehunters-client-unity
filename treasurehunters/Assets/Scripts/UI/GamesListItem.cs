@@ -45,12 +45,12 @@ public class GamesListItem : MonoBehaviour
         if (!AllowRejoin)
         {
             ServerConnection.Instance().JoinGameAsync(GameIdText.text,
-                (isJoined, gameId, playersCount, sessionId) =>
+                (isJoined, gameId, sessionId) =>
                 {
                     if (isJoined)
                     {
                         Debug.Log($"Joined to the game {gameId}");
-                        Game.JoinGame(gameId, playersCount, sessionId);
+                        Game.JoinGame(gameId, sessionId);
                     }
                     else
                         Debug.Log("Did not join");
@@ -61,9 +61,9 @@ public class GamesListItem : MonoBehaviour
             ServerConnection.Instance().GetGameStateAsync(GameIdText.text, (state, playersCount) =>
             {
                 if (state == GameState.NotStarted.ToString())
-                    Game.JoinGame(GameIdText.text, playersCount, "", started: false);
+                    Game.JoinGame(GameIdText.text, "", started: false);
                 else if (state == GameState.Running.ToString())
-                    Game.JoinGame(GameIdText.text, playersCount, "", started: true);
+                    Game.JoinGame(GameIdText.text,  "", started: true);
                 else
                     throw new Exception($"Game state {state} not supported");
             });

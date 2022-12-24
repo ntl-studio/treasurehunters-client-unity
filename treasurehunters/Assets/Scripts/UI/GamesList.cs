@@ -15,7 +15,7 @@ public class GamesList : MonoBehaviour
 
         UpdateGamesList();
 
-        Game.OnUpdateCurrentPlayerName += UpdateGamesList;
+        Game.OnUpdatePlayerName += UpdateGamesList;
         Game.OnJoined += () => gameObject.SetActive(false);
     }
 

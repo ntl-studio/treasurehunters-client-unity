@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using JsonObjects;
-using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -30,45 +29,22 @@ public class ServerConnection : MonoBehaviour
     {
         string uri = "https://localhost:7209/api/v1/games";
 
-        StartCoroutine(WebRequest<GamesDataJson>(uri, 
-                (gamesDataJson) => { gameListCallback(gamesDataJson.data); },
-                RequestType.Get
-            ));
+        StartCoroutine(WebRequest<GamesDataJson>(uri, (gamesDataJson) => 
+            { gameListCallback(gamesDataJson.data); },
+            RequestType.Get
+        ));
     }
 
-    public delegate void JoinGameCallbackAction(bool joined, string gameId, int playersCount, string sessionId);
+    public delegate void JoinGameCallbackAction(bool joined, string gameId, string sessionId);
 
     public void JoinGameAsync(string gameId, JoinGameCallbackAction joinGameCallback)
     {
-        StartCoroutine(JoinGame(gameId, joinGameCallback));
-    }
-
-    private IEnumerator JoinGame(string gameId, JoinGameCallbackAction joinGameCallback)
-    {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{Game.PlayerName}";
-        UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
 
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var playersData = JsonUtility.FromJson<PlayersDataJson>(jsonText);
-            if (playersData == null)
-            {
-                Debug.Log($"Could not read players list form json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                joinGameCallback(playersData.successful, gameId, 1, playersData.data.sessionid);
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
+        StartCoroutine(WebRequest<PlayersDataJson>(uri, (playerDataJson) => 
+            { joinGameCallback(playerDataJson.successful, gameId, playerDataJson.data.sessionid); },
+            RequestType.Put
+        ));
     }
 
     public void GetGameStateAsync(string gameId, Action<string, int> gameStateCallback)
@@ -76,47 +52,31 @@ public class ServerConnection : MonoBehaviour
         string uri = $"https://localhost:7209/api/v1/games/{gameId}";
 
         StartCoroutine(WebRequest<GameDataJson>(uri, (gameDataJson) =>
-                { gameStateCallback(gameDataJson.data.state, gameDataJson.data.playerscount); },
-                RequestType.Get
-            ));
+            { gameStateCallback(gameDataJson.data.state, gameDataJson.data.playerscount); },
+            RequestType.Get
+        ));
     }
 
     public void StartGameAsync(string gameId, Action startGameCallback)
     {
-        StartCoroutine(StartGame(gameId, startGameCallback));
-    }
-    private IEnumerator StartGame(string gameId, Action startGameCallback)
-    {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/start";
-        UnityWebRequest request = UnityWebRequest.Put(uri, string.Empty);
 
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var gameStateData = JsonUtility.FromJson<GameStateDataJson>(jsonText);
-            if (gameStateData == null)
-            {
-                Debug.Log($"Could not read game state from json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                startGameCallback();
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
+        StartCoroutine(WebRequest<GameStateDataJson>(uri, (gameStateJson) =>
+            { startGameCallback(); },
+            RequestType.Put
+        ));
     }
 
     public void GetCurrentPlayerAsync(string gameId, Action<string> currentPlayerCallback)
     {
-        StartCoroutine(GetCurrentPlayer(gameId, currentPlayerCallback));
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/currentplayer";
+
+        StartCoroutine(WebRequest<CurrentPlayerDataJson>(uri, (currentPlayerJson) =>
+            { currentPlayerCallback(currentPlayerJson.data.name); },
+            RequestType.Get
+        ));
     }
+
     private IEnumerator GetCurrentPlayer(string gameId, Action<string> currentPlayerCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/currentplayer";
@@ -180,44 +140,21 @@ public class ServerConnection : MonoBehaviour
 
     public void PerformActionAsync(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
     {
-        StartCoroutine(PerformAction(gameId, playerName, actionName, performActionCallback));
-    }
-
-    private IEnumerator PerformAction(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
-    {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
-        UnityWebRequest request = UnityWebRequest.Put(uri, String.Empty);
 
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            var jsonText = request.downloadHandler.text;
-
-            var playerActionResult = JsonUtility.FromJson<PlayerActionResultDataJson>(jsonText);
-            if (playerActionResult == null)
-            {
-                Debug.Log($"Could not read action result from json: {jsonText}");
-                Debug.Assert(true);
-            }
-            else
-            {
-                performActionCallback(playerActionResult.successful);
-            }
-        }
-        else
-        {
-            Debug.Log(request.error);
-        }
+        StartCoroutine(WebRequest<PlayerActionResultDataJson>(uri, (playerActionResult) => 
+            { performActionCallback(playerActionResult.successful); },
+            RequestType.Put
+        ));
     }
 
     enum RequestType { Put, Get }
 
     private IEnumerator WebRequest<T>(string uri, Action<T> callback, RequestType requestType)
     {
-        Debug.Log($"Sending request: {uri}");
+        Debug.Log($"Sending {requestType} request: {uri}");
         UnityWebRequest request =
-            (requestType == RequestType.Put)
+            (requestType == RequestType.Get)
             ? UnityWebRequest.Get(uri)
             : UnityWebRequest.Put(uri, String.Empty);
 
@@ -233,6 +170,8 @@ public class ServerConnection : MonoBehaviour
                 Debug.Log($"Could not read data form the json: {jsonText}");
                 Debug.Assert(true);
             }
+            else
+                Debug.Log($"Getting data: {jsonText}");
 
             callback(data);
         }
@@ -241,5 +180,4 @@ public class ServerConnection : MonoBehaviour
             Debug.Log(request.error);
         }
     }
-
 }

@@ -98,7 +98,12 @@ namespace TreasureHunters
         public event GameEvent OnPlayerClicked;
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
-        public event GameEvent OnUpdateCurrentPlayerName;
+
+        public event GameEvent OnUpdatePlayerName; 
+
+
+        // current player is the player who's turn is now, and it is not necessarily player who runs the client
+        public event GameEvent OnUpdateCurrentPlayerName; 
 
         private void AddCallbacksDebug()
         {
@@ -209,7 +214,7 @@ namespace TreasureHunters
             {
                 _playerName = value;
                 PlayerPrefs.SetString(PlayerNameKey, _playerName);
-                OnUpdateCurrentPlayerName?.Invoke();
+                OnUpdatePlayerName?.Invoke();
             }
             get => _playerName;
         }
@@ -219,12 +224,12 @@ namespace TreasureHunters
         public Position PreviousPosition;
 
         private bool _isStarted;
-        public void JoinGame(string gameId, int playersCount, string sessionId, bool started = false)
+        public void JoinGame(string gameId, string sessionId, bool started = false)
         {
             Debug.Log($"Joined game {gameId}");
             _gameId = gameId;
             _sessionId = sessionId;
-            PlayersCount = playersCount;
+            PlayersCount = 1;
             _isStarted = started;
 
             State = GameClientState.Joined;

@@ -60,16 +60,16 @@ public class GameSession : MonoBehaviour
     {
         while (Game.State == GameClientState.WaitingForTurn)
         {
-            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (playerName) =>
+            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (currentPlayerName) =>
             {
-                if (playerName == Game.PlayerName)
+                if (currentPlayerName == Game.PlayerName)
                 {
                     Game.State = GameClientState.YourTurn;
                 }
                 else
                 {
-                    Game.CurrentPlayerName = playerName;
-                    Debug.Log($"Waiting for your turn. Current player is {playerName}.");
+                    Game.CurrentPlayerName = currentPlayerName;
+                    Debug.Log($"Waiting for your turn. Current player is {currentPlayerName}.");
                 }
             });
 
