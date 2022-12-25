@@ -44,6 +44,12 @@ namespace JsonObjects
     }
 
     [System.Serializable]
+    class PlayerActionResult
+    {
+        public bool hastreasure;
+    }
+
+    [System.Serializable]
     class DataJson<T>
     {
         public T data;

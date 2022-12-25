@@ -11,7 +11,6 @@ public class PlayerItems : MonoBehaviour
     {
         Debug.Assert(TreasureImage);
         TreasureImage.SetActive(false);
-        Game.OnYourTurn += () => TreasureImage.SetActive(Game.CurrentPlayerHasTreasure);
-        Game.OnEndMove+= () => TreasureImage.SetActive(Game.CurrentPlayerHasTreasure);
+        Game.OnUpdatePlayerHasTreasure += hasTreasure => TreasureImage.SetActive(hasTreasure);
     }
 }

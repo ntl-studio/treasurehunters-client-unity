@@ -99,8 +99,8 @@ namespace TreasureHunters
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
 
-        public event GameEvent OnUpdatePlayerName; 
-
+        public event GameEvent OnUpdatePlayerName;
+        public event GameEventBool OnUpdatePlayerHasTreasure;
 
         // current player is the player who's turn is now, and it is not necessarily player who runs the client
         public event GameEvent OnUpdateCurrentPlayerName; 
@@ -160,11 +160,19 @@ namespace TreasureHunters
             return _visibleArea;
         }
 
-        public bool CurrentPlayerHasTreasure => false;
+        protected bool _playerHasTreasure;
+        public bool PlayerHasTreasure
+        {
+            set
+            {
+                _playerHasTreasure = value;
+                OnUpdatePlayerHasTreasure?.Invoke(_playerHasTreasure);
+            }
+            get => _playerHasTreasure;
+        }
 
         public List<PlayerMoveState> CurrentPlayerMoveStates =>
             _game.PlayerMoveStates[_game.CurrentPlayerIndex];
-
 
         private Position _playerPosition;
         public Position PlayerPosition
@@ -193,7 +201,11 @@ namespace TreasureHunters
         {
             ServerConnection.Instance().PerformActionAsync(
                 GameId, PlayerName, playerAction.ToString(),
-                actionResult => OnMakingMove?.Invoke(actionResult) );
+                (actionResult, hasTreasure) =>
+                {
+                    PlayerHasTreasure = hasTreasure;
+                    OnMakingMove?.Invoke(actionResult);
+                });
         }
 
         public string GameId

@@ -9,7 +9,7 @@ using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson
 using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
 using GameStateDataJson = JsonObjects.DataJson<JsonObjects.GameStateJson>;
 using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
-using PlayerActionResultDataJson = JsonObjects.DataJson<string>;
+using PlayerActionResultDataJson = JsonObjects.DataJson<JsonObjects.PlayerActionResult>;
 using PlayerInfoDataJson = JsonObjects.DataJson<JsonObjects.PlayerInfoJson>;
 using PlayersDataJson =  JsonObjects.DataJson<JsonObjects.PlayersJson>;
 
@@ -85,7 +85,8 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    public void GetPlayerInfoAsync(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
+    public void GetPlayerInfoAsync(string gameId, string playerName, 
+        Action<int, int, int[]> getPlayerInfoCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
 
@@ -95,12 +96,13 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    public void PerformActionAsync(string gameId, string playerName, string actionName, Action<bool> performActionCallback)
+    public void PerformActionAsync(string gameId, string playerName, string actionName, 
+        Action<bool, bool> performActionCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
 
         StartCoroutine(WebRequest<PlayerActionResultDataJson>(uri, (playerActionResult) => 
-            { performActionCallback(playerActionResult.successful); },
+            { performActionCallback(playerActionResult.successful, playerActionResult.data.hastreasure); },
             RequestType.Put
         ));
     }

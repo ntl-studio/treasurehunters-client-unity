@@ -132,31 +132,6 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    // Hides all cells visible to the previous player
-    // Enables all cells visible to the current player, including areas visited before
-    // (covered in fog of war)
-    public void UpdateBoardAfterPreviousTurn()
-    {
-        int playerId = _game.CurrentPlayerId;
-
-        for (int x = 0; x < GameField.FieldWidth; ++x)
-        {
-            for (int y = 0; y < GameField.FieldHeight; ++y)
-            {
-                if (_playerBoard.Visited[x, y])
-                {
-                    FieldCell cell = _playerBoard.Board[x, y];
-                    _wallCells[y][x].SetWallsVisibility(cell);
-                    _ceilingCells[y][x].State = CeilingState.Fog;
-                }
-                else
-                {
-                    _ceilingCells[y][x].State = CeilingState.Hidden;
-                }
-            }
-        }
-    }
-
     public void FogVisitedAreas()
     {
         var position = _game.PreviousPosition;
