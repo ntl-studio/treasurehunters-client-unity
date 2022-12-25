@@ -172,6 +172,7 @@ namespace TreasureHunters
             get => _playerPosition;
             set
             {
+                PreviousPosition = _playerPosition;
                 _playerPosition = value;
                 OnUpdatePlayerPosition?.Invoke();
             }

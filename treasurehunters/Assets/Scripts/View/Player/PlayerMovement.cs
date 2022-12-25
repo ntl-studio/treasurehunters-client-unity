@@ -1,3 +1,4 @@
+using System;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
@@ -8,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public bool AcceptInput = false;
 
-    private bool _isMoving;
+    private bool _isPlayingMovingAnimation;
     private Vector3 _destination;
     private Vector3 _direction;
 
@@ -27,12 +28,14 @@ public class PlayerMovement : MonoBehaviour
         {
             if (actionResult)
             {
-                Vector2Int shift = GameUtils.ActionToVector2(_lastAction);
+                Vector2Int shift = GameUtils.ActionToVector2(LastAction);
 
                 _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
 
                 _direction = (_destination - transform.position).normalized;
-                _isMoving = true;
+                Debug.Log($"set direction {_direction}");
+
+                _isPlayingMovingAnimation = true;
                 // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
 
                 AcceptInput = false;
@@ -42,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Could not move player");
             }
 
-            _lastAction = PlayerAction.None;
+            LastAction = PlayerAction.None;
         };
     }
 
@@ -54,17 +57,21 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (_isMoving)
+        if (_isPlayingMovingAnimation)
         {
             const float movementSpeed = 5.0f;
 
             if (math.distancesq(transform.position, _destination) > 0.01f)
             {
+                Debug.Assert(Math.Abs(_direction.x) > Mathf.Epsilon || 
+                             Math.Abs(_direction.y) > Mathf.Epsilon || 
+                             Math.Abs(_direction.z) > Mathf.Epsilon);
+
                 transform.position += _direction * Time.deltaTime * movementSpeed;
             }
             else
             {
-                _isMoving = false;
+                _isPlayingMovingAnimation = false;
                 transform.position = _destination;
 
                 // tell them game we finished the move when animation finished playing
@@ -85,9 +92,19 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerAction _lastAction = PlayerAction.None;
 
+    private PlayerAction LastAction
+    {
+        get => _lastAction;
+        set
+        {
+            Debug.Log($"Changing player action from {_lastAction} to {value}");
+            _lastAction = value;
+        }
+    }
+
     private void MovePlayer()
     {
-        if (_isMoving)
+        if (_isPlayingMovingAnimation)
             return;
 
         PlayerAction playerAction = PlayerAction.None;
@@ -97,6 +114,8 @@ public class PlayerMovement : MonoBehaviour
         {
             var playerPos = transform.position;
             var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            Debug.Log($"Mouse position: {Input.mousePosition}, click position {clickPos}, player position {transform.position}");
 
             if (math.abs(clickPos.x - playerPos.x) < 1.5f &&
                 math.abs(clickPos.y - playerPos.y) < 1.5f)
@@ -119,10 +138,9 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.DownArrow))
             playerAction = PlayerAction.MoveDown;
 
-        _lastAction = playerAction;
-
         if (playerAction != PlayerAction.None)
         {
+            LastAction = playerAction;
             Game.PerformAction(playerAction);
         }
     }

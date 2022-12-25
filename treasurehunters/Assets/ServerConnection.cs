@@ -134,7 +134,7 @@ public class ServerConnection : MonoBehaviour
         }
         else
         {
-            Debug.Log(request.error);
+            Debug.Log($"{requestType} request {uri} failed with error: {request.error}");
         }
     }
 }
