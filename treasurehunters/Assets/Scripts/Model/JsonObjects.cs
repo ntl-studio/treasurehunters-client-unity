@@ -17,6 +17,13 @@ namespace JsonObjects
     }
 
     [System.Serializable]
+    class TreasurePositionJson
+    {
+        public int x;
+        public int y;
+    }
+
+    [System.Serializable]
     class PlayersJson
     {
         public string sessionid;

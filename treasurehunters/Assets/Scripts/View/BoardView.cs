@@ -44,7 +44,7 @@ public class BoardView : MonoBehaviour
     private readonly List<List<WallView>> _wallCells = new();
     private readonly List<List<CeilingCell>> _ceilingCells = new();
 
-    private static GameClient _game => GameClient.Instance();
+    private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
@@ -62,19 +62,23 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        _game.OnUpdateVisibleArea += () =>
+        Game.OnUpdateVisibleArea += () =>
         {
             UpdatePlayerVisibility();
         };
 
-        _game.OnEndMove += () =>
+        Game.OnEndMove += () =>
         {
             FogVisitedAreas();
             UpdatePlayerVisibility();
-            UpdateTreasurePosition(_game.TreasurePosition());
         };
 
-        _game.OnShowTreasureEvent += isVisible =>
+        Game.OnUpdateTreasurePosition_Debug += () =>
+        {
+            UpdateTreasurePosition(Game.TreasurePosition_Debug);
+        };
+
+        Game.OnShowTreasureEvent += isVisible =>
         {
             _treasure.SetActive(isVisible);
         };
@@ -134,7 +138,7 @@ public class BoardView : MonoBehaviour
 
     public void FogVisitedAreas()
     {
-        var position = _game.PreviousPosition;
+        var position = Game.PreviousPosition;
 
         for (int x = 0; x < VisibleArea.Width; ++x)
         {
@@ -155,10 +159,10 @@ public class BoardView : MonoBehaviour
 
     public void UpdatePlayerVisibility()
     {
-        var position = _game.PlayerPosition;
-        var visibleArea = _game.CurrentVisibleArea();
+        var position = Game.PlayerPosition;
+        var visibleArea = Game.CurrentVisibleArea();
 
-        if (!_game.IsTreasureAlwaysVisible)
+        if (!Game.IsTreasureAlwaysVisible)
             _treasure.SetActive(false);
 
         for (int x = 0; x < VisibleArea.Width; ++x)

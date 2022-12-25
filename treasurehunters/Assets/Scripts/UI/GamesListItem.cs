@@ -1,9 +1,10 @@
-using System;
 using NtlStudio.TreasureHunters.Model;
+using Position = TreasureHunters.Position;
+using System;
 using TMPro;
 using TreasureHunters;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class GamesListItem : MonoBehaviour
 {
@@ -68,6 +69,11 @@ public class GamesListItem : MonoBehaviour
                     throw new Exception($"Game state {state} not supported");
             });
         }
+
+        ServerConnection.Instance().GetTreasurePositionAsync(GameIdText.text, (x, y) =>
+        {
+            Game.TreasurePosition_Debug = new Position(x, y);
+        });
     }
 
     public void StartGame()

@@ -101,6 +101,7 @@ namespace TreasureHunters
 
         public event GameEvent OnUpdatePlayerName;
         public event GameEventBool OnUpdatePlayerHasTreasure;
+        public event GameEvent OnUpdateTreasurePosition_Debug;
 
         // current player is the player who's turn is now, and it is not necessarily player who runs the client
         public event GameEvent OnUpdateCurrentPlayerName; 
@@ -275,10 +276,15 @@ namespace TreasureHunters
 
         public bool IsTreasureAlwaysVisible { get; private set; }
 
-        public Position TreasurePosition()
+        protected Position _treasurePosition_Debug;
+        public Position TreasurePosition_Debug
         {
-            var pos = _game.TreasurePosition;
-            return new Position(pos.X, pos.Y);
+            set
+            {
+                _treasurePosition_Debug = value;
+                OnUpdateTreasurePosition_Debug?.Invoke();
+            }
+            get => _treasurePosition_Debug;
         }
     }
 }

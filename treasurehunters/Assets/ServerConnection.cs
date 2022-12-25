@@ -12,6 +12,7 @@ using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
 using PlayerActionResultDataJson = JsonObjects.DataJson<JsonObjects.PlayerActionResult>;
 using PlayerInfoDataJson = JsonObjects.DataJson<JsonObjects.PlayerInfoJson>;
 using PlayersDataJson =  JsonObjects.DataJson<JsonObjects.PlayersJson>;
+using TreasurePositionDataJson = JsonObjects.DataJson<JsonObjects.TreasurePositionJson>;
 
 public class ServerConnection : MonoBehaviour
 {
@@ -52,6 +53,16 @@ public class ServerConnection : MonoBehaviour
         StartCoroutine(WebRequest<PlayersDataJson>(uri, (playerDataJson) => 
             { joinGameCallback(playerDataJson.successful, gameId, playerDataJson.data.sessionid); },
             RequestType.Put
+        ));
+    }
+
+    public void GetTreasurePositionAsync(string gameId, Action<int, int> getTreasurePositionCallback)
+    {
+        string uri = $"https://localhost:7209/api/v1/games/{gameId}/treasureposition_debug";
+
+        StartCoroutine(WebRequest<TreasurePositionDataJson>(uri, (treasurePositionDataJson) =>
+            { getTreasurePositionCallback(treasurePositionDataJson.data.x, treasurePositionDataJson.data.y); },
+            RequestType.Get
         ));
     }
 
