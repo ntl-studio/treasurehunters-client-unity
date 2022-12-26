@@ -39,6 +39,8 @@ public class BoardView : MonoBehaviour
 
     public GameObject _treasure;
 
+    public Enemies _enemies;
+
     private readonly PlayerBoardView _playerBoard = new();
 
     private readonly List<List<WallView>> _wallCells = new();
@@ -60,12 +62,11 @@ public class BoardView : MonoBehaviour
         Debug.Assert(_cellLabelPrefab);
         Debug.Assert(_cellLabelsParent);
 
+        Debug.Assert(_enemies);
+
         GenerateBoardSprites();
 
-        Game.OnUpdateVisibleArea += () =>
-        {
-            UpdatePlayerVisibility();
-        };
+        Game.OnUpdateVisibleArea += UpdatePlayerVisibility;
 
         Game.OnEndMove += () =>
         {
@@ -138,6 +139,8 @@ public class BoardView : MonoBehaviour
 
     public void FogVisitedAreas()
     {
+        _enemies.ClearEnemies();
+
         var position = Game.PreviousPosition;
 
         for (int x = 0; x < VisibleArea.Width; ++x)
@@ -182,11 +185,16 @@ public class BoardView : MonoBehaviour
                 if (cell.HasFlag(FieldCell.Invisible))
                     continue;
 
-                if (cell.HasFlag(FieldCell.Treasure))
+                if (cell.HasTreasure())
                 {
                     UpdateTreasurePosition(fieldX, fieldY);
                     _treasure.SetActive(true);
-                }    
+                }
+
+                if (cell.HasEnemy())
+                {
+                    _enemies.ShowEnemy(fieldX, fieldY);
+                }
 
                 _wallCells[fieldY][fieldX].SetWallsVisibility(cell);
                 _ceilingCells[fieldY][fieldX].State = CeilingState.Visible;

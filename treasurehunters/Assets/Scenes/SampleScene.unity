@@ -2847,7 +2847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b59132dfea886046a0bcc6361b495a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 4014059945718007183, guid: 2f678e1536cbaef478bd93ed8fbcd13f,
+  EnemyPrefab: {fileID: 4014059945718007183, guid: 2f678e1536cbaef478bd93ed8fbcd13f,
     type: 3}
 --- !u!1 &1296037214
 GameObject:
@@ -2911,6 +2911,7 @@ MonoBehaviour:
     type: 3}
   _cellLabelsParent: {fileID: 1608669925}
   _treasure: {fileID: 203234066}
+  _enemies: {fileID: 1255125028}
 --- !u!1 &1343819625
 GameObject:
   m_ObjectHideFlags: 0

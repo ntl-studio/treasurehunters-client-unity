@@ -6,51 +6,26 @@ using UnityEngine;
 
 public class Enemies : MonoBehaviour
 {
-    public GameObject PlayerPrefab;
+    public GameObject EnemyPrefab;
 
     private static GameClient Game => GameClient.Instance();
 
-    private readonly Dictionary<string, GameObject> _enemyViews = new();
+    private List<GameObject> _enemies = new();
+
+    public void ShowEnemy(int x, int y)
+    {
+        var enemyObject = Instantiate(EnemyPrefab, transform);
+        enemyObject.transform.position = new Vector3(x, y);
+        _enemies.Add(enemyObject);
+    }
+
+    public void ClearEnemies()
+    {
+        _enemies.Clear();
+    }
 
     void Start()
     {
-        Debug.Assert(PlayerPrefab);
-
-        foreach (var enemy in Game.Enemies)
-        {
-            var enemyObject = Instantiate(PlayerPrefab, transform);
-            enemyObject.SetActive(false);
-
-            var spriteRenderer = enemyObject.GetComponent<SpriteRenderer>();
-            Debug.Assert(spriteRenderer);
-            spriteRenderer.color = UnityEngine.Color.yellow;
-
-            _enemyViews.Add(enemy.Key, enemyObject);
-        }
-
-        Game.OnUpdateVisibleArea += UpdateEnemiesVisibility;
-    }
-
-    void UpdateEnemiesVisibility()
-    {
-        var visibilityArea = Game.CurrentVisibleArea();
-
-        foreach (var enemy in Game.Enemies)
-        {
-            _enemyViews[enemy.Key].SetActive(false);
-
-            var playerPos = Game.PlayerPosition;
-            var enemyPosition = enemy.Value;
-
-            if (Math.Abs(enemyPosition.X - playerPos.X) <= 1 &&
-                    Math.Abs(enemyPosition.Y - playerPos.Y) <= 1)
-            {
-                if (!visibilityArea[Math.Abs(playerPos.X - enemyPosition.X - 1), Math.Abs(playerPos.Y - enemyPosition.Y - 1)]
-                        .HasFlag(FieldCell.Invisible))
-                {
-                    _enemyViews[enemy.Key].SetActive(true);
-                }
-            }
-        }
+        Debug.Assert(EnemyPrefab != null);
     }
 }
