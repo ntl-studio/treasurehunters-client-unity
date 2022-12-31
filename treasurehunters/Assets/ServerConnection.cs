@@ -108,12 +108,18 @@ public class ServerConnection : MonoBehaviour
     }
 
     public void PerformActionAsync(string gameId, string playerName, string actionName, 
-        Action<bool, bool> performActionCallback)
+        Action<bool, bool, string> performActionCallback)
     {
         string uri = $"https://localhost:7209/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
 
         StartCoroutine(WebRequest<PlayerActionResultDataJson>(uri, (playerActionResult) => 
-            { performActionCallback(playerActionResult.successful, playerActionResult.data.hastreasure); },
+            { 
+                performActionCallback(
+                    playerActionResult.successful, 
+                    playerActionResult.data.hastreasure,
+                    playerActionResult.data.state // game state
+                );
+            },
             RequestType.Put
         ));
     }

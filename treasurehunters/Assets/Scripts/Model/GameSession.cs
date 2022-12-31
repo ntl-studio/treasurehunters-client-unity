@@ -19,7 +19,7 @@ public class GameSession : MonoBehaviour
         {
             if (result)
                 StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForTurn));
-            else
+            else if (Game.State != GameClientState.Finished)
                 Game.State = GameClientState.YourTurn;
         };
     }
@@ -32,7 +32,9 @@ public class GameSession : MonoBehaviour
                 Debug.Log($"Updating player position to ({x}, {y})");
                 Game.PlayerPosition = new TreasureHunters.Position(x, y);
                 Game.SetVisibleArea(visibleArea);
-                Game.State = nextState;
+
+                if (Game.State != GameClientState.Finished)
+                    Game.State = nextState;
             });
 
         yield return null;

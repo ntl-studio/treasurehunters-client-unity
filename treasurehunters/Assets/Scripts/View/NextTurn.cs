@@ -26,9 +26,12 @@ public class NextTurn : MonoBehaviour
         Game.OnJoined += () => { Message.text = "You joined the game"; };
 
         Game.OnWaitingForTurn += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
+
         Game.OnUpdateCurrentPlayerName += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
 
         Game.OnYourTurn += () => { Message.text = "Your turn!"; };
+
+        Game.OnGameFinished += () => { Message.text = "You won!"; };
     }
 
     void Update()

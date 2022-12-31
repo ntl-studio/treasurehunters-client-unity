@@ -20,7 +20,7 @@ namespace TreasureHunters
 
         MakingMove,
 
-        GameOver                // Someone won the game (it could be you)
+        Finished                // Someone won the game (it could be you)
     }
 
     public class GameClient
@@ -69,12 +69,14 @@ namespace TreasureHunters
                             OnWaitingForTurn?.Invoke();
                             break;
                         case GameClientState.YourTurn:
+
                             OnYourTurn?.Invoke();
                             break;
                         case GameClientState.MakingMove:
                             Debug.LogError("Should not be assigning MakingMove state directory");
                             break;
-                        case GameClientState.GameOver:
+                        case GameClientState.Finished:
+                            OnGameFinished?.Invoke();
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -90,6 +92,7 @@ namespace TreasureHunters
         public event GameEvent OnJoined;
         public event GameEvent OnWaitingForStart;
         public event GameEvent OnYourTurn;
+        public event GameEvent OnGameFinished;
         public event GameEventBool OnMakingMove;
 
         public event GameEvent OnWaitingForTurn;
@@ -202,8 +205,11 @@ namespace TreasureHunters
         {
             ServerConnection.Instance().PerformActionAsync(
                 GameId, PlayerName, playerAction.ToString(),
-                (actionResult, hasTreasure) =>
+                (actionResult, hasTreasure, gameState) =>
                 {
+                    if (gameState == "Finished")
+                        State = GameClientState.Finished;
+
                     PlayerHasTreasure = hasTreasure;
                     OnMakingMove?.Invoke(actionResult);
                 });

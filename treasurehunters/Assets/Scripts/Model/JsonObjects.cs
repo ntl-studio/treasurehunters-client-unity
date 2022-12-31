@@ -54,6 +54,7 @@ namespace JsonObjects
     class PlayerActionResult
     {
         public bool hastreasure;
+        public string state; // Game State
     }
 
     [System.Serializable]
