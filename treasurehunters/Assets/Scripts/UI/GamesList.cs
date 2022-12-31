@@ -56,11 +56,26 @@ public class GamesList : MonoBehaviour
             gamesListItem.GameId = game.id;
             gamesListItem.State = game.state;
             gamesListItem.NumberOfPlayers = game.playerscount.ToString();
+            gamesListItem.GamesList = this;
 
             if (game.players.Any(p => p == Game.PlayerName))
                 gamesListItem.AllowRejoin = true;
 
             _games.Add(obj);
         }
+    }
+
+    public void DeleteGame(string gameId)
+    {
+        ServerConnection.Instance().DeleteGameAsync(gameId, () =>
+        {
+            var game = _games.First(x => x.GetComponent<GamesListItem>().GameId == gameId);
+            Destroy(game);
+            _games.Remove(game);
+
+            Debug.Log($"Game {gameId} deleted");
+
+            UpdateGamesList();
+        });
     }
 }

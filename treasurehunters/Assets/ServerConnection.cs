@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 
 using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson>;
 using NewGameDataJson = JsonObjects.DataJson<JsonObjects.NewGameJson>;
+using DeleteGameDataJson = JsonObjects.DataJson<string>;
 using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
 using GameStateDataJson = JsonObjects.DataJson<JsonObjects.GameStateJson>;
 using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
@@ -92,9 +93,19 @@ public class ServerConnection : MonoBehaviour
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/start";
 
-        StartCoroutine(WebRequest<GameStateDataJson>(uri, (gameStateJson) =>
+        StartCoroutine(WebRequest<GameStateDataJson>(uri, (_) =>
             { startGameCallback(); },
             RequestType.Put
+        ));
+    }
+
+    public void DeleteGameAsync(string gameId, Action deleteGameCallback)
+    {
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/delete";
+
+        StartCoroutine(WebRequest<DeleteGameDataJson>(uri, (_) =>
+            { deleteGameCallback(); },
+            RequestType.Post
         ));
     }
 

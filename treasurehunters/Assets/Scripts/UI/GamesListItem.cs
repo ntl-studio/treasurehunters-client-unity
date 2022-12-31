@@ -16,6 +16,8 @@ public class GamesListItem : MonoBehaviour
     public Button JoinGameButton;
     public Button StartGameButton;
 
+    public GamesList GamesList; // pointer to the parent object
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +28,8 @@ public class GamesListItem : MonoBehaviour
 
         Debug.Assert(JoinGameButton);
         Debug.Assert(StartGameButton);
+
+        Debug.Assert(GamesList);
 
         if (AllowRejoin)
             JoinButtonText.text = "Rejoin";
@@ -94,11 +98,15 @@ public class GamesListItem : MonoBehaviour
 
     public void StartGame()
     {
-        ServerConnection.Instance()
-            .StartGameAsync(GameId, () =>
-            {
-                Debug.Log($"Game {GameId} started");
-                StartGameButton.interactable = false;
-            });
+        ServerConnection.Instance().StartGameAsync(GameId, () =>
+        {
+            Debug.Log($"Game {GameId} started");
+            StartGameButton.interactable = false;
+        });
+    }
+
+    public void DeleteGame()
+    {
+        GamesList.DeleteGame(GameId);
     }
 }
