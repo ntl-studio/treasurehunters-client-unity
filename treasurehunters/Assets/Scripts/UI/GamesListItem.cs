@@ -51,7 +51,7 @@ public class GamesListItem : MonoBehaviour
             if (value == "Finished")
                 JoinGameButton.interactable = false;
 
-            if (value == "Running" || value == "Finished")
+            if (value is "Running" or "Finished")
                 StartGameButton.interactable = false;
         }
     }
@@ -79,15 +79,7 @@ public class GamesListItem : MonoBehaviour
         }
         else
         {
-            ServerConnection.Instance().GetGameStateAsync(GameIdText.text, (state, playersCount) =>
-            {
-                if (state == GameState.NotStarted.ToString())
-                    Game.JoinGame(GameIdText.text, "", started: false);
-                else if (state == GameState.Running.ToString())
-                    Game.JoinGame(GameIdText.text,  "", started: true);
-                else
-                    throw new Exception($"Game state {state} not supported");
-            });
+            Game.JoinGame(GameIdText.text, "");
         }
 
         ServerConnection.Instance().GetTreasurePositionAsync(GameIdText.text, (x, y) =>

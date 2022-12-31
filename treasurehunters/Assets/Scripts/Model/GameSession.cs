@@ -9,11 +9,18 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
+        Game.OnJoined += () => StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForStart));
+
         Game.OnWaitingForStart += () => StartCoroutine(WaitForGameStart());
 
         Game.OnWaitingForTurn += () => StartCoroutine(WaitForTurn());
 
-        Game.OnJoined += () => StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForStart));
+        // When it is again your turn, the client needs to pull updated visibility area
+        Game.OnYourTurn += () =>
+        {
+            StartCoroutine(UpdatePlayerDetails(GameClientState.YourTurn));
+            UpdateMovesHistory();
+        };
 
         Game.OnMakingMove += (bool result) =>
         {
@@ -22,9 +29,6 @@ public class GameSession : MonoBehaviour
             else if (Game.State != GameClientState.Finished)
                 Game.State = GameClientState.YourTurn;
         };
-
-        // When it is again your turn, the client needs to pull updated visibility area
-        Game.OnYourTurn += () => StartCoroutine(UpdatePlayerDetails(GameClientState.YourTurn));
     }
 
     IEnumerator UpdatePlayerDetails(GameClientState nextState)
@@ -50,7 +54,10 @@ public class GameSession : MonoBehaviour
             ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state, playersCount) =>
             {
                 if (state == GameState.Running.ToString())
+                {
+                    Game.PlayersCount = playersCount;
                     Game.State = GameClientState.WaitingForTurn;
+                }    
                 else
                     Debug.Log($"Waiting for game to start. Current state is {state}.");
             });
@@ -80,5 +87,13 @@ public class GameSession : MonoBehaviour
 
             yield return new WaitForSeconds(2);
         }
+    }
+
+    void UpdateMovesHistory()
+    {
+        ServerConnection.Instance().GetMovesHistoryAsync(Game.GameId, (movesHistory) =>
+        {
+            Game.PlayersMovesHistory = movesHistory;
+        });
     }
 }

@@ -84,11 +84,6 @@ public class PlayerMovement : MonoBehaviour
     public void UpdateView()
     {
         transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
-
-        var states = Game.CurrentPlayerMoveStates;
-        GameUtils.UpdateRotation(
-            states.Count > 0 ? states[0].Direction : MoveDirection.None,
-            transform);
     }
 
     private PlayerAction _lastAction = PlayerAction.None;

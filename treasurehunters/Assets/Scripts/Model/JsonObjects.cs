@@ -1,3 +1,5 @@
+using NtlStudio.TreasureHunters.Model;
+
 namespace JsonObjects
 {
     [System.Serializable]
@@ -45,6 +47,27 @@ namespace JsonObjects
     {
         public int index;
         public string name;
+    }
+
+    [System.Serializable]
+    class PlayerMoveStateJson
+    {
+        public Position position;
+        public MoveDirection direction;
+        public FieldCell cell;
+    }
+
+    [System.Serializable]
+    class PlayerMoveStatesJson
+    {
+        public string player;
+        public PlayerMoveStateJson[] movestates;
+    }
+
+    [System.Serializable]
+    class PlayersMoveStatesJson
+    {
+        public PlayerMoveStatesJson[] players;
     }
 
     [System.Serializable]

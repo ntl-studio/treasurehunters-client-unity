@@ -1,11 +1,15 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using JsonObjects;
 using TreasureHunters;
 using UnityEngine;
 using UnityEngine.Networking;
 
+using NtlStudio.TreasureHunters.Model;
+
 using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson>;
+using PlayersMoveHistoryDataJson = JsonObjects.DataJson<JsonObjects.PlayersMoveStatesJson>;
 using NewGameDataJson = JsonObjects.DataJson<JsonObjects.NewGameJson>;
 using DeleteGameDataJson = JsonObjects.DataJson<string>;
 using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
@@ -144,6 +148,40 @@ public class ServerConnection : MonoBehaviour
                 );
             },
             RequestType.Put
+        ));
+    }
+
+    public void GetMovesHistoryAsync(string gameId, Action<List<PlayerMovesDetails>> movesHistoryCallback)
+    {
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/playersmovestates";
+
+        StartCoroutine(WebRequest<PlayersMoveHistoryDataJson>(uri, (playersMoveStates) =>
+            {
+                List<PlayerMovesDetails> playerMoveStates = new();
+
+                foreach (var player in playersMoveStates.data.players)
+                {
+                    PlayerMovesDetails details = new PlayerMovesDetails
+                    {
+                        PlayerName = player.player
+                    };
+
+                    foreach (var move in player.movestates)
+                    {
+                        details.Moves.Add(new PlayerMoveState()
+                        {
+                            Position = move.position,
+                            Direction = move.direction,
+                            FieldCell = move.cell
+                        });
+                    }
+
+                    playerMoveStates.Add(details);
+                }
+
+                movesHistoryCallback(playerMoveStates);
+            },
+            RequestType.Get
         ));
     }
 

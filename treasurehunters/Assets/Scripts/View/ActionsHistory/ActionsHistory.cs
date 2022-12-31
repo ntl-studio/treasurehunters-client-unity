@@ -1,51 +1,65 @@
+using NtlStudio.TreasureHunters.Model;
 using System.Collections.Generic;
 using TreasureHunters;
+using UnityEditor;
 using UnityEngine;
 
 using SM = NtlStudio.TreasureHunters.Model;
+
+public class PlayerMovesDetails
+{
+    public string PlayerName;
+    public List<PlayerMoveState> Moves = new();
+}
 
 public class ActionsHistory : MonoBehaviour
 {
     public GameObject ActionsListViewPrefab; 
 
-    private readonly Dictionary<string, ActionsListView> _actionViews= new();
+    private readonly List<ActionsListView> _actionViews = new();
 
     private static GameClient Game => GameClient.Instance();
+
+    private bool _isInitialized;
 
     void Start()
     {
         Debug.Assert(ActionsListViewPrefab);
 
-        Game.OnEndMove += () =>
-        { 
-            // UpdateStates(Game.PlayerName, Game.CurrentPlayerMoveStates);
-        };
-
         Vector3 lastListPosition = transform.position;
 
-        for (int i = 0; i < Game.PlayersCount; i++)
+        Game.OnUpdatePlayersMoveHistory += UpdateStates;
+
+        Game.OnWaitingForTurn += () =>
         {
-            var actionsListObj = Instantiate(ActionsListViewPrefab, transform, true);
-            actionsListObj.transform.SetPositionAndRotation(lastListPosition, Quaternion.identity);
-            lastListPosition.y -= 120.0f;
+            if (_isInitialized) 
+                return;
 
-            var playerName = Game.Players[i].Name;
-            var actionsList = actionsListObj.GetComponent<ActionsListView>();
-            Debug.Assert(actionsList);
-            actionsList.SetPlayerName(playerName);
+            for (int i = 0; i < Game.PlayersCount; i++)
+            {
+                var actionsListObj = Instantiate(ActionsListViewPrefab, transform, true);
+                actionsListObj.transform.SetPositionAndRotation(lastListPosition, Quaternion.identity);
+                lastListPosition.y -= 120.0f;
 
-            _actionViews.Add(playerName, actionsList);
-        }
+                var actionsList = actionsListObj.GetComponent<ActionsListView>();
+                Debug.Assert(actionsList);
+
+                _actionViews.Add(actionsList);
+            }
+
+            _isInitialized = true;
+        };
     }
 
-    void UpdateStates(string playerName, List<SM.PlayerMoveState> actionStates)
+    void UpdateStates()
     {
-        if (_actionViews.ContainsKey(playerName))
+        Debug.Assert(_actionViews.Count == Game.PlayersMovesHistory.Count);
+
+        for (int i = 0; i < Game.PlayersMovesHistory.Count; ++i)
         {
-            var actionsView = _actionViews[playerName];
-            actionsView.UpdatePlayerActionStates(actionStates);
+            var states = Game.PlayersMovesHistory[i];
+            _actionViews[i].SetPlayerName(states.PlayerName);
+            _actionViews[i].UpdatePlayerActionStates(states.Moves);
         }
-        else
-            Debug.Assert(false, $"Could not find a player {playerName}");
     }
 }

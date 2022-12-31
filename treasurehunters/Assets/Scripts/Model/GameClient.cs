@@ -90,16 +90,17 @@ namespace TreasureHunters
 
         public event GameEvent OnJoined;
         public event GameEvent OnWaitingForStart;
+        public event GameEvent OnWaitingForTurn;
         public event GameEvent OnYourTurn;
         public event GameEvent OnGameFinished;
         public event GameEventBool OnMakingMove;
 
-        public event GameEvent OnWaitingForTurn;
         public event GameEvent OnEndMove;
 
         public event GameEvent OnPlayerClicked;
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
+        public event GameEvent OnUpdatePlayersMoveHistory;
 
         public event GameEvent OnUpdatePlayerName;
         public event GameEventBool OnUpdatePlayerHasTreasure;
@@ -163,6 +164,18 @@ namespace TreasureHunters
             return _visibleArea;
         }
 
+        private List<PlayerMovesDetails> _playersMovesHistory;
+
+        public List<PlayerMovesDetails> PlayersMovesHistory
+        {
+            set
+            {
+                _playersMovesHistory = value;
+                OnUpdatePlayersMoveHistory?.Invoke();
+            }
+            get => _playersMovesHistory;
+        }
+
         protected bool _playerHasTreasure;
         public bool PlayerHasTreasure
         {
@@ -173,9 +186,6 @@ namespace TreasureHunters
             }
             get => _playerHasTreasure;
         }
-
-        public List<PlayerMoveState> CurrentPlayerMoveStates =>
-            _game.PlayerMoveStates[_game.CurrentPlayerIndex];
 
         private Position _playerPosition;
         public Position PlayerPosition
@@ -189,16 +199,9 @@ namespace TreasureHunters
             }
         }
 
-        public string PlayerNameOld(int playerIndex)
-        {
-            return _game.Players[playerIndex].Name;
-        }
-
         public int PlayersCount = -1;
 
         public Dictionary<string, Position> Enemies = new();
-
-        public List<Player> Players = new();
 
         public void PerformAction(PlayerAction playerAction)
         {
@@ -243,13 +246,11 @@ namespace TreasureHunters
         public Position PreviousPosition;
 
         private bool _isStarted;
-        public void JoinGame(string gameId, string sessionId, bool started = false)
+        public void JoinGame(string gameId, string sessionId)
         {
             Debug.Log($"Joined game {gameId}");
             _gameId = gameId;
             _sessionId = sessionId;
-            PlayersCount = 1;
-            _isStarted = started;
 
             State = GameClientState.Joined;
         }
