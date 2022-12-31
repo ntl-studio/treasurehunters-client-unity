@@ -1,5 +1,10 @@
 namespace JsonObjects
 {
+    [System.Serializable]
+    public class NewGameJson
+    {
+        public string id;
+    }
 
     [System.Serializable]
     public class GameJson

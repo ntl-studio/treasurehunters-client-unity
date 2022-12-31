@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson>;
+using NewGameDataJson = JsonObjects.DataJson<JsonObjects.NewGameJson>;
 using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
 using GameStateDataJson = JsonObjects.DataJson<JsonObjects.GameStateJson>;
 using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
@@ -18,7 +19,7 @@ public class ServerConnection : MonoBehaviour
 {
     private static ServerConnection _instance;
     private static GameClient Game => GameClient.Instance();
-    private string ServerAddress = "localhost:7205";
+    private string ServerAddress = "localhost:7209";
 
     public static ServerConnection Instance()
     {
@@ -33,6 +34,16 @@ public class ServerConnection : MonoBehaviour
         }
 
         return _instance;
+    }
+
+    public void CreateGameAsync(Action gameListCallback)
+    {
+        string uri = $"https://{ServerAddress}/api/v1/games/create?privateGame=false";
+
+        StartCoroutine(WebRequest<NewGameDataJson>(uri, (_) => 
+            { gameListCallback(); },
+            RequestType.Post
+        ));
     }
 
     public void UpdateGamesListAsync(Action<GamesJson> gameListCallback)
@@ -125,15 +136,28 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    enum RequestType { Put, Get }
+    enum RequestType { Get, Post, Put }
 
     private IEnumerator WebRequest<T>(string uri, Action<T> callback, RequestType requestType)
     {
         Debug.Log($"Sending {requestType} request: {uri}");
-        UnityWebRequest request =
-            (requestType == RequestType.Get)
-            ? UnityWebRequest.Get(uri)
-            : UnityWebRequest.Put(uri, String.Empty);
+
+        UnityWebRequest request;
+
+        switch (requestType)
+        {
+            case RequestType.Get:
+                request = UnityWebRequest.Get(uri);
+                break;
+            case RequestType.Post:
+                request = UnityWebRequest.Post(uri, String.Empty);
+                break;
+            case RequestType.Put:
+                request = UnityWebRequest.Put(uri, String.Empty);
+                break;
+            default:
+                throw new Exception($"Not supported request type {requestType}");
+        }
 
         yield return request.SendWebRequest();
 

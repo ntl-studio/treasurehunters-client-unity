@@ -19,12 +19,18 @@ public class GamesList : MonoBehaviour
         Game.OnJoined += () => gameObject.SetActive(false);
     }
 
+
+    public void CreateGame()
+    {
+        ServerConnection.Instance().CreateGameAsync(UpdateGamesList);
+    }
+
+    private List<GameObject> _games = new List<GameObject>();
+
     public void UpdateGamesList()
     {
         ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
     }
-
-    private List<GameObject> _games = new List<GameObject>();
 
     public void UpdateGamesList(GamesJson games)
     {
@@ -36,6 +42,8 @@ public class GamesList : MonoBehaviour
         _games.Clear();
 
         var pos = transform.position;
+        pos.y += 300;
+
         foreach (var game in games.games)
         {
             var obj = Instantiate(GamesListItemPrefab, transform);
