@@ -29,26 +29,25 @@ public class ActionsHistory : MonoBehaviour
         Vector3 lastListPosition = transform.position;
 
         Game.OnUpdatePlayersMoveHistory += UpdateStates;
+        Game.OnWaitingForTurn += InitView;
+    }
 
-        Game.OnWaitingForTurn += () =>
+    void InitView()
+    {
+        if (_isInitialized)
+            return;
+
+        for (int i = 0; i < Game.PlayersCount; i++)
         {
-            if (_isInitialized) 
-                return;
+            var actionsListObj = Instantiate(ActionsListViewPrefab, transform);
 
-            for (int i = 0; i < Game.PlayersCount; i++)
-            {
-                var actionsListObj = Instantiate(ActionsListViewPrefab, transform, true);
-                actionsListObj.transform.SetPositionAndRotation(lastListPosition, Quaternion.identity);
-                lastListPosition.y -= 120.0f;
+            var actionsList = actionsListObj.GetComponent<ActionsListView>();
+            Debug.Assert(actionsList);
 
-                var actionsList = actionsListObj.GetComponent<ActionsListView>();
-                Debug.Assert(actionsList);
+            _actionViews.Add(actionsList);
+        }
 
-                _actionViews.Add(actionsList);
-            }
-
-            _isInitialized = true;
-        };
+        _isInitialized = true;
     }
 
     void UpdateStates()

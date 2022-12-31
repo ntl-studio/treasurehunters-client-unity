@@ -16,14 +16,11 @@ public class ActionsListView : MonoBehaviour
         Debug.Assert(ActionsParent);
         Debug.Assert(PlayerNameText);
 
-        var pos = transform.position;
         for (int i = 0; i < SM.Game.ActionsHistorySize; ++i)
         {
-            var actionStateViewObj = Instantiate(ActionStateViewPrefab, transform, false);
-            actionStateViewObj.SetActive(false);
+            var actionStateViewObj = Instantiate(ActionStateViewPrefab, ActionsParent, false);
 
-            pos.x += 130;
-            actionStateViewObj.transform.position = pos;
+            actionStateViewObj.SetActive(false);
 
             _actionsList.Add(actionStateViewObj);
         }

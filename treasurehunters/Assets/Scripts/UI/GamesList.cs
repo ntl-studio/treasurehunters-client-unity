@@ -7,11 +7,13 @@ using UnityEngine;
 public class GamesList : MonoBehaviour
 {
     public GameObject GamesListItemPrefab;
+    public Transform GameItemsParent;
     private static GameClient Game => GameClient.Instance();
 
     void Start()
     {
         Debug.Assert(GamesListItemPrefab);
+        Debug.Assert(GameItemsParent);
 
         UpdateGamesList();
 
@@ -41,14 +43,9 @@ public class GamesList : MonoBehaviour
 
         _games.Clear();
 
-        var pos = transform.position;
-        pos.y += 300;
-
         foreach (var game in games.games)
         {
-            var obj = Instantiate(GamesListItemPrefab, transform);
-            obj.transform.position = pos;
-            pos.y -= 120;
+            var obj = Instantiate(GamesListItemPrefab, GameItemsParent);
 
             var gamesListItem = obj.GetComponent<GamesListItem>();
             Debug.Assert(gamesListItem);
