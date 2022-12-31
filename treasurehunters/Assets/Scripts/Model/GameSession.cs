@@ -22,6 +22,9 @@ public class GameSession : MonoBehaviour
             else if (Game.State != GameClientState.Finished)
                 Game.State = GameClientState.YourTurn;
         };
+
+        // When it is again your turn, the client needs to pull updated visibility area
+        Game.OnYourTurn += () => StartCoroutine(UpdatePlayerDetails(GameClientState.YourTurn));
     }
 
     IEnumerator UpdatePlayerDetails(GameClientState nextState)

@@ -1,3 +1,4 @@
+using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
 
@@ -18,6 +19,6 @@ public class PlayerActions : MonoBehaviour
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        Game.StartTurn();
+        Game.PerformAction(PlayerAction.SkipTurn);
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
@@ -21,6 +22,9 @@ public class Enemies : MonoBehaviour
 
     public void ClearEnemies()
     {
+        foreach (var enemy in _enemies)
+            Destroy(enemy);
+
         _enemies.Clear();
     }
 

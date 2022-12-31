@@ -69,7 +69,6 @@ namespace TreasureHunters
                             OnWaitingForTurn?.Invoke();
                             break;
                         case GameClientState.YourTurn:
-
                             OnYourTurn?.Invoke();
                             break;
                         case GameClientState.MakingMove:

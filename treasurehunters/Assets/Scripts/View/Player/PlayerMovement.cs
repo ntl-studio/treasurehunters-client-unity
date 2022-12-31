@@ -3,7 +3,8 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
-using Player = TreasureHunters.Player;
+using UnityEngine.EventSystems;
+using MoveDirection = NtlStudio.TreasureHunters.Model.MoveDirection;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -110,19 +111,18 @@ public class PlayerMovement : MonoBehaviour
         PlayerAction playerAction = PlayerAction.None;
 
         // left mouse click
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             var playerPos = transform.position;
             var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             Debug.Log($"Mouse position: {Input.mousePosition}, click position {clickPos}, player position {transform.position}");
 
-            if (math.abs(clickPos.x - playerPos.x) < 1.5f &&
-                math.abs(clickPos.y - playerPos.y) < 1.5f)
-            {
-                var shiftX = (int) math.round(clickPos.x - playerPos.x);
-                var shiftY = (int) math.round(clickPos.y - playerPos.y);
+            var shiftX = (int)math.round(clickPos.x - playerPos.x);
+            var shiftY = (int)math.round(clickPos.y - playerPos.y);
 
+            if ((math.abs(shiftX) == 1) ^ (math.abs(shiftY) == 1))
+            {
                 if (math.abs(shiftX) > math.abs(shiftY))
                     playerAction = shiftX > 0 ? PlayerAction.MoveRight : PlayerAction.MoveLeft;
                 else
