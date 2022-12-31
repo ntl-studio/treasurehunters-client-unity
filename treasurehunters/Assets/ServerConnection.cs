@@ -18,6 +18,7 @@ public class ServerConnection : MonoBehaviour
 {
     private static ServerConnection _instance;
     private static GameClient Game => GameClient.Instance();
+    private string ServerAddress = "localhost:7205";
 
     public static ServerConnection Instance()
     {
@@ -36,7 +37,7 @@ public class ServerConnection : MonoBehaviour
 
     public void UpdateGamesListAsync(Action<GamesJson> gameListCallback)
     {
-        string uri = "https://localhost:7209/api/v1/games";
+        string uri = $"https://{ServerAddress}/api/v1/games";
 
         StartCoroutine(WebRequest<GamesDataJson>(uri, (gamesDataJson) => 
             { gameListCallback(gamesDataJson.data); },
@@ -48,7 +49,7 @@ public class ServerConnection : MonoBehaviour
 
     public void JoinGameAsync(string gameId, JoinGameCallbackAction joinGameCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{Game.PlayerName}";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/players/{Game.PlayerName}";
 
         StartCoroutine(WebRequest<PlayersDataJson>(uri, (playerDataJson) => 
             { joinGameCallback(playerDataJson.successful, gameId, playerDataJson.data.sessionid); },
@@ -58,7 +59,7 @@ public class ServerConnection : MonoBehaviour
 
     public void GetTreasurePositionAsync(string gameId, Action<int, int> getTreasurePositionCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/treasureposition_debug";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/treasureposition_debug";
 
         StartCoroutine(WebRequest<TreasurePositionDataJson>(uri, (treasurePositionDataJson) =>
             { getTreasurePositionCallback(treasurePositionDataJson.data.x, treasurePositionDataJson.data.y); },
@@ -68,7 +69,7 @@ public class ServerConnection : MonoBehaviour
 
     public void GetGameStateAsync(string gameId, Action<string, int> gameStateCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}";
 
         StartCoroutine(WebRequest<GameDataJson>(uri, (gameDataJson) =>
             { gameStateCallback(gameDataJson.data.state, gameDataJson.data.playerscount); },
@@ -78,7 +79,7 @@ public class ServerConnection : MonoBehaviour
 
     public void StartGameAsync(string gameId, Action startGameCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/start";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/start";
 
         StartCoroutine(WebRequest<GameStateDataJson>(uri, (gameStateJson) =>
             { startGameCallback(); },
@@ -88,7 +89,7 @@ public class ServerConnection : MonoBehaviour
 
     public void GetCurrentPlayerAsync(string gameId, Action<string> currentPlayerCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/currentplayer";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/currentplayer";
 
         StartCoroutine(WebRequest<CurrentPlayerDataJson>(uri, (currentPlayerJson) =>
             { currentPlayerCallback(currentPlayerJson.data.name); },
@@ -99,7 +100,7 @@ public class ServerConnection : MonoBehaviour
     public void GetPlayerInfoAsync(string gameId, string playerName, 
         Action<int, int, int[]> getPlayerInfoCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/players/{playerName}";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/players/{playerName}";
 
         StartCoroutine(WebRequest<PlayerInfoDataJson>(uri, (playerInfo) =>
             { getPlayerInfoCallback(playerInfo.data.x, playerInfo.data.y, playerInfo.data.visiblearea); },
@@ -110,7 +111,7 @@ public class ServerConnection : MonoBehaviour
     public void PerformActionAsync(string gameId, string playerName, string actionName, 
         Action<bool, bool, string> performActionCallback)
     {
-        string uri = $"https://localhost:7209/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
 
         StartCoroutine(WebRequest<PlayerActionResultDataJson>(uri, (playerActionResult) => 
             { 
