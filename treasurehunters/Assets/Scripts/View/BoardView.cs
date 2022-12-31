@@ -139,8 +139,6 @@ public class BoardView : MonoBehaviour
 
     public void FogVisitedAreas()
     {
-        _enemies.ClearEnemies();
-
         var position = Game.PreviousPosition;
 
         for (int x = 0; x < VisibleArea.Width; ++x)
@@ -162,6 +160,8 @@ public class BoardView : MonoBehaviour
 
     public void UpdatePlayerVisibility()
     {
+        _enemies.ClearEnemies();
+
         var position = Game.PlayerPosition;
         var visibleArea = Game.CurrentVisibleArea();
 
