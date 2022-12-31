@@ -28,11 +28,11 @@ public class ActionsHistory : MonoBehaviour
 
         Vector3 lastListPosition = transform.position;
 
-        Game.OnUpdatePlayersMoveHistory += UpdateStates;
-        Game.OnWaitingForTurn += InitView;
+        Game.OnUpdatePlayersMoveHistory += UpdatePlayersActionHistory;
+        Game.OnWaitingForTurn += InitPlayerActionsView;
     }
 
-    void InitView()
+    void InitPlayerActionsView()
     {
         if (_isInitialized)
             return;
@@ -50,7 +50,7 @@ public class ActionsHistory : MonoBehaviour
         _isInitialized = true;
     }
 
-    void UpdateStates()
+    void UpdatePlayersActionHistory()
     {
         Debug.Assert(_actionViews.Count == Game.PlayersMovesHistory.Count);
 

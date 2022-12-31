@@ -25,7 +25,10 @@ public class GameSession : MonoBehaviour
         Game.OnMakingMove += (bool result) =>
         {
             if (result)
+            {
+                UpdateMovesHistory();
                 StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForTurn));
+            }
             else if (Game.State != GameClientState.Finished)
                 Game.State = GameClientState.YourTurn;
         };
