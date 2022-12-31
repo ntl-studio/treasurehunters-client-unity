@@ -12,7 +12,9 @@ public class GamesListItem : MonoBehaviour
     public TextMeshProUGUI NumberOfPlayersText;
     public TextMeshProUGUI GameStateText;
     public TextMeshProUGUI JoinButtonText;
-    public GameObject StartGameButton;
+
+    public Button JoinGameButton;
+    public Button StartGameButton;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +23,8 @@ public class GamesListItem : MonoBehaviour
         Debug.Assert(NumberOfPlayersText);
         Debug.Assert(GameStateText);
         Debug.Assert(JoinButtonText);
+
+        Debug.Assert(JoinGameButton);
         Debug.Assert(StartGameButton);
 
         if (AllowRejoin)
@@ -34,7 +38,19 @@ public class GamesListItem : MonoBehaviour
     }
     public string NumberOfPlayers { set => NumberOfPlayersText.text = value; }
 
-    public string State { set => GameStateText.text = value; }
+    public string State
+    {
+        set
+        {
+            GameStateText.text = value;
+
+            if (value == "Finished")
+                JoinGameButton.interactable = false;
+
+            if (value == "Running" || value == "Finished")
+                StartGameButton.interactable = false;
+        }
+    }
 
     public bool AllowRejoin;
 
@@ -82,7 +98,7 @@ public class GamesListItem : MonoBehaviour
             .StartGameAsync(GameId, () =>
             {
                 Debug.Log($"Game {GameId} started");
-                StartGameButton.GetComponent<Button>().interactable = false;
+                StartGameButton.interactable = false;
             });
     }
 }
