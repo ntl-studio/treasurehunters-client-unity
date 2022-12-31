@@ -24,7 +24,7 @@ public class ServerConnection : MonoBehaviour
 {
     private static ServerConnection _instance;
     private static GameClient Game => GameClient.Instance();
-    private string ServerAddress = "localhost:7209";
+    private string ServerAddress => Game.ServerName;
 
     public static ServerConnection Instance()
     {

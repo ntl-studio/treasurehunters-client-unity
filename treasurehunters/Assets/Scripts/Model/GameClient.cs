@@ -33,12 +33,15 @@ namespace TreasureHunters
         }
 
         private const string PlayerNameKey = "PlayerName";
+        private const string ServerNameKey = "ServerName";
 
         private GameClient()
         {
             if (PlayerPrefs.HasKey(PlayerNameKey))
                 _playerName = PlayerPrefs.GetString(PlayerNameKey);
 
+            if (PlayerPrefs.HasKey(ServerNameKey))
+                _serverName = PlayerPrefs.GetString(ServerNameKey);
 
             AddCallbacksDebug();
         }
@@ -103,6 +106,7 @@ namespace TreasureHunters
         public event GameEvent OnUpdatePlayersMoveHistory;
 
         public event GameEvent OnUpdatePlayerName;
+        public event GameEvent OnUpdateServerName;
         public event GameEventBool OnUpdatePlayerHasTreasure;
         public event GameEvent OnUpdateTreasurePosition_Debug;
 
@@ -229,7 +233,6 @@ namespace TreasureHunters
         private string _gameId;
 
         private string _playerName;
-
         public string PlayerName
         {
             set
@@ -239,6 +242,18 @@ namespace TreasureHunters
                 OnUpdatePlayerName?.Invoke();
             }
             get => _playerName;
+        }
+
+        private string _serverName;
+        public string ServerName
+        {
+            set
+            {
+                _serverName = value;
+                PlayerPrefs.SetString(ServerNameKey, _serverName);
+                OnUpdateServerName?.Invoke();
+            }
+            get => _serverName;
         }
 
         private string _sessionId;

@@ -15,7 +15,8 @@ public class GamesList : MonoBehaviour
         Debug.Assert(GamesListItemPrefab);
         Debug.Assert(GameItemsParent);
 
-        UpdateGamesList();
+        if (!string.IsNullOrEmpty(Game.ServerName))
+            UpdateGamesList();
 
         Game.OnUpdatePlayerName += UpdateGamesList;
         Game.OnJoined += () => gameObject.SetActive(false);
