@@ -19,7 +19,7 @@ public class GamesList : MonoBehaviour
             UpdateGamesList();
 
         Game.OnUpdatePlayerName += UpdateGamesList;
-        Game.OnJoined += () => gameObject.SetActive(false);
+        Game.OnWaitingForTurn += () => gameObject.SetActive(false);
     }
 
 
