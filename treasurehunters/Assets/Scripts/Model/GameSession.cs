@@ -32,6 +32,11 @@ public class GameSession : MonoBehaviour
             else if (Game.State != GameClientState.Finished)
                 Game.State = GameClientState.YourTurn;
         };
+
+        Game.OnGameFinished += () =>
+        {
+            ServerConnection.Instance().GetWinnerAsync(Game.GameId, (winnerName) => { Game.WinnerName = winnerName; });
+        };
     }
 
     IEnumerator UpdatePlayerDetails(GameClientState nextState)
@@ -75,11 +80,11 @@ public class GameSession : MonoBehaviour
     {
         while (Game.State == GameClientState.WaitingForTurn)
         {
-            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (currentPlayerName) =>
+            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (currentPlayerName, gameState) =>
             {
                 if (currentPlayerName == Game.PlayerName)
                 {
-                    Game.State = GameClientState.YourTurn;
+                    Game.State = gameState == "Finished" ? GameClientState.Finished : GameClientState.YourTurn;
                 }
                 else
                 {

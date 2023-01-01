@@ -47,6 +47,7 @@ namespace JsonObjects
     {
         public int index;
         public string name;
+        public string gamestate;
     }
 
     [System.Serializable]

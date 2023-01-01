@@ -31,7 +31,13 @@ public class NextTurn : MonoBehaviour
 
         Game.OnYourTurn += () => { Message.text = "Your turn!"; };
 
-        Game.OnGameFinished += () => { Message.text = "You won!"; };
+        Game.OnUpdateWinner += () =>
+        {
+            if (Game.PlayerName == Game.WinnerName)
+                Message.text = "You won!";
+            else
+                Message.text = $"You lost, the winner is {Game.WinnerName}.\nSorry, but you suck at this game.";
+        };
     }
 
     void Update()

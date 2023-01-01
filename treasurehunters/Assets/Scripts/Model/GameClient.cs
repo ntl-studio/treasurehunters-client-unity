@@ -107,6 +107,7 @@ namespace TreasureHunters
 
         public event GameEvent OnUpdatePlayerName;
         public event GameEvent OnUpdateServerName;
+        public event GameEvent OnUpdateWinner;
         public event GameEventBool OnUpdatePlayerHasTreasure;
         public event GameEvent OnUpdateTreasurePosition_Debug;
 
@@ -254,6 +255,18 @@ namespace TreasureHunters
                 OnUpdateServerName?.Invoke();
             }
             get => _serverName;
+        }
+
+        private string _winnerName;
+
+        public string WinnerName
+        {
+            set
+            {
+                _winnerName = value;
+                OnUpdateWinner?.Invoke();
+            }
+            get => _winnerName;
         }
 
         private string _sessionId;

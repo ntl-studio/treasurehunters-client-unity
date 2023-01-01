@@ -19,6 +19,7 @@ using PlayerActionResultDataJson = JsonObjects.DataJson<JsonObjects.PlayerAction
 using PlayerInfoDataJson = JsonObjects.DataJson<JsonObjects.PlayerInfoJson>;
 using PlayersDataJson =  JsonObjects.DataJson<JsonObjects.PlayersJson>;
 using TreasurePositionDataJson = JsonObjects.DataJson<JsonObjects.TreasurePositionJson>;
+using WinnerNameDataJson = JsonObjects.DataJson<string>;
 
 public class ServerConnection : MonoBehaviour
 {
@@ -113,12 +114,14 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    public void GetCurrentPlayerAsync(string gameId, Action<string> currentPlayerCallback)
+    public void GetCurrentPlayerAsync(string gameId, Action<string, string> currentPlayerCallback)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/currentplayer";
 
         StartCoroutine(WebRequest<CurrentPlayerDataJson>(uri, (currentPlayerJson) =>
-            { currentPlayerCallback(currentPlayerJson.data.name); },
+            { currentPlayerCallback(
+                currentPlayerJson.data.name,
+                currentPlayerJson.data.gamestate); },
             RequestType.Get
         ));
     }
@@ -148,6 +151,18 @@ public class ServerConnection : MonoBehaviour
                 );
             },
             RequestType.Put
+        ));
+    }
+
+    public void GetWinnerAsync(string gameId, Action<string> getWinnerCallback)
+    {
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/getwinner";
+
+        StartCoroutine(WebRequest<WinnerNameDataJson>(uri, (getWinnerResult) =>
+            {
+                getWinnerCallback(getWinnerResult.data);
+            },
+            RequestType.Get
         ));
     }
 
