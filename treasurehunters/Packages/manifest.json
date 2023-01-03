@@ -9,7 +9,7 @@
     }
   ],
   "dependencies": {
-    "com.ntlstudio.treasurehunters.model": "1.0.15",
+    "com.ntlstudio.treasurehunters.model": "1.0.16",
     "com.unity.2d.animation": "7.0.5",
     "com.unity.2d.pixel-perfect": "5.0.1",
     "com.unity.2d.psdimporter": "6.0.3",
