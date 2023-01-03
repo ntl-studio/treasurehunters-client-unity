@@ -3,7 +3,6 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -28,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (actionResult)
             {
-                Vector2Int shift = GameUtils.ActionToVector2(LastAction);
+                Vector2Int shift = GameUtils.ActionToVector2(_lastAction);
 
                 _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
 
@@ -45,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Could not move player");
             }
 
-            LastAction = PlayerAction.None;
+            _lastAction = PlayerAction.None;
         };
     }
 
@@ -87,16 +86,6 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerAction _lastAction = PlayerAction.None;
 
-    private PlayerAction LastAction
-    {
-        get => _lastAction;
-        set
-        {
-            Debug.Log($"Changing player action from {_lastAction} to {value}");
-            _lastAction = value;
-        }
-    }
-
     private void MovePlayer()
     {
         if (_isPlayingMovingAnimation)
@@ -106,13 +95,13 @@ public class PlayerMovement : MonoBehaviour
 
         if (direction != ActionDirection.None)
         {
-            LastAction = new PlayerAction()
+            _lastAction = new PlayerAction()
             {
                 Direction = direction,
                 Type = ActionType.Move
             };
 
-            Game.PerformAction(LastAction);
+            Game.PerformAction(_lastAction);
         }
     }
 }
