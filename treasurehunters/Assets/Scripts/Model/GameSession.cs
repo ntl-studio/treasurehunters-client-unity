@@ -22,15 +22,11 @@ public class GameSession : MonoBehaviour
             UpdateMovesHistory();
         };
 
-        Game.OnMakingMove += (bool result) =>
+        Game.OnPerformAction += (result) => { UpdateMovesHistory(); };
+
+        Game.OnEndMove += () =>
         {
-            if (result)
-            {
-                UpdateMovesHistory();
-                StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForTurn));
-            }
-            else if (Game.State != GameClientState.Finished)
-                Game.State = GameClientState.YourTurn;
+            StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForTurn));
         };
 
         Game.OnGameFinished += () =>
@@ -97,7 +93,7 @@ public class GameSession : MonoBehaviour
         }
     }
 
-    void UpdateMovesHistory()
+    private void UpdateMovesHistory()
     {
         ServerConnection.Instance().GetMovesHistoryAsync(Game.GameId, (movesHistory) =>
         {

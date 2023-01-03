@@ -68,7 +68,7 @@ public class BoardView : MonoBehaviour
 
         Game.OnUpdateVisibleArea += UpdatePlayerVisibility;
 
-        Game.OnEndMove += () =>
+        Game.OnEndMoveAnimation += () =>
         {
             FogVisitedAreas();
             UpdatePlayerVisibility();

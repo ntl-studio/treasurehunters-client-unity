@@ -1,4 +1,3 @@
-using NtlStudio.TreasureHunters.Model;
 using TMPro;
 using TreasureHunters;
 using UnityEngine;
@@ -38,15 +37,5 @@ public class NextTurn : MonoBehaviour
             else
                 Message.text = $"You lost, the winner is {Game.WinnerName}.\nSorry, but you suck at this game.";
         };
-    }
-
-    void Update()
-    {
-        if (Game.State == GameClientState.YourTurn &&
-            (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
-        {
-            NextTurnPanel.SetActive(false);
-            Game.StartTurn();
-        }
     }
 }

@@ -1036,6 +1036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ActionsWindow: {fileID: 1222958835}
+  PlayerMovement: {fileID: 0}
 --- !u!1 &287066936
 GameObject:
   m_ObjectHideFlags: 0

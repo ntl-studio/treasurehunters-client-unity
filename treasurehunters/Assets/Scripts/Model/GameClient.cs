@@ -2,6 +2,7 @@ using NtlStudio.TreasureHunters.Model;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static NtlStudio.TreasureHunters.Model.ActionType;
 
 namespace TreasureHunters
 {
@@ -95,12 +96,11 @@ namespace TreasureHunters
         public event GameEvent OnWaitingForStart;
         public event GameEvent OnWaitingForTurn;
         public event GameEvent OnYourTurn;
-        public event GameEvent OnGameFinished;
-        public event GameEventBool OnMakingMove;
-
+        public event GameEventBool OnPerformAction;
         public event GameEvent OnEndMove;
+        public event GameEvent OnEndMoveAnimation;
+        public event GameEvent OnGameFinished;
 
-        public event GameEvent OnPlayerClicked;
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
         public event GameEvent OnUpdatePlayersMoveHistory;
@@ -112,16 +112,20 @@ namespace TreasureHunters
         public event GameEvent OnUpdateTreasurePosition_Debug;
 
         // current player is the player who's turn is now, and it is not necessarily player who runs the client
-        public event GameEvent OnUpdateCurrentPlayerName; 
+        public event GameEvent OnUpdateCurrentPlayerName;
+
+        public event GameEvent OnChoosePlayerAction;
+        public event GameEvent OnChoosePlayerActionCancel;
+
+        // when the player chooses to fire gun from the menu
+        public event GameEvent OnStartFiringGun;
 
         private void AddCallbacksDebug()
         {
             OnJoined += () => Debug.Log("OnJoined");
             OnWaitingForStart += () => Debug.Log("OnWaitingForStart");
             OnYourTurn += () => Debug.Log("OnYourTurn");
-            OnEndMove += () => Debug.Log("OnEndMove");
-
-            OnPlayerClicked += () => Debug.Log("OnPlayerClicked");
+            OnEndMoveAnimation += () => Debug.Log("OnEndMoveAnimation");
 
             OnUpdateVisibleArea += () => Debug.Log("OnUpdateVisibleArea");
             OnUpdatePlayerPosition += () => Debug.Log("OnUpdatePlayerPosition");
@@ -218,7 +222,13 @@ namespace TreasureHunters
                         State = GameClientState.Finished;
 
                     PlayerHasTreasure = hasTreasure;
-                    OnMakingMove?.Invoke(actionResult);
+
+                    OnPerformAction?.Invoke(actionResult);
+
+                    if (actionResult && (playerAction.Type == Move || playerAction.Type == Skip))
+                    {
+                        OnEndMove?.Invoke();
+                    }
                 });
         }
 
@@ -283,19 +293,14 @@ namespace TreasureHunters
             State = GameClientState.Joined;
         }
 
-        public void EndMove()
+        public void EndMoveAnimation()
         {
-            OnEndMove?.Invoke();
+            OnEndMoveAnimation?.Invoke();
         }
 
         public void StartTurn()
         {
             OnYourTurn?.Invoke();
-        }
-
-        public void PlayerClicked()
-        {
-            OnPlayerClicked?.Invoke();
         }
 
         public delegate void ShowTreasureEvent(bool isVisible);
@@ -319,5 +324,9 @@ namespace TreasureHunters
             }
             get => _treasurePosition_Debug;
         }
+
+        public void StartFiringGun() { OnStartFiringGun?.Invoke(); }
+        public void ChoosePlayerAction() { OnChoosePlayerAction?.Invoke(); }
+        public void ChoosePlayerActionCancel() { OnChoosePlayerActionCancel?.Invoke(); }
     }
 }
