@@ -102,35 +102,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isPlayingMovingAnimation)
             return;
 
-        ActionDirection direction = ActionDirection.None;
-
-        // left mouse click
-        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
-        {
-            var playerPos = transform.position;
-            var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            Debug.Log($"Mouse position: {Input.mousePosition}, click position {clickPos}, player position {transform.position}");
-
-            var shiftX = (int)math.round(clickPos.x - playerPos.x);
-            var shiftY = (int)math.round(clickPos.y - playerPos.y);
-
-            if ((math.abs(shiftX) == 1) ^ (math.abs(shiftY) == 1))
-            {
-                if (math.abs(shiftX) > math.abs(shiftY))
-                    direction = shiftX > 0 ? ActionDirection.Right : ActionDirection.Left;
-                else
-                    direction = shiftY > 0 ? ActionDirection.Up : ActionDirection.Down;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            direction = ActionDirection.Left;
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-            direction = ActionDirection.Up;
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-            direction = ActionDirection.Right;
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-            direction = ActionDirection.Down;
+        ActionDirection direction = GameUtils.GetActionDirection(transform.position);
 
         if (direction != ActionDirection.None)
         {

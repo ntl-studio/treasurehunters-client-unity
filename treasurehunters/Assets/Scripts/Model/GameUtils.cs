@@ -1,7 +1,9 @@
 using System;
-using NtlStudio.TreasureHunters.Model;
+using Unity.Mathematics;
+using UnityEngine.EventSystems;
 using UnityEngine;
 
+using NtlStudio.TreasureHunters.Model;
 using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
@@ -50,6 +52,39 @@ namespace TreasureHunters
                 case ActionDirection.Up:
                     break;
             }
+        }
+
+        public static ActionDirection GetActionDirection(Vector3 playerPosition)
+        {
+            ActionDirection direction = ActionDirection.None;
+
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+            {
+                var clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+                Debug.Log($"Mouse position: {Input.mousePosition}, click position {clickPos}, player position {playerPosition}");
+
+                var shiftX = (int)math.round(clickPos.x - playerPosition.x);
+                var shiftY = (int)math.round(clickPos.y - playerPosition.y);
+
+                if ((math.abs(shiftX) == 1) ^ (math.abs(shiftY) == 1))
+                {
+                    if (math.abs(shiftX) > math.abs(shiftY))
+                        direction = shiftX > 0 ? ActionDirection.Right : ActionDirection.Left;
+                    else
+                        direction = shiftY > 0 ? ActionDirection.Up : ActionDirection.Down;
+                }
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                direction = ActionDirection.Left;
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+                direction = ActionDirection.Up;
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+                direction = ActionDirection.Right;
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+                direction = ActionDirection.Down;
+
+            return direction;
         }
     }
 }
