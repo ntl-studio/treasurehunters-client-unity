@@ -1,7 +1,6 @@
 using NtlStudio.TreasureHunters.Model;
 using System.Collections.Generic;
 using TreasureHunters;
-using UnityEditor;
 using UnityEngine;
 
 using SM = NtlStudio.TreasureHunters.Model;
@@ -9,7 +8,7 @@ using SM = NtlStudio.TreasureHunters.Model;
 public class PlayerMovesDetails
 {
     public string PlayerName;
-    public List<PlayerMoveState> Moves = new();
+    public List<PlayerActionState> Moves = new();
 }
 
 public class ActionsHistory : MonoBehaviour

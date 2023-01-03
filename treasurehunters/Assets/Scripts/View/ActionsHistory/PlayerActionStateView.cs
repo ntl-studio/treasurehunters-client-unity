@@ -18,13 +18,13 @@ public class PlayerActionStateView : MonoBehaviour
         Debug.Assert(PlayerDirectionTransform);
     }
 
-    public void SetWallsVisibility(SM.PlayerMoveState playerState)
+    public void SetWallsVisibility(SM.PlayerActionState playerActionState)
     {
-        RightWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.RightWall));
-        DownWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.BottomWall));
-        LeftWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.LeftWall));
-        UpWallImage.gameObject.SetActive(playerState.FieldCell.HasFlag(SM.FieldCell.TopWall));
+        RightWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.RightWall));
+        DownWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.BottomWall));
+        LeftWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.LeftWall));
+        UpWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.TopWall));
 
-        GameUtils.UpdateRotation(playerState.Direction, PlayerDirectionTransform);
+        GameUtils.UpdateRotation(playerActionState.Action, PlayerDirectionTransform);
     }
 }

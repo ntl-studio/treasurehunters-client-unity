@@ -211,7 +211,7 @@ namespace TreasureHunters
         public void PerformAction(PlayerAction playerAction)
         {
             ServerConnection.Instance().PerformActionAsync(
-                GameId, PlayerName, playerAction.ToString(),
+                GameId, PlayerName, playerAction,
                 (actionResult, hasTreasure, gameState) =>
                 {
                     if (gameState == "Finished")
@@ -290,7 +290,6 @@ namespace TreasureHunters
 
         public void StartTurn()
         {
-            _game.EndTurn();
             OnYourTurn?.Invoke();
         }
 

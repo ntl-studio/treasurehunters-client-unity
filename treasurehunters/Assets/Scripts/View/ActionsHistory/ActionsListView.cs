@@ -34,15 +34,15 @@ public class ActionsListView : MonoBehaviour
     private Vector3 _lastActionPosition;
     private readonly List<GameObject> _actionsList = new();
 
-    public void UpdatePlayerActionStates(List<SM.PlayerMoveState> playerStates)
+    public void UpdatePlayerActionStates(List<SM.PlayerActionState> playerActions)
     {
-        for (int i = 0; i < playerStates.Count; ++i)
+        for (int i = 0; i < playerActions.Count; ++i)
         {
             _actionsList[i].SetActive(true);
 
             var stateVisibility = _actionsList[i].GetComponent<PlayerActionStateView>();
             Debug.Assert(stateVisibility);
-            stateVisibility.SetWallsVisibility(playerStates[i]);
+            stateVisibility.SetWallsVisibility(playerActions[i]);
         }
     }
 }

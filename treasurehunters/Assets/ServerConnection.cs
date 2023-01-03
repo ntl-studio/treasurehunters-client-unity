@@ -137,10 +137,10 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    public void PerformActionAsync(string gameId, string playerName, string actionName, 
+    public void PerformActionAsync(string gameId, string playerName, PlayerAction playerAction, 
         Action<bool, bool, string> performActionCallback)
     {
-        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/performaction/player/{playerName}/action/{actionName}";
+        string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/performaction/player/{playerName}/action/{playerAction.Type}/{playerAction.Direction}";
 
         StartCoroutine(WebRequest<PlayerActionResultDataJson>(uri, (playerActionResult) => 
             { 
@@ -181,13 +181,21 @@ public class ServerConnection : MonoBehaviour
                         PlayerName = player.player
                     };
 
-                    foreach (var move in player.movestates)
+                    Debug.Assert(player.actionstates != null);
+
+                    foreach (var playerAction in player.actionstates)
                     {
-                        details.Moves.Add(new PlayerMoveState()
+                        details.Moves.Add(new PlayerActionState()
                         {
-                            Position = move.position,
-                            Direction = move.direction,
-                            FieldCell = move.cell
+                            Position = playerAction.position,
+
+                            Action = new PlayerAction
+                            {
+                                Direction = playerAction.direction,
+                                Type = playerAction.type
+                            },
+
+                            FieldCell = playerAction.cell
                         });
                     }
 

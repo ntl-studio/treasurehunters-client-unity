@@ -4,7 +4,6 @@ using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using MoveDirection = NtlStudio.TreasureHunters.Model.MoveDirection;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -103,7 +102,7 @@ public class PlayerMovement : MonoBehaviour
         if (_isPlayingMovingAnimation)
             return;
 
-        PlayerAction playerAction = PlayerAction.None;
+        ActionDirection direction = ActionDirection.None;
 
         // left mouse click
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
@@ -119,24 +118,29 @@ public class PlayerMovement : MonoBehaviour
             if ((math.abs(shiftX) == 1) ^ (math.abs(shiftY) == 1))
             {
                 if (math.abs(shiftX) > math.abs(shiftY))
-                    playerAction = shiftX > 0 ? PlayerAction.MoveRight : PlayerAction.MoveLeft;
+                    direction = shiftX > 0 ? ActionDirection.Right : ActionDirection.Left;
                 else
-                    playerAction = shiftY > 0 ? PlayerAction.MoveUp: PlayerAction.MoveDown;
+                    direction = shiftY > 0 ? ActionDirection.Up : ActionDirection.Down;
             }
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            playerAction = PlayerAction.MoveLeft;
+            direction = ActionDirection.Left;
         else if (Input.GetKeyDown(KeyCode.UpArrow))
-            playerAction = PlayerAction.MoveUp;
+            direction = ActionDirection.Up;
         else if (Input.GetKeyDown(KeyCode.RightArrow))
-            playerAction = PlayerAction.MoveRight;
+            direction = ActionDirection.Right;
         else if (Input.GetKeyDown(KeyCode.DownArrow))
-            playerAction = PlayerAction.MoveDown;
+            direction = ActionDirection.Down;
 
-        if (playerAction != PlayerAction.None)
+        if (direction != ActionDirection.None)
         {
-            LastAction = playerAction;
-            Game.PerformAction(playerAction);
+            LastAction = new PlayerAction()
+            {
+                Direction = direction,
+                Type = ActionType.Move
+            };
+
+            Game.PerformAction(LastAction);
         }
     }
 }

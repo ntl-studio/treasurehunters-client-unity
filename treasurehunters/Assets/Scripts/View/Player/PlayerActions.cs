@@ -14,11 +14,16 @@ public class PlayerActions : MonoBehaviour
     public void GunAction()
     {
         Debug.Log("Shoot gun");
+
+        // enable mouse & keyboardhandling
+
+        // check for direction and call server API with action perform command
+        // ServerConnection.Instance().PerformActionAsync
     }
     
     public void SkipAction()
     {
         Debug.Log("Skip turn");
-        Game.PerformAction(PlayerAction.SkipTurn);
+        Game.PerformAction(new PlayerAction { Type = ActionType.Skip });
     }
 }

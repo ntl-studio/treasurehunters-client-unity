@@ -12,45 +12,42 @@ namespace TreasureHunters
         {
             var result = new Vector2Int(0, 0);
 
-            switch (action)
+            switch (action.Direction)
             {
-                case PlayerAction.MoveRight:
+                case ActionDirection.Right:
                     result.x += 1;
                     break;
-                case PlayerAction.MoveDown:
+                case ActionDirection.Down:
                     result.y -= 1;
                     break;
-                case PlayerAction.MoveLeft:
+                case ActionDirection.Left:
                     result.x -= 1;
                     break;
-                case PlayerAction.MoveUp:
+                case ActionDirection.Up:
                     result.y += 1;
                     break;
-                case PlayerAction.SkipTurn:
-                    break;
-                case PlayerAction.ThrowGrenade:
-                case PlayerAction.FireGun:
-                    throw new Exception("Action not supported");
+                default:
+                    throw new Exception($"Action direction not supported {action.Direction}");
             }
 
             return result;
         }
 
-        public static void UpdateRotation(MoveDirection moveDirection, Transform transform)
+        public static void UpdateRotation(PlayerAction playerAction, Transform transform)
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
-            switch (moveDirection)
+            switch (playerAction.Direction)
             {
-                case MoveDirection.Right:
+                case ActionDirection.Right:
                     transform.rotation = Quaternion.Euler(0, 0, -90);
                     break;
-                case MoveDirection.Down:
+                case ActionDirection.Down:
                     transform.rotation = Quaternion.Euler(0, 0, 180);
                     break;
-                case MoveDirection.Left:
+                case ActionDirection.Left:
                     transform.rotation = Quaternion.Euler(0, 0, 90);
                     break;
-                case MoveDirection.Up:
+                case ActionDirection.Up:
                     break;
             }
         }

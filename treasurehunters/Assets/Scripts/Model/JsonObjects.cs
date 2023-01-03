@@ -51,10 +51,11 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerMoveStateJson
+    class PlayerActionStateJson
     {
         public Position position;
-        public MoveDirection direction;
+        public ActionDirection direction;
+        public ActionType type;
         public FieldCell cell;
     }
 
@@ -62,7 +63,7 @@ namespace JsonObjects
     class PlayerMoveStatesJson
     {
         public string player;
-        public PlayerMoveStateJson[] movestates;
+        public PlayerActionStateJson[] actionstates;
     }
 
     [System.Serializable]
