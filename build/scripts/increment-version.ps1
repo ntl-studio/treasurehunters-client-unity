@@ -17,4 +17,5 @@ $projectSettings = $projectSettings -replace "bundleVersion: .*", "bundleVersion
 git add $projectSettingsPath
 git commit -m"Update version to $version"
 git tag $version
+git push
 git push origin $version
