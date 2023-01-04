@@ -1,3 +1,4 @@
+git fetch --tags
 $searchTags = git tag --list 1.0.0-alpha.* --sort=-v:refname
 if ($searchTags -eq $null) {
     $version = "1.0.0-alpha.1"
