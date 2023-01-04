@@ -11,6 +11,8 @@ param(
     [string]$devTeamId
 )
 
+pwsh ./scripts/increment-version.ps1
+
 /Applications/Unity/Hub/Editor/2021.3.4f1/Unity.app/Contents/MacOS/Unity -quit -accept-apiupdate -batchmode -logFile "$logFile" -projectPath "$projectPath" -executeMethod BuildScript.PerformBuild -buildPath "$buildPath"
 
 if ($LASTEXITCODE -ne 0) {
