@@ -7,5 +7,6 @@ public class Version : MonoBehaviour
     void Start()
     {
         GetComponent<Text>().text = "Version: " + Application.version;
+        Debug.Log("Version: " + Application.version);
     }
 }

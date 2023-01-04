@@ -13,6 +13,8 @@ param(
 
 pwsh ./scripts/increment-version.ps1
 
+rm -r $buildPath
+
 /Applications/Unity/Hub/Editor/2021.3.4f1/Unity.app/Contents/MacOS/Unity -quit -accept-apiupdate -batchmode -logFile "$logFile" -projectPath "$projectPath" -executeMethod BuildScript.PerformBuild -buildPath "$buildPath"
 
 if ($LASTEXITCODE -ne 0) {
@@ -68,7 +70,7 @@ if ($createdToolsVersionIndex -eq -1) {
     exit
 }
 
-$provisioningStyleIndex = Get-Index $projectFileContent $createdToolsVersionIndex 'ProvisioningStyle = Manual;'
+$provisioningStyleIndex = Get-Index $projectFileContent $createdToolsVersionIndex 'ProvisioningStyle = '
 if ($provisioningStyleIndex -eq -1) {
     Write-Error "Could not find ProvisioningStyle section"
     exit
