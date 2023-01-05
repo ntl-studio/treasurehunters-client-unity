@@ -212,24 +212,19 @@ namespace TreasureHunters
 
         public Dictionary<string, Position> Enemies = new();
 
-        public void PerformAction(PlayerAction playerAction)
+        public async void PerformAction(PlayerAction playerAction)
         {
-            ServerConnection.Instance().PerformActionAsync(
-                GameId, PlayerName, playerAction,
-                (actionResult, hasTreasure, gameState) =>
-                {
-                    if (gameState == "Finished")
-                        State = GameClientState.Finished;
+            var actionResult = await ServerConnection.Instance().PerformActionAsync(GameId, PlayerName, playerAction);
 
-                    PlayerHasTreasure = hasTreasure;
+            if (actionResult.data.state == "Finished")
+                State = GameClientState.Finished;
 
-                    OnPerformAction?.Invoke(actionResult);
+            PlayerHasTreasure = actionResult.data.hastreasure;
 
-                    if (actionResult && (playerAction.Type == Move || playerAction.Type == Skip))
-                    {
-                        OnEndMove?.Invoke();
-                    }
-                });
+            OnPerformAction?.Invoke(actionResult.successful);
+
+            if (actionResult.successful && playerAction.Type is Move or Skip)
+                OnEndMove?.Invoke();
         }
 
         public string GameId

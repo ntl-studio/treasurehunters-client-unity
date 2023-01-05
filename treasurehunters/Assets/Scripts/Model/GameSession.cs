@@ -31,10 +31,7 @@ public class GameSession : MonoBehaviour
 
         Game.OnEndMove += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForTurn);
 
-        Game.OnGameFinished += () =>
-        {
-            Server.GetWinnerAsync(Game.GameId, (winnerName) => { Game.WinnerName = winnerName; });
-        };
+        Game.OnGameFinished += async () => { Game.WinnerName = await Server.GetWinnerAsync(Game.GameId); };
     }
 
     async Task UpdatePlayerDetailsAsync(GameClientState nextState)
@@ -93,6 +90,11 @@ public class GameSession : MonoBehaviour
     }
 
     private async Task UpdateMovesHistoryAsync()
+    {
+        Game.PlayersMovesHistory = await Server.GetMovesHistoryAsync(Game.GameId);
+    }
+
+    private async Task UpdateWinnerName()
     {
         Game.PlayersMovesHistory = await Server.GetMovesHistoryAsync(Game.GameId);
     }

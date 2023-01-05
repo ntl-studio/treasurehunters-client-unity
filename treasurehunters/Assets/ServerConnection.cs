@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using JsonObjects;
-using TreasureHunters;
+using System;
 using UnityEngine;
 
+using JsonObjects;
 using NtlStudio.TreasureHunters.Model;
-
+using TreasureHunters;
 
 public class ServerConnection : MonoBehaviour
 {
@@ -15,8 +14,7 @@ public class ServerConnection : MonoBehaviour
     private static GameClient Game => GameClient.Instance();
     private string ServerAddress => Game.ServerName;
     private enum RequestType { Get, Post, Put }
-
-    private static readonly HttpClient _httpClient = new();
+    private static readonly HttpClient HttpClient = new();
 
     public static ServerConnection Instance()
     {
@@ -91,23 +89,17 @@ public class ServerConnection : MonoBehaviour
         return playerInfo.data;
     }
 
-    public async void PerformActionAsync(string gameId, string playerName, PlayerAction playerAction, 
-        Action<bool, bool, string> performActionCallback)
+    public async Task<PlayerActionResultDataJson> PerformActionAsync(string gameId, string playerName, PlayerAction playerAction)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/performaction/player/{playerName}/action/{playerAction.Type}/{playerAction.Direction}";
-        var playerActionResult = await WebRequestAsync<PlayerActionResultDataJson>(uri, RequestType.Put);
-        performActionCallback(
-            playerActionResult.successful,
-            playerActionResult.data.hastreasure,
-            playerActionResult.data.state // game state
-        );
+        return await WebRequestAsync<PlayerActionResultDataJson>(uri, RequestType.Put);
     }
 
-    public async void GetWinnerAsync(string gameId, Action<string> getWinnerCallback)
+    public async Task<string> GetWinnerAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/getwinner";
         var winnerResult= await WebRequestAsync<WinnerNameDataJson>(uri, RequestType.Get);
-        getWinnerCallback(winnerResult.data);
+        return winnerResult.data;
     }
 
     public async Task<List<PlayerMovesDetails>> GetMovesHistoryAsync(string gameId)
@@ -155,13 +147,13 @@ public class ServerConnection : MonoBehaviour
         switch (requestType)
         {
             case RequestType.Get:
-                response = await _httpClient.GetAsync(uri);
+                response = await HttpClient.GetAsync(uri);
                 break;
             case RequestType.Post:
-                response = await _httpClient.PostAsync(uri, null);
+                response = await HttpClient.PostAsync(uri, null);
                 break;
             case RequestType.Put:
-                response = await _httpClient.PutAsync(uri, null);
+                response = await HttpClient.PutAsync(uri, null);
                 break;
             default:
                 throw new Exception($"Not supported request type {requestType}");
