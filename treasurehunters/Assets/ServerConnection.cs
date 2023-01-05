@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using JsonObjects;
 using TreasureHunters;
 using UnityEngine;
@@ -52,14 +54,11 @@ public class ServerConnection : MonoBehaviour
         ));
     }
 
-    public void UpdateGamesListAsync(Action<GamesJson> gameListCallback)
+    public async Task<GamesJson> UpdateGamesListAsync()
     {
         string uri = $"https://{ServerAddress}/api/v1/games";
-
-        StartCoroutine(WebRequest<GamesDataJson>(uri, (gamesDataJson) => 
-            { gameListCallback(gamesDataJson.data); },
-            RequestType.Get
-        ));
+        var gamesList = await WebRequestAsync<GamesDataJson>(uri, RequestType.Get);
+        return gamesList.data;
     }
 
     public delegate void JoinGameCallbackAction(bool joined, string gameId, string sessionId);
@@ -231,7 +230,10 @@ public class ServerConnection : MonoBehaviour
                 throw new Exception($"Not supported request type {requestType}");
         }
 
+        var before = Time.realtimeSinceStartup;
         yield return request.SendWebRequest();
+        var total = Time.realtimeSinceStartup - before;
+        Debug.Log($"WebRequest duration {total} for {uri}");
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -252,5 +254,43 @@ public class ServerConnection : MonoBehaviour
         {
             Debug.Log($"{requestType} request {uri} failed with error: {request.error}");
         }
+    }
+
+    private static readonly HttpClient _httpClient = new();
+
+    private async Task<T> WebRequestAsync<T>(string uri, RequestType requestType)
+    {
+        HttpResponseMessage response;
+
+        switch (requestType)
+        {
+            case RequestType.Get:
+                response = await _httpClient.GetAsync(uri);
+                break;
+            case RequestType.Post:
+                response = await _httpClient.PostAsync(uri, null);
+                break;
+            case RequestType.Put:
+                response = await _httpClient.PutAsync(uri, null);
+                break;
+            default:
+                throw new Exception($"Not supported request type {requestType}");
+        }
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception($"{requestType} request {uri} failed with error: {response.StatusCode}");
+
+        var jsonText = await response.Content.ReadAsStringAsync();
+
+        var data = JsonUtility.FromJson<T>(jsonText);
+        if (data == null)
+        {
+            Debug.Log($"Could not read data form the json: {jsonText}");
+            Debug.Assert(true);
+        }
+        else
+            Debug.Log($"Getting data: {jsonText}");
+
+        return data;
     }
 }

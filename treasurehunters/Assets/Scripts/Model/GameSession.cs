@@ -51,6 +51,9 @@ public class GameSession : MonoBehaviour
         yield return null;
     }
 
+
+    private readonly WaitForSeconds _waitFor2Seconds = new WaitForSeconds(2);
+
     IEnumerator WaitForGameStart()
     {
         while (Game.State == GameClientState.WaitingForStart)
@@ -66,7 +69,7 @@ public class GameSession : MonoBehaviour
                     Debug.Log($"Waiting for game to start. Current state is {state}.");
             });
 
-            yield return new WaitForSeconds(2);
+            yield return _waitFor2Seconds;
         }
 
         yield return null;
@@ -89,7 +92,7 @@ public class GameSession : MonoBehaviour
                 }
             });
 
-            yield return new WaitForSeconds(2);
+            yield return _waitFor2Seconds;
         }
     }
 

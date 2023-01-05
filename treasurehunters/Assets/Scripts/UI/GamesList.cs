@@ -16,23 +16,24 @@ public class GamesList : MonoBehaviour
         Debug.Assert(GameItemsParent);
 
         if (!string.IsNullOrEmpty(Game.ServerName))
-            UpdateGamesList();
+            UpdateGamesListAsync();
 
-        Game.OnUpdatePlayerName += UpdateGamesList;
+        Game.OnUpdatePlayerName += UpdateGamesListAsync;
         Game.OnWaitingForTurn += () => gameObject.SetActive(false);
     }
 
 
     public void CreateGame()
     {
-        ServerConnection.Instance().CreateGameAsync(UpdateGamesList);
+        ServerConnection.Instance().CreateGameAsync(UpdateGamesListAsync);
     }
 
     private List<GameObject> _games = new List<GameObject>();
 
-    public void UpdateGamesList()
+    public async void UpdateGamesListAsync()
     {
-        ServerConnection.Instance().UpdateGamesListAsync(UpdateGamesList);
+        var games = await ServerConnection.Instance().UpdateGamesListAsync();
+        UpdateGamesList(games);
     }
 
     public void UpdateGamesList(GamesJson games)
@@ -73,7 +74,7 @@ public class GamesList : MonoBehaviour
 
             Debug.Log($"Game {gameId} deleted");
 
-            UpdateGamesList();
+            UpdateGamesListAsync();
         });
     }
 }
