@@ -45,14 +45,13 @@ public class ServerConnection : MonoBehaviour
         return _instance;
     }
 
-    public async void CreateGameAsync(Action gameListCallback)
+    public async Task CreateGameAsync()
     {
         string uri = $"https://{ServerAddress}/api/v1/games/create?privateGame=false";
         await WebRequestAsync<NewGameDataJson>(uri, RequestType.Post);
-        gameListCallback();
     }
 
-    public async Task<GamesJson> UpdateGamesListAsync()
+    public async Task<GamesJson> GetGamesListAsync()
     {
         string uri = $"https://{ServerAddress}/api/v1/games";
         var gamesList = await WebRequestAsync<GamesDataJson>(uri, RequestType.Get);
@@ -89,11 +88,10 @@ public class ServerConnection : MonoBehaviour
         startGameCallback();
     }
 
-    public async void DeleteGameAsync(string gameId, Action deleteGameCallback)
+    public async Task DeleteGameAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/delete";
         await WebRequestAsync<DeleteGameDataJson>(uri, RequestType.Post);
-        deleteGameCallback();
     }
 
     public async void GetCurrentPlayerAsync(string gameId, Action<string, string> currentPlayerCallback)
@@ -103,15 +101,11 @@ public class ServerConnection : MonoBehaviour
         currentPlayerCallback(currentPlayerJson.data.name, currentPlayerJson.data.gamestate);
     }
 
-    public async void GetPlayerInfoAsync(string gameId, string playerName, Action<int, int, int[]> getPlayerInfoCallback)
+    public async Task<PlayerInfoJson> GetPlayerInfoAsync(string gameId, string playerName)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/players/{playerName}";
         var playerInfo = await WebRequestAsync<PlayerInfoDataJson>(uri, RequestType.Get);
-        getPlayerInfoCallback(
-            playerInfo.data.x,
-            playerInfo.data.y,
-            playerInfo.data.visiblearea
-        );
+        return playerInfo.data;
     }
 
     public async void PerformActionAsync(string gameId, string playerName, PlayerAction playerAction, 

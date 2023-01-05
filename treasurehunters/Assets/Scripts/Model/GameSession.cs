@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
@@ -9,25 +10,22 @@ public class GameSession : MonoBehaviour
 
     void Start()
     {
-        Game.OnJoined += () => StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForStart));
+        Game.OnJoined += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForStart);
 
         Game.OnWaitingForStart += () => StartCoroutine(WaitForGameStart());
 
         Game.OnWaitingForTurn += () => StartCoroutine(WaitForTurn());
 
         // When it is again your turn, the client needs to pull updated visibility area
-        Game.OnYourTurn += () =>
+        Game.OnYourTurn += async () =>
         {
-            StartCoroutine(UpdatePlayerDetails(GameClientState.YourTurn));
+            await UpdatePlayerDetailsAsync(GameClientState.YourTurn);
             UpdateMovesHistory();
         };
 
-        Game.OnPerformAction += (result) => { UpdateMovesHistory(); };
+        Game.OnPerformAction += _ => UpdateMovesHistory();
 
-        Game.OnEndMove += () =>
-        {
-            StartCoroutine(UpdatePlayerDetails(GameClientState.WaitingForTurn));
-        };
+        Game.OnEndMove += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForTurn);
 
         Game.OnGameFinished += () =>
         {
@@ -35,20 +33,16 @@ public class GameSession : MonoBehaviour
         };
     }
 
-    IEnumerator UpdatePlayerDetails(GameClientState nextState)
+    async Task UpdatePlayerDetailsAsync(GameClientState nextState)
     {
-        ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName,
-            (x, y, visibleArea) =>
-            {
-                Debug.Log($"Updating player position to ({x}, {y})");
-                Game.PlayerPosition = new TreasureHunters.Position(x, y);
-                Game.SetVisibleArea(visibleArea);
+        var player = await ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName);
 
-                if (Game.State != GameClientState.Finished)
-                    Game.State = nextState;
-            });
+        Debug.Log($"Updating player position to ({player.x}, {player.y})");
+        Game.PlayerPosition = new TreasureHunters.Position(player.x, player.y);
+        Game.SetVisibleArea(player.visiblearea);
 
-        yield return null;
+        if (Game.State != GameClientState.Finished)
+            Game.State = nextState;
     }
 
 

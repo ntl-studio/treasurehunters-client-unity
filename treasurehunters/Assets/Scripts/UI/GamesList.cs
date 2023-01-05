@@ -23,20 +23,21 @@ public class GamesList : MonoBehaviour
     }
 
 
-    public void CreateGame()
+    public async void CreateGameAsync()
     {
-        ServerConnection.Instance().CreateGameAsync(UpdateGamesListAsync);
+        await ServerConnection.Instance().CreateGameAsync();
+        UpdateGamesListAsync();
     }
 
     private List<GameObject> _games = new List<GameObject>();
 
     public async void UpdateGamesListAsync()
     {
-        var games = await ServerConnection.Instance().UpdateGamesListAsync();
+        var games = await ServerConnection.Instance().GetGamesListAsync();
         UpdateGamesList(games);
     }
 
-    public void UpdateGamesList(GamesJson games)
+    private void UpdateGamesList(GamesJson games)
     {
         foreach (var game in _games)
         {
@@ -64,17 +65,16 @@ public class GamesList : MonoBehaviour
         }
     }
 
-    public void DeleteGame(string gameId)
+    public async void DeleteGameAsync(string gameId)
     {
-        ServerConnection.Instance().DeleteGameAsync(gameId, () =>
-        {
-            var game = _games.First(x => x.GetComponent<GamesListItem>().GameId == gameId);
-            Destroy(game);
-            _games.Remove(game);
+        await ServerConnection.Instance().DeleteGameAsync(gameId);
 
-            Debug.Log($"Game {gameId} deleted");
+        var game = _games.First(x => x.GetComponent<GamesListItem>().GameId == gameId);
+        Destroy(game);
+        _games.Remove(game);
 
-            UpdateGamesListAsync();
-        });
+        Debug.Log($"Game {gameId} deleted");
+
+        UpdateGamesListAsync();
     }
 }

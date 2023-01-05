@@ -1,6 +1,4 @@
-using NtlStudio.TreasureHunters.Model;
 using Position = TreasureHunters.Position;
-using System;
 using TMPro;
 using TreasureHunters;
 using UnityEngine.UI;
@@ -99,6 +97,6 @@ public class GamesListItem : MonoBehaviour
 
     public void DeleteGame()
     {
-        GamesList.DeleteGame(GameId);
+        GamesList.DeleteGameAsync(GameId);
     }
 }

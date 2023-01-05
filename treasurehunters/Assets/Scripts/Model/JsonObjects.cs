@@ -73,7 +73,7 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerInfoJson
+    public class PlayerInfoJson
     {
         public int x;
         public int y;
