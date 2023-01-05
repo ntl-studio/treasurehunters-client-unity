@@ -96,7 +96,8 @@ namespace TreasureHunters
         public event GameEvent OnWaitingForStart;
         public event GameEvent OnWaitingForTurn;
         public event GameEvent OnYourTurn;
-        public event GameEventBool OnPerformAction;
+        public event GameEventBool OnPerformActionClient;
+        public event GameEventBool OnPerformActionServer;
         public event GameEvent OnEndMove;
         public event GameEvent OnEndMoveAnimation;
         public event GameEvent OnGameFinished;
@@ -214,6 +215,9 @@ namespace TreasureHunters
 
         public async void PerformAction(PlayerAction playerAction)
         {
+            var result = PerformActionClient(playerAction);
+            OnPerformActionClient?.Invoke(result);
+
             var actionResult = await ServerConnection.Instance().PerformActionAsync(GameId, PlayerName, playerAction);
 
             if (actionResult.data.state == "Finished")
@@ -221,10 +225,24 @@ namespace TreasureHunters
 
             PlayerHasTreasure = actionResult.data.hastreasure;
 
-            OnPerformAction?.Invoke(actionResult.successful);
+            OnPerformActionServer?.Invoke(actionResult.successful);
 
             if (actionResult.successful && playerAction.Type is Move or Skip)
                 OnEndMove?.Invoke();
+        }
+
+        bool PerformActionClient(PlayerAction playerAction)
+        {
+            if (playerAction.Type is not Move) 
+                return false;
+
+            var dir = playerAction.Direction;
+
+            return
+                (dir == ActionDirection.Right && !_visibleArea[1, 1].HasFlag(FieldCell.RightWall)) ||
+                (dir == ActionDirection.Down && !_visibleArea[1, 1].HasFlag(FieldCell.BottomWall)) ||
+                (dir == ActionDirection.Left && !_visibleArea[1, 1].HasFlag(FieldCell.LeftWall)) ||
+                (dir == ActionDirection.Up && !_visibleArea[1, 1].HasFlag(FieldCell.TopWall));
         }
 
         public string GameId

@@ -10,11 +10,11 @@ namespace TreasureHunters
 {
     public static class GameUtils
     {
-        public static Vector2Int ActionToVector2(PlayerAction action)
+        public static Vector2Int ActionDirectionToVector2(ActionDirection direction)
         {
             var result = new Vector2Int(0, 0);
 
-            switch (action.Direction)
+            switch (direction)
             {
                 case ActionDirection.Right:
                     result.x += 1;
@@ -29,7 +29,7 @@ namespace TreasureHunters
                     result.y += 1;
                     break;
                 default:
-                    throw new Exception($"Action direction not supported {action.Direction}");
+                    throw new Exception($"Action direction not supported {direction}");
             }
 
             return result;

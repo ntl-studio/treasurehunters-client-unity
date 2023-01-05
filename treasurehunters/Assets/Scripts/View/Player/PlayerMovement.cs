@@ -17,8 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     private enum EActionType
     {
-        None, // do not accept input
-        Move,
+        Move, // Default mode
         Gun
     }
 
@@ -37,22 +36,25 @@ public class PlayerMovement : MonoBehaviour
             transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };
 
-        Game.OnPerformAction += (_) =>
+        Game.OnPerformActionServer += (_) =>
         {
             _actionType = EActionType.Move;
         };
 
-        Game.OnEndMove += () =>
+        Game.OnPerformActionClient += (result) =>
         {
-            Vector2Int shift = GameUtils.ActionToVector2(_lastAction);
+            if (result)
+            {
+                Vector2Int shift = GameUtils.ActionDirectionToVector2(_lastAction.Direction);
 
-            _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
+                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
 
-            _direction = (_destination - transform.position).normalized;
-            Debug.Log($"set direction {_direction}");
+                _direction = (_destination - transform.position).normalized;
+                Debug.Log($"set direction {_direction}");
 
-            _isPlayingMovingAnimation = true;
-            // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
+                _isPlayingMovingAnimation = true;
+                // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
+            }
 
             _lastAction = PlayerAction.None;
         };
@@ -130,7 +132,6 @@ public class PlayerMovement : MonoBehaviour
                 Type = _actionType == EActionType.Move ? ActionType.Move : ActionType.FireGun
             };
 
-            Game.PerformAction(_lastAction);
-        }
+            Game.PerformAction(_lastAction); }
     }
 }
