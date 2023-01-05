@@ -8,18 +8,6 @@ using UnityEngine;
 
 using NtlStudio.TreasureHunters.Model;
 
-using CurrentPlayerDataJson = JsonObjects.DataJson<JsonObjects.CurrentPlayerJson>;
-using PlayersMoveHistoryDataJson = JsonObjects.DataJson<JsonObjects.PlayersMoveStatesJson>;
-using NewGameDataJson = JsonObjects.DataJson<JsonObjects.NewGameJson>;
-using DeleteGameDataJson = JsonObjects.DataJson<string>;
-using GameDataJson = JsonObjects.DataJson<JsonObjects.GameJson>;
-using GameStateDataJson = JsonObjects.DataJson<JsonObjects.GameStateJson>;
-using GamesDataJson = JsonObjects.DataJson<JsonObjects.GamesJson>;
-using PlayerActionResultDataJson = JsonObjects.DataJson<JsonObjects.PlayerActionResult>;
-using PlayerInfoDataJson = JsonObjects.DataJson<JsonObjects.PlayerInfoJson>;
-using PlayersDataJson =  JsonObjects.DataJson<JsonObjects.PlayersJson>;
-using TreasurePositionDataJson = JsonObjects.DataJson<JsonObjects.TreasurePositionJson>;
-using WinnerNameDataJson = JsonObjects.DataJson<string>;
 
 public class ServerConnection : MonoBehaviour
 {
@@ -32,15 +20,14 @@ public class ServerConnection : MonoBehaviour
 
     public static ServerConnection Instance()
     {
-        if (!_instance)
-        { 
-            var connectionObject = GameObject.Find("ServerConnection");
+        if (_instance) 
+            return _instance;
 
-            Debug.Assert(connectionObject);
+        var connectionObject = GameObject.Find("ServerConnection");
+        Debug.Assert(connectionObject);
 
-            _instance = connectionObject.GetComponent<ServerConnection>();
-            Debug.Assert(_instance);
-        }
+        _instance = connectionObject.GetComponent<ServerConnection>();
+        Debug.Assert(_instance);
 
         return _instance;
     }
@@ -58,34 +45,30 @@ public class ServerConnection : MonoBehaviour
         return gamesList.data;
     }
 
-    public delegate void JoinGameCallbackAction(bool joined, string gameId, string sessionId);
-
-    public async void JoinGameAsync(string gameId, JoinGameCallbackAction joinGameCallback)
+    public async Task<PlayerSessionIdDataJson> JoinGameAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/players/{Game.PlayerName}";
-        var playerData = await WebRequestAsync<PlayersDataJson>(uri, RequestType.Put);
-        joinGameCallback(playerData.successful, gameId, playerData.data.sessionid);
+        return await WebRequestAsync<PlayerSessionIdDataJson>(uri, RequestType.Put);
     }
 
-    public async void GetTreasurePositionAsync(string gameId, Action<int, int> getTreasurePositionCallback)
+    public async Task<TreasurePositionJson> GetTreasurePositionAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/treasureposition_debug";
-        var treasureData = await WebRequestAsync<TreasurePositionDataJson>(uri, RequestType.Get);
-        getTreasurePositionCallback(treasureData.data.x, treasureData.data.y);
+        var treasurePosition = await WebRequestAsync<TreasurePositionDataJson>(uri, RequestType.Get);
+        return treasurePosition.data;
     }
 
-    public async void GetGameStateAsync(string gameId, Action<string, int> gameStateCallback)
+    public async Task<GameJson> GetGameStateAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}";
         var gameData = await WebRequestAsync<GameDataJson>(uri, RequestType.Get);
-        gameStateCallback(gameData.data.state, gameData.data.playerscount);
+        return gameData.data;
     }
 
-    public async void StartGameAsync(string gameId, Action startGameCallback)
+    public async Task StartGameAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/start";
         await WebRequestAsync<GameStateDataJson>(uri, RequestType.Put);
-        startGameCallback();
     }
 
     public async Task DeleteGameAsync(string gameId)
@@ -94,11 +77,11 @@ public class ServerConnection : MonoBehaviour
         await WebRequestAsync<DeleteGameDataJson>(uri, RequestType.Post);
     }
 
-    public async void GetCurrentPlayerAsync(string gameId, Action<string, string> currentPlayerCallback)
+    public async Task<CurrentPlayerJson> GetCurrentPlayerAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/currentplayer";
         var currentPlayerJson = await WebRequestAsync<CurrentPlayerDataJson>(uri, RequestType.Get);
-        currentPlayerCallback(currentPlayerJson.data.name, currentPlayerJson.data.gamestate);
+        return currentPlayerJson.data;
     }
 
     public async Task<PlayerInfoJson> GetPlayerInfoAsync(string gameId, string playerName)
@@ -127,7 +110,7 @@ public class ServerConnection : MonoBehaviour
         getWinnerCallback(winnerResult.data);
     }
 
-    public async void GetMovesHistoryAsync(string gameId, Action<List<PlayerMovesDetails>> movesHistoryCallback)
+    public async Task<List<PlayerMovesDetails>> GetMovesHistoryAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/playersmovestates";
         var playersMoveStates = await WebRequestAsync<PlayersMoveHistoryDataJson>(uri, RequestType.Get);
@@ -162,7 +145,7 @@ public class ServerConnection : MonoBehaviour
             playerMoveStates.Add(details);
         }
 
-        movesHistoryCallback(playerMoveStates);
+        return playerMoveStates;
     }
 
     private async Task<T> WebRequestAsync<T>(string uri, RequestType requestType)

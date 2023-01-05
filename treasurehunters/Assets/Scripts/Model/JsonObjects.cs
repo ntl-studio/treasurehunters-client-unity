@@ -24,26 +24,26 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class TreasurePositionJson
+    public class TreasurePositionJson
     {
         public int x;
         public int y;
     }
 
     [System.Serializable]
-    class PlayersJson
+    public class PlayerSessionIdJson
     {
         public string sessionid;
     }
 
     [System.Serializable]
-    class GameStateJson
+    public class GameStateJson
     {
         public string state;
     }
 
-    [System.Serializable]
-    class CurrentPlayerJson
+    [System.Serializable]  
+    public class CurrentPlayerJson
     {
         public int index;
         public string name;
@@ -51,7 +51,7 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerActionStateJson
+    public class PlayerActionStateJson
     {
         public Position position;
         public ActionDirection direction;
@@ -60,14 +60,14 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerMoveStatesJson
+    public class PlayerMoveStatesJson
     {
         public string player;
         public PlayerActionStateJson[] actionstates;
     }
 
     [System.Serializable]
-    class PlayersMoveStatesJson
+    public class PlayersMoveStatesJson
     {
         public PlayerMoveStatesJson[] players;
     }
@@ -81,16 +81,29 @@ namespace JsonObjects
     }
 
     [System.Serializable]
-    class PlayerActionResult
+    public class PlayerActionResult
     {
         public bool hastreasure;
         public string state; // Game State
     }
 
     [System.Serializable]
-    class DataJson<T>
+    public class DataJson<T>
     {
         public T data;
         public bool successful;
     }
+
+    public class PlayerSessionIdDataJson : DataJson<PlayerSessionIdJson> { }
+    public class TreasurePositionDataJson : DataJson<TreasurePositionJson> { }
+    public class CurrentPlayerDataJson : DataJson<CurrentPlayerJson> { }
+    public class PlayersMoveHistoryDataJson : DataJson<PlayersMoveStatesJson> { }
+    public class NewGameDataJson : DataJson<NewGameJson> { }
+    public class DeleteGameDataJson : DataJson<string> { }
+    public class GameDataJson : DataJson<GameJson> { }
+    public class GameStateDataJson : DataJson<GameStateJson> { }
+    public class GamesDataJson : DataJson<GamesJson> { }
+    public class PlayerActionResultDataJson : DataJson<PlayerActionResult> { }
+    public class PlayerInfoDataJson : DataJson<PlayerInfoJson> { }
+    public class WinnerNameDataJson : DataJson<string> { }
 }

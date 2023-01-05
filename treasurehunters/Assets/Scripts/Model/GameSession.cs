@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Threading.Tasks;
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
@@ -7,35 +6,40 @@ using UnityEngine;
 public class GameSession : MonoBehaviour
 {
     private static GameClient Game => GameClient.Instance();
+    private static ServerConnection Server => ServerConnection.Instance();
 
     void Start()
     {
-        Game.OnJoined += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForStart);
+        Game.OnJoined += async () =>
+        {
+            await UpdatePlayerDetailsAsync(GameClientState.WaitingForStart);
+            await UpdateTreasurePositionAsync_Debug();
+        };
 
-        Game.OnWaitingForStart += () => StartCoroutine(WaitForGameStart());
+        Game.OnWaitingForStart += async () => await WaitForGameStartAsync();
 
-        Game.OnWaitingForTurn += () => StartCoroutine(WaitForTurn());
+        Game.OnWaitingForTurn += async () => await WaitForTurnAsync();
 
         // When it is again your turn, the client needs to pull updated visibility area
         Game.OnYourTurn += async () =>
         {
             await UpdatePlayerDetailsAsync(GameClientState.YourTurn);
-            UpdateMovesHistory();
+            await UpdateMovesHistoryAsync();
         };
 
-        Game.OnPerformAction += _ => UpdateMovesHistory();
+        Game.OnPerformAction += async _ => await UpdateMovesHistoryAsync();
 
         Game.OnEndMove += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForTurn);
 
         Game.OnGameFinished += () =>
         {
-            ServerConnection.Instance().GetWinnerAsync(Game.GameId, (winnerName) => { Game.WinnerName = winnerName; });
+            Server.GetWinnerAsync(Game.GameId, (winnerName) => { Game.WinnerName = winnerName; });
         };
     }
 
     async Task UpdatePlayerDetailsAsync(GameClientState nextState)
     {
-        var player = await ServerConnection.Instance().GetPlayerInfoAsync(Game.GameId, Game.PlayerName);
+        var player = await Server.GetPlayerInfoAsync(Game.GameId, Game.PlayerName);
 
         Debug.Log($"Updating player position to ({player.x}, {player.y})");
         Game.PlayerPosition = new TreasureHunters.Position(player.x, player.y);
@@ -45,56 +49,51 @@ public class GameSession : MonoBehaviour
             Game.State = nextState;
     }
 
-
+    async Task UpdateTreasurePositionAsync_Debug()
+    {
+        var treasurePosition = await Server.GetTreasurePositionAsync(Game.GameId);
+        Game.TreasurePosition_Debug = new TreasureHunters.Position(treasurePosition.x, treasurePosition.y);
+    }
     private readonly WaitForSeconds _waitFor2Seconds = new WaitForSeconds(2);
 
-    IEnumerator WaitForGameStart()
+    async Task WaitForGameStartAsync()
     {
-        while (Game.State == GameClientState.WaitingForStart)
+        while (true)
         {
-            ServerConnection.Instance().GetGameStateAsync(Game.GameId, (state, playersCount) =>
+            var gameState = await Server.GetGameStateAsync(Game.GameId);
+
+            if (gameState.state != GameState.NotStarted.ToString())
             {
-                if (state == GameState.Running.ToString())
-                {
-                    Game.PlayersCount = playersCount;
-                    Game.State = GameClientState.WaitingForTurn;
-                }    
-                else
-                    Debug.Log($"Waiting for game to start. Current state is {state}.");
-            });
+                Game.PlayersCount = gameState.playerscount;
+                Game.State = GameClientState.WaitingForTurn;
+                break;
+            }
 
-            yield return _waitFor2Seconds;
-        }
-
-        yield return null;
-    }
-
-    IEnumerator WaitForTurn()
-    {
-        while (Game.State == GameClientState.WaitingForTurn)
-        {
-            ServerConnection.Instance().GetCurrentPlayerAsync(Game.GameId, (currentPlayerName, gameState) =>
-            {
-                if (currentPlayerName == Game.PlayerName)
-                {
-                    Game.State = gameState == "Finished" ? GameClientState.Finished : GameClientState.YourTurn;
-                }
-                else
-                {
-                    Game.CurrentPlayerName = currentPlayerName;
-                    Debug.Log($"Waiting for your turn. Current player is {currentPlayerName}.");
-                }
-            });
-
-            yield return _waitFor2Seconds;
+            Debug.Log($"Waiting for game to start. Current state is {gameState.state}.");
+            await Task.Delay(2000);
         }
     }
 
-    private void UpdateMovesHistory()
+    async Task WaitForTurnAsync()
     {
-        ServerConnection.Instance().GetMovesHistoryAsync(Game.GameId, (movesHistory) =>
+        while (true)
         {
-            Game.PlayersMovesHistory = movesHistory;
-        });
+            var currentPlayer = await Server.GetCurrentPlayerAsync(Game.GameId);
+
+            if (currentPlayer.name == Game.PlayerName)
+            {
+                Game.State = currentPlayer.gamestate == "Finished" ? GameClientState.Finished : GameClientState.YourTurn;
+                break;
+            }
+
+            Game.CurrentPlayerName = currentPlayer.name;
+            Debug.Log($"Waiting for your turn. Current player is {currentPlayer.name}.");
+            await Task.Delay(2000);
+        }
+    }
+
+    private async Task UpdateMovesHistoryAsync()
+    {
+        Game.PlayersMovesHistory = await Server.GetMovesHistoryAsync(Game.GameId);
     }
 }

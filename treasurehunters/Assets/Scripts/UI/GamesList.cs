@@ -3,11 +3,16 @@ using System.Linq;
 using JsonObjects;
 using TreasureHunters;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GamesList : MonoBehaviour
 {
     public GameObject GamesListItemPrefab;
     public Transform GameItemsParent;
+
+    public Button CreateGameButton;
+    public Button RefreshGameButton;
+
     private static GameClient Game => GameClient.Instance();
 
     void Start()
@@ -15,13 +20,18 @@ public class GamesList : MonoBehaviour
         Debug.Assert(GamesListItemPrefab);
         Debug.Assert(GameItemsParent);
 
+        Debug.Assert(CreateGameButton != null);
+        CreateGameButton?.onClick.AddListener(CreateGameAsync);
+
+        Debug.Assert(RefreshGameButton != null);
+        RefreshGameButton?.onClick.AddListener(UpdateGamesListAsync);
+
         if (!string.IsNullOrEmpty(Game.ServerName))
             UpdateGamesListAsync();
 
         Game.OnUpdatePlayerName += UpdateGamesListAsync;
         Game.OnWaitingForTurn += () => gameObject.SetActive(false);
     }
-
 
     public async void CreateGameAsync()
     {
@@ -56,7 +66,6 @@ public class GamesList : MonoBehaviour
             gamesListItem.GameId = game.id;
             gamesListItem.State = game.state;
             gamesListItem.NumberOfPlayers = game.playerscount.ToString();
-            gamesListItem.GamesList = this;
 
             if (game.players.Any(p => p == Game.PlayerName))
                 gamesListItem.AllowRejoin = true;

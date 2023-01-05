@@ -392,9 +392,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5225825175907934597}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GamesListItem, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -641,6 +641,7 @@ MonoBehaviour:
   JoinButtonText: {fileID: 8661530493062821481}
   JoinGameButton: {fileID: 8661530492944430637}
   StartGameButton: {fileID: 8811183345720980056}
+  DeleteGameButton: {fileID: 7095063130608857021}
   GamesList: {fileID: 0}
   AllowRejoin: 0
 --- !u!114 &3819702371570589852
@@ -791,9 +792,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5225825175907934597}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GamesListItem, Assembly-CSharp
-        m_MethodName: DeleteGame
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -925,9 +926,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5225825175907934597}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GamesListItem, Assembly-CSharp
-        m_MethodName: JoinGame
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

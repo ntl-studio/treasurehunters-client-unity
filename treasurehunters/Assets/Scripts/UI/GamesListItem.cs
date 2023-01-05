@@ -13,10 +13,10 @@ public class GamesListItem : MonoBehaviour
 
     public Button JoinGameButton;
     public Button StartGameButton;
+    public Button DeleteGameButton;
 
-    public GamesList GamesList; // pointer to the parent object
+    private GamesList _gamesList; 
 
-    // Start is called before the first frame update
     void Start()
     {
         Debug.Assert(GameIdText);
@@ -25,9 +25,16 @@ public class GamesListItem : MonoBehaviour
         Debug.Assert(JoinButtonText);
 
         Debug.Assert(JoinGameButton);
-        Debug.Assert(StartGameButton);
+        JoinGameButton.GetComponent<Button>().onClick.AddListener(JoinGameAsync);
 
-        Debug.Assert(GamesList);
+        Debug.Assert(StartGameButton);
+        StartGameButton.GetComponent<Button>().onClick.AddListener(StartGameAsync);
+
+        Debug.Assert(DeleteGameButton);
+        DeleteGameButton.GetComponent<Button>().onClick.AddListener(DeleteGame);
+
+        _gamesList = gameObject.GetComponentInParent<GamesList>();
+        Debug.Assert(_gamesList);
 
         if (AllowRejoin)
             JoinButtonText.text = "Rejoin";
@@ -58,45 +65,38 @@ public class GamesListItem : MonoBehaviour
 
     private GameClient Game => GameClient.Instance();
 
-    public void JoinGame()
+    public async void JoinGameAsync()
     {
+        var gameId = GameIdText.text;
+
         // If we join the game for the first time (player name is not in the players list)
         if (!AllowRejoin)
         {
-            ServerConnection.Instance().JoinGameAsync(GameIdText.text,
-                (isJoined, gameId, sessionId) =>
-                {
-                    if (isJoined)
-                    {
-                        Debug.Log($"Joined to the game {gameId}");
-                        Game.JoinGame(gameId, sessionId);
-                    }
-                    else
-                        Debug.Log("Did not join");
-                });
+            var joinGameData = await ServerConnection.Instance().JoinGameAsync(gameId);
+
+            if (joinGameData.successful)
+            {
+                Debug.Log($"Joined to the game {gameId}");
+                Game.JoinGame(gameId, joinGameData.data.sessionid);
+            }
+            else
+                Debug.Log("Did not join");
         }
         else
         {
-            Game.JoinGame(GameIdText.text, "");
+            Game.JoinGame(gameId, "");
         }
-
-        ServerConnection.Instance().GetTreasurePositionAsync(GameIdText.text, (x, y) =>
-        {
-            Game.TreasurePosition_Debug = new Position(x, y);
-        });
     }
 
-    public void StartGame()
+    public async void StartGameAsync()
     {
-        ServerConnection.Instance().StartGameAsync(GameId, () =>
-        {
-            Debug.Log($"Game {GameId} started");
-            StartGameButton.interactable = false;
-        });
+        await ServerConnection.Instance().StartGameAsync(GameId);
+        Debug.Log($"Game {GameId} started");
+        StartGameButton.interactable = false;
     }
 
     public void DeleteGame()
     {
-        GamesList.DeleteGameAsync(GameId);
+        _gamesList.DeleteGameAsync(GameId);
     }
 }
