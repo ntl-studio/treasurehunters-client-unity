@@ -8,7 +8,8 @@ using SM = NtlStudio.TreasureHunters.Model;
 public class PlayerMovesDetails
 {
     public string PlayerName;
-    public List<PlayerActionState> Moves = new();
+    public List<PlayerActionState> Moves;
+    public int StatesCount = -1;
 }
 
 public class ActionsHistory : MonoBehaviour

@@ -36,6 +36,8 @@ namespace TreasureHunters
         private const string PlayerNameKey = "PlayerName";
         private const string ServerNameKey = "ServerName";
 
+        public int HistorySize => Game.ActionsHistorySize;
+
         private GameClient()
         {
             if (PlayerPrefs.HasKey(PlayerNameKey))

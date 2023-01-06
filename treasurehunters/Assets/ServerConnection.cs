@@ -102,42 +102,52 @@ public class ServerConnection : MonoBehaviour
         return winnerResult.data;
     }
 
+    private List<PlayerMovesDetails> _playerMoveStates;
+
     public async Task<List<PlayerMovesDetails>> GetMovesHistoryAsync(string gameId)
     {
         string uri = $"https://{ServerAddress}/api/v1/games/{gameId}/playersmovestates";
         var playersMoveStates = await WebRequestAsync<PlayersMoveHistoryDataJson>(uri, RequestType.Get);
 
-        List<PlayerMovesDetails> playerMoveStates = new();
+        Debug.Assert(Game.PlayersCount == playersMoveStates.data.players.Length);
 
-        foreach (var player in playersMoveStates.data.players)
+        if (_playerMoveStates == null)
         {
-            PlayerMovesDetails details = new PlayerMovesDetails
+            _playerMoveStates = new List<PlayerMovesDetails>(Game.PlayersCount);
+
+            var moves = new List<PlayerActionState>(Game.HistorySize);
+            for (int moveId = 0; moveId < Game.HistorySize; ++moveId)
             {
-                PlayerName = player.player
-            };
-
-            Debug.Assert(player.actionstates != null);
-
-            foreach (var playerAction in player.actionstates)
-            {
-                details.Moves.Add(new PlayerActionState()
-                {
-                    Position = playerAction.position,
-
-                    Action = new PlayerAction
-                    {
-                        Direction = playerAction.direction,
-                        Type = playerAction.type
-                    },
-
-                    FieldCell = playerAction.cell
-                });
+                moves.Add(new PlayerActionState());
             }
 
-            playerMoveStates.Add(details);
+            for (int playerId = 0; playerId < Game.PlayersCount; ++playerId)
+            {
+                _playerMoveStates.Add(new PlayerMovesDetails()
+                {
+                    PlayerName = playersMoveStates.data.players[playerId].player,
+                    Moves = new List<PlayerActionState>(moves)
+                });
+            }
         }
 
-        return playerMoveStates;
+        // foreach (var player in playersMoveStates.data.players)
+        for (int playerId = 0; playerId < playersMoveStates.data.players.Length; ++playerId)
+        {
+            var details = _playerMoveStates[playerId];
+            var playerData  = playersMoveStates.data.players[playerId];
+
+            details.StatesCount = playerData.actionstates.Length;
+            for (int actionId = 0; actionId < details.StatesCount; ++actionId)
+            {
+                details.Moves[actionId].Position = playerData.actionstates[actionId].position;
+                details.Moves[actionId].Action.Direction = playerData.actionstates[actionId].direction;
+                details.Moves[actionId].Action.Type = playerData.actionstates[actionId].type;
+                details.Moves[actionId].FieldCell = playerData.actionstates[actionId].cell;
+            }
+        }
+
+        return _playerMoveStates;
     }
 
     private async Task<T> WebRequestAsync<T>(string uri, RequestType requestType)
