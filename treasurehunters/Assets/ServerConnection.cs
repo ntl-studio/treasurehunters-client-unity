@@ -177,11 +177,11 @@ public class ServerConnection : MonoBehaviour
         var data = JsonUtility.FromJson<T>(jsonText);
         if (data == null)
         {
-            Debug.Log($"Could not read data form the json: {jsonText}");
+            Debug.Log($"Could not read data form the json: {jsonText}, webrequest {uri}");
             Debug.Assert(true);
         }
         else
-            Debug.Log($"Getting data: {jsonText}");
+            Debug.Log($"Getting data: {jsonText}, webrequest {uri}");
 
         return data;
     }

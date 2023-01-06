@@ -14,6 +14,7 @@ public class GamesList : MonoBehaviour
     public Button RefreshGameButton;
 
     private static GameClient Game => GameClient.Instance();
+    private List<GamesListItem> _gameListItems = new();
 
     void Start()
     {
@@ -47,30 +48,30 @@ public class GamesList : MonoBehaviour
         UpdateGamesList(games);
     }
 
+    private GamesListItem AddNewGameListItem()
+    {
+        var obj = Instantiate(GamesListItemPrefab, GameItemsParent);
+
+        var gamesListItem = obj.GetComponent<GamesListItem>();
+        Debug.Assert(gamesListItem);
+
+        return gamesListItem;
+    }
+
     private void UpdateGamesList(GamesJson games)
     {
-        foreach (var game in _games)
+        for (int gameId = 0; gameId < games.games.Length; ++gameId)
         {
-            Destroy(game);
-        }
+            if (gameId >= _gameListItems.Count)
+                _gameListItems.Add(AddNewGameListItem());
 
-        _games.Clear();
-
-        foreach (var game in games.games)
-        {
-            var obj = Instantiate(GamesListItemPrefab, GameItemsParent);
-
-            var gamesListItem = obj.GetComponent<GamesListItem>();
-            Debug.Assert(gamesListItem);
-
-            gamesListItem.GameId = game.id;
-            gamesListItem.State = game.state;
-            gamesListItem.NumberOfPlayers = game.playerscount.ToString();
+            var game = games.games[gameId];
+            _gameListItems[gameId].GameId = game.id;
+            _gameListItems[gameId].State = game.state;
+            _gameListItems[gameId].NumberOfPlayers = game.playerscount.ToString();
 
             if (game.players.Any(p => p == Game.PlayerName))
-                gamesListItem.AllowRejoin = true;
-
-            _games.Add(obj);
+                _gameListItems[gameId].AllowRejoin = true;
         }
     }
 
