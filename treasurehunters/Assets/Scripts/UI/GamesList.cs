@@ -14,6 +14,7 @@ public class GamesList : MonoBehaviour
     public Button RefreshGameButton;
 
     private static GameClient Game => GameClient.Instance();
+    private readonly List<GamesListItem> _gameListItems = new();
 
     void Start()
     {
@@ -39,7 +40,6 @@ public class GamesList : MonoBehaviour
         UpdateGamesListAsync();
     }
 
-    private List<GameObject> _games = new List<GameObject>();
 
     public async void UpdateGamesListAsync()
     {
@@ -47,43 +47,43 @@ public class GamesList : MonoBehaviour
         UpdateGamesList(games);
     }
 
+    private GamesListItem AddNewGameListItem()
+    {
+        var obj = Instantiate(GamesListItemPrefab, GameItemsParent);
+
+        var gamesListItem = obj.GetComponent<GamesListItem>();
+        Debug.Assert(gamesListItem);
+
+        return gamesListItem;
+    }
+
     private void UpdateGamesList(GamesJson games)
     {
-        foreach (var game in _games)
+        for (int gameId = 0; gameId < games.games.Length; ++gameId)
         {
-            Destroy(game);
-        }
+            if (gameId >= _gameListItems.Count)
+                _gameListItems.Add(AddNewGameListItem());
 
-        _games.Clear();
+            var game = games.games[gameId];
+            _gameListItems[gameId].GameId = game.id;
+            _gameListItems[gameId].State = game.state;
+            _gameListItems[gameId].NumberOfPlayers = game.playerscount.ToString();
 
-        foreach (var game in games.games)
-        {
-            var obj = Instantiate(GamesListItemPrefab, GameItemsParent);
-
-            var gamesListItem = obj.GetComponent<GamesListItem>();
-            Debug.Assert(gamesListItem);
-
-            gamesListItem.GameId = game.id;
-            gamesListItem.State = game.state;
-            gamesListItem.NumberOfPlayers = game.playerscount.ToString();
+            _gameListItems[gameId].gameObject.SetActive(true);
 
             if (game.players.Any(p => p == Game.PlayerName))
-                gamesListItem.AllowRejoin = true;
+                _gameListItems[gameId].AllowRejoin = true;
+        }
 
-            _games.Add(obj);
+        for (int gameId = games.games.Length; gameId < _gameListItems.Count; ++gameId)
+        {
+            _gameListItems[gameId].gameObject.SetActive(false);
         }
     }
 
     public async void DeleteGameAsync(string gameId)
     {
         await ServerConnection.Instance().DeleteGameAsync(gameId);
-
-        var game = _games.First(x => x.GetComponent<GamesListItem>().GameId == gameId);
-        Destroy(game);
-        _games.Remove(game);
-
-        Debug.Log($"Game {gameId} deleted");
-
         UpdateGamesListAsync();
     }
 }
