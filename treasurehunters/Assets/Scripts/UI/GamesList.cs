@@ -14,7 +14,7 @@ public class GamesList : MonoBehaviour
     public Button RefreshGameButton;
 
     private static GameClient Game => GameClient.Instance();
-    private List<GamesListItem> _gameListItems = new();
+    private readonly List<GamesListItem> _gameListItems = new();
 
     void Start()
     {
@@ -40,7 +40,6 @@ public class GamesList : MonoBehaviour
         UpdateGamesListAsync();
     }
 
-    private List<GameObject> _games = new List<GameObject>();
 
     public async void UpdateGamesListAsync()
     {
@@ -70,21 +69,21 @@ public class GamesList : MonoBehaviour
             _gameListItems[gameId].State = game.state;
             _gameListItems[gameId].NumberOfPlayers = game.playerscount.ToString();
 
+            _gameListItems[gameId].gameObject.SetActive(true);
+
             if (game.players.Any(p => p == Game.PlayerName))
                 _gameListItems[gameId].AllowRejoin = true;
+        }
+
+        for (int gameId = games.games.Length; gameId < _gameListItems.Count; ++gameId)
+        {
+            _gameListItems[gameId].gameObject.SetActive(false);
         }
     }
 
     public async void DeleteGameAsync(string gameId)
     {
         await ServerConnection.Instance().DeleteGameAsync(gameId);
-
-        var game = _games.First(x => x.GetComponent<GamesListItem>().GameId == gameId);
-        Destroy(game);
-        _games.Remove(game);
-
-        Debug.Log($"Game {gameId} deleted");
-
         UpdateGamesListAsync();
     }
 }
