@@ -6,18 +6,21 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public Animator PlayerAnimator;
+
+    [SerializeField]
+    private float _speed = 5f;
+
     private bool _acceptInput = false;
     private bool _enableAcceptInput = false;
 
     private bool _isPlayingMovingAnimation;
     private Vector3 _destination;
     private Vector3 _direction;
-    private Animator _animator;
-
-    [SerializeField]
-    private float _speed = 5f;
 
     private static GameClient Game => GameClient.Instance();
+
+    private EActionType _actionType;
 
     private enum EActionType
     {
@@ -25,11 +28,10 @@ public class PlayerMovement : MonoBehaviour
         Gun
     }
 
-    private EActionType _actionType;
     
     void Start()
     {
-        _animator = GetComponent<Animator>();
+        Debug.Assert(PlayerAnimator);
 
         Game.OnYourTurn += () =>
         {
@@ -66,7 +68,6 @@ public class PlayerMovement : MonoBehaviour
 
             _lastAction = PlayerAction.None;
         };
-
 
         Game.OnStartFiringGun += () =>
         {
@@ -117,12 +118,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveAnimation()
     {
-        _animator.SetInteger("state", 1);
+        PlayerAnimator.SetInteger("state", 1);
     }
     
     private void IdleAnimation()
     {
-        _animator.SetInteger("state", 0);
+        PlayerAnimator.SetInteger("state", 0);
     }
 
     public void UpdateView()
