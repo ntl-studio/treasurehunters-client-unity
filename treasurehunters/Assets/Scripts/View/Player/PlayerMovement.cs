@@ -41,7 +41,8 @@ public class PlayerMovement : MonoBehaviour
 
         Game.OnUpdatePlayerPosition += () =>
         {
-            transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
+            if (!_isPlayingMovingAnimation)
+                transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
         };
 
         Game.OnPerformActionServer += (_) =>
