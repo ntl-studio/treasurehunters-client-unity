@@ -12,6 +12,12 @@ public class PlayerMovement : MonoBehaviour
     private bool _isPlayingMovingAnimation;
     private Vector3 _destination;
     private Vector3 _direction;
+    private Animator _animator;
+
+    [SerializeField]
+    private float _speed = 5f;
+
+    private float _speedOffset;
 
     private static GameClient Game => GameClient.Instance();
 
@@ -25,6 +31,8 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
+        _speedOffset = Time.deltaTime * _speed;
+        _animator = GetComponent<Animator>();
         Game.OnYourTurn += () =>
         {
             _actionType = EActionType.Move;
@@ -53,6 +61,7 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log($"set direction {_direction}");
 
                 _isPlayingMovingAnimation = true;
+                MoveAnimation();
                 // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
             }
 
@@ -85,24 +94,34 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void MoveAnimation()
+    {
+        _animator.SetInteger("state", 1);
+    }
+    
+    private void IdleAnimation()
+    {
+        _animator.SetInteger("state", 0);
+    }
+
     void FixedUpdate()
     {
         if (_isPlayingMovingAnimation)
         {
-            const float movementSpeed = 5.0f;
-
-            if (math.distancesq(transform.position, _destination) > 0.01f)
+            var delta = math.distancesq(transform.position, _destination);
+            if (delta > 0.01f)
             {
                 Debug.Assert(Math.Abs(_direction.x) > Mathf.Epsilon || 
                              Math.Abs(_direction.y) > Mathf.Epsilon || 
                              Math.Abs(_direction.z) > Mathf.Epsilon);
 
-                transform.position += _direction * Time.deltaTime * movementSpeed;
+                transform.position += _direction * _speedOffset;
             }
             else
             {
                 _isPlayingMovingAnimation = false;
                 transform.position = _destination;
+                IdleAnimation();
 
                 // tell the game we finished the move when animation finished playing
                 Game.EndMoveAnimation(); 
@@ -132,6 +151,7 @@ public class PlayerMovement : MonoBehaviour
                 Type = _actionType == EActionType.Move ? ActionType.Move : ActionType.FireGun
             };
 
-            Game.PerformAction(_lastAction); }
+            Game.PerformAction(_lastAction); 
+        }
     }
 }
