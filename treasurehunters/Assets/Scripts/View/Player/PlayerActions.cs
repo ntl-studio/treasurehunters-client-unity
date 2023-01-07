@@ -1,10 +1,27 @@
 using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerActions : MonoBehaviour
 {
     private static GameClient Game => GameClient.Instance();
+
+    public Button GrenadeButton;
+    public Button GunButton;
+    public Button SkipButton;
+
+    void Start()
+    {
+        Debug.Assert(GrenadeButton);
+        GrenadeButton.onClick.AddListener(GrenadeAction);
+
+        Debug.Assert(GunButton);
+        GunButton.onClick.AddListener(GunAction);
+
+        Debug.Assert(SkipButton);
+        SkipButton.onClick.AddListener(SkipAction);
+    }
 
     public void GrenadeAction()
     {

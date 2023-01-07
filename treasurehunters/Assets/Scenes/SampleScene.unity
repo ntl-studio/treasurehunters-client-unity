@@ -1801,7 +1801,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 289.99997, y: 0}
   m_SizeDelta: {x: 361.78885, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &662160465
@@ -3715,6 +3715,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1222958836}
   - component: {fileID: 1222958837}
+  - component: {fileID: 1222958838}
   m_Layer: 5
   m_Name: ActionsWindow
   m_TagString: Untagged
@@ -3771,6 +3772,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1222958838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222958835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f50149571d673d46b4d8cc354b98979, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GrenadeButton: {fileID: 2083767748}
+  GunButton: {fileID: 1535344369}
+  SkipButton: {fileID: 1992272533}
 --- !u!1 &1246288474
 GameObject:
   m_ObjectHideFlags: 0
