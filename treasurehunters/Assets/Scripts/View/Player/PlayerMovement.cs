@@ -17,8 +17,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _speed = 5f;
 
-    private float _speedOffset;
-
     private static GameClient Game => GameClient.Instance();
 
     private enum EActionType
@@ -31,8 +29,8 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
-        _speedOffset = Time.deltaTime * _speed;
         _animator = GetComponent<Animator>();
+
         Game.OnYourTurn += () =>
         {
             _actionType = EActionType.Move;
@@ -83,6 +81,28 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_acceptInput)
             HandleInput();
+
+        if (_isPlayingMovingAnimation)
+        {
+            var delta = math.distancesq(transform.position, _destination);
+            if (delta > 0.01f)
+            {
+                Debug.Assert(Math.Abs(_direction.x) > Mathf.Epsilon || 
+                             Math.Abs(_direction.y) > Mathf.Epsilon || 
+                             Math.Abs(_direction.z) > Mathf.Epsilon);
+
+                transform.position += _direction * Time.deltaTime * _speed;
+            }
+            else
+            {
+                _isPlayingMovingAnimation = false;
+                transform.position = _destination;
+                IdleAnimation();
+
+                // tell the game we finished the move when animation finished playing
+                Game.EndMoveAnimation(); 
+            }
+        }
     }
 
     void LateUpdate()
@@ -102,31 +122,6 @@ public class PlayerMovement : MonoBehaviour
     private void IdleAnimation()
     {
         _animator.SetInteger("state", 0);
-    }
-
-    void FixedUpdate()
-    {
-        if (_isPlayingMovingAnimation)
-        {
-            var delta = math.distancesq(transform.position, _destination);
-            if (delta > 0.01f)
-            {
-                Debug.Assert(Math.Abs(_direction.x) > Mathf.Epsilon || 
-                             Math.Abs(_direction.y) > Mathf.Epsilon || 
-                             Math.Abs(_direction.z) > Mathf.Epsilon);
-
-                transform.position += _direction * _speedOffset;
-            }
-            else
-            {
-                _isPlayingMovingAnimation = false;
-                transform.position = _destination;
-                IdleAnimation();
-
-                // tell the game we finished the move when animation finished playing
-                Game.EndMoveAnimation(); 
-            }
-        }
     }
 
     public void UpdateView()
