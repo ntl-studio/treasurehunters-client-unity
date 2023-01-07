@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Animator PlayerAnimator;
+    public PlayerAnimation PlayerAnimation;
 
     [SerializeField]
     private float _speed = 5f;
@@ -31,8 +31,6 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
-        Debug.Assert(PlayerAnimator);
-
         Game.OnYourTurn += () =>
         {
             _actionType = EActionType.Move;
@@ -74,6 +72,7 @@ public class PlayerMovement : MonoBehaviour
         {
             _actionType = EActionType.Gun;
             _enableAcceptInput = true;
+            PlayerAnimation.PlayShootAnimation();
         };
 
         Game.OnChoosePlayerAction += () => _acceptInput = false;
@@ -119,12 +118,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveAnimation()
     {
-        PlayerAnimator.SetInteger("state", 1);
+        PlayerAnimation.PlayMoveAnimation();
     }
     
     private void IdleAnimation()
     {
-        PlayerAnimator.SetInteger("state", 0);
+        PlayerAnimation.PlayIdleAnimation();
     }
 
     public void UpdateView()
