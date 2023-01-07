@@ -134,13 +134,8 @@ namespace TreasureHunters
             OnUpdatePlayerPosition += () => Debug.Log("OnUpdatePlayerPosition");
         }
 
-        private readonly Game _game = new(Guid.NewGuid());
-
         public const int FieldWidth = GameField.FieldWidth;
         public const int FieldHeight = GameField.FieldHeight;
-
-        public int CurrentPlayerId => _game.CurrentPlayerIndex;
-
 
         private string _currentPlayerName;
 
