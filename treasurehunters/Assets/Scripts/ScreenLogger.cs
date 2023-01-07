@@ -1,4 +1,5 @@
-using System.Collections; using TMPro;
+using System.Text;
+using TMPro;
 using UnityEngine;
 
 public class ScreenLogger : MonoBehaviour
@@ -20,26 +21,15 @@ public class ScreenLogger : MonoBehaviour
         Application.logMessageReceived -= HandleLog;
     }
 
-    string myLog;
-    Queue myLogQueue = new();
+    private readonly StringBuilder _myLogBuilder = new StringBuilder();
 
     void HandleLog(string logString, string stackTrace, LogType type)
     {
-        myLog = logString;
-        string newString = "\n [" + type + "] : " + myLog;
-        myLogQueue.Enqueue(newString);
+        _myLogBuilder.Append($"[{type}] : {logString}\n");
+
         if (type == LogType.Exception)
-        {
-            newString = "\n" + stackTrace;
-            myLogQueue.Enqueue(newString);
-        }
+            _myLogBuilder.Append($"{stackTrace}\n");
 
-        myLog = string.Empty;
-        foreach (string mylog in myLogQueue)
-        {
-            myLog += mylog;
-        }
-
-        LogText.text = myLog;
+        LogText.text = _myLogBuilder.ToString();
     }
 }
