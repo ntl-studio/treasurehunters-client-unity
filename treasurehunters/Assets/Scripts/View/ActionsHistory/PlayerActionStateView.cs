@@ -25,6 +25,6 @@ public class PlayerActionStateView : MonoBehaviour
         LeftWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.LeftWall));
         UpWallImage.gameObject.SetActive(playerActionState.FieldCell.HasFlag(SM.FieldCell.TopWall));
 
-        GameUtils.UpdateRotation(playerActionState.Action, PlayerDirectionTransform);
+        GameUtils.UpdateRotation(playerActionState.Action.Direction, PlayerDirectionTransform);
     }
 }

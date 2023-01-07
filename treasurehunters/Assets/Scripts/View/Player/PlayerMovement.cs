@@ -60,7 +60,8 @@ public class PlayerMovement : MonoBehaviour
 
                 _isPlayingMovingAnimation = true;
                 MoveAnimation();
-                // GameUtils.UpdateRotation(Game.CurrentPlayerMoveStates[0].Direction, transform);
+
+                GameUtils.UpdateRotation(_lastAction.Direction, transform);
             }
 
             _lastAction = PlayerAction.None;

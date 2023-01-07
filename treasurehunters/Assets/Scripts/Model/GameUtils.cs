@@ -35,10 +35,10 @@ namespace TreasureHunters
             return result;
         }
 
-        public static void UpdateRotation(PlayerAction playerAction, Transform transform)
+        public static void UpdateRotation(ActionDirection direction, Transform transform)
         {
             transform.rotation = Quaternion.Euler(0, 0, 0);
-            switch (playerAction.Direction)
+            switch (direction)
             {
                 case ActionDirection.Right:
                     transform.rotation = Quaternion.Euler(0, 0, -90);
