@@ -11,11 +11,11 @@ param(
     [string]$devTeamId
 )
 
-pwsh ./scripts/increment-version.ps1
+$version = pwsh ./scripts/increment-version.ps1
 
 rm -r $buildPath
 
-/Applications/Unity/Hub/Editor/2021.3.4f1/Unity.app/Contents/MacOS/Unity -quit -accept-apiupdate -batchmode -logFile "$logFile" -projectPath "$projectPath" -executeMethod BuildScript.PerformBuild -buildPath "$buildPath"
+/Applications/Unity/Hub/Editor/2022.1.23f1/Unity.app/Contents/MacOS/Unity -quit -accept-apiupdate -batchmode -logFile "$logFile" -projectPath "$projectPath" -executeMethod BuildScript.PerformBuild -buildPath "$buildPath"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Unity build failed"
@@ -176,9 +176,16 @@ Write-Information "Update manifest.plist"
 
 $manifest = Get-Content "$appsPath/manifest.plist" -Raw
 
-$manifest = $manifest -replace "treasurehunters.ipa", "TreasureHunters.ipa"
-$manifest = $manifest -replace "treasurehunters-", "TreasureHunters-"
+$manifest = $manifest -replace "treasurehunters.ipa", "Treasure%20Hunters.ipa"
+$manifest = $manifest -replace "treasurehunters-", "Treasure%20Hunters-"
 Set-Content "$appsPath/manifest.plist" $manifest
 
 Set-Location ../treasurehunters-client-unity/build
 pwsh ./scripts/upload-build.ps1 -archivePath "../$appsPath" -connectionString "$env:NTL_TH_STORAGEACCOUNTCONNECTIONSTRING"
+
+$projectSettingsPath = "../treasurehunters/ProjectSettings/ProjectSettings.asset"
+git add $projectSettingsPath
+git commit -m"Update version to v$version"
+git tag v$version
+git push
+git push origin v$version

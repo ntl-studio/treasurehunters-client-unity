@@ -14,8 +14,10 @@ $projectSettingsPath = "../treasurehunters/ProjectSettings/ProjectSettings.asset
 $projectSettings = get-content $projectSettingsPath -Raw
 $projectSettings = $projectSettings -replace "bundleVersion: .*", "bundleVersion: $version" | Set-Content ../treasurehunters/ProjectSettings/ProjectSettings.asset
 
-git add $projectSettingsPath
-git commit -m"Update version to v$version"
-git tag v$version
-git push
-git push origin v$version
+write-output $version
+exit 0
+# git add $projectSettingsPath
+# git commit -m"Update version to v$version"
+# git tag v$version
+# git push
+# git push origin v$version
