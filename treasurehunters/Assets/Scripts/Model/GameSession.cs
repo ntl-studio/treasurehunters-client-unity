@@ -27,7 +27,11 @@ public class GameSession : MonoBehaviour
             await UpdateMovesHistoryAsync();
         };
 
-        Game.OnPerformActionServer += async _ => await UpdateMovesHistoryAsync();
+        Game.OnPerformActionServer += async _ =>
+        {
+            await UpdatePlayerDetailsAsync(Game.State);
+            await UpdateMovesHistoryAsync();
+        };
 
         Game.OnEndMove += async () => await UpdatePlayerDetailsAsync(GameClientState.WaitingForTurn);
 
