@@ -24,18 +24,32 @@ public class NextTurn : MonoBehaviour
 
         Game.OnJoined += () => { Message.text = "You joined the game"; };
 
-        Game.OnWaitingForTurn += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
+        Game.OnWaitingForTurn += () =>
+        {
+            Message.text = Game.IsPlayerAlive 
+                ? $"Waiting for turn.\n Current player:\n{Game.CurrentPlayerName}" 
+                : $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
+        };
 
-        Game.OnUpdateCurrentPlayerName += () => { Message.text = $"Waiting for turn.\n Current player: {Game.CurrentPlayerName}"; };
+        Game.OnUpdateCurrentPlayerName += () =>
+        {
+            Message.text = Game.IsPlayerAlive
+                ? $"Waiting for turn.\n Current player:\n{Game.CurrentPlayerName}"
+                : $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
+        };
 
         Game.OnYourTurn += () => { Message.text = "Your turn!"; };
 
         Game.OnUpdateWinner += () =>
         {
-            if (Game.PlayerName == Game.WinnerName)
-                Message.text = "You won!";
-            else
-                Message.text = $"You lost, the winner is {Game.WinnerName}.\nSorry, but you suck at this game.";
+            Message.text = Game.PlayerName == Game.WinnerName 
+                ? "You won!" 
+                : $"You lost, the winner is {Game.WinnerName}.\nSorry, but you suck at this game.";
+        };
+
+        Game.OnPlayerDied += () => 
+        { 
+            Message.text = $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
         };
     }
 }

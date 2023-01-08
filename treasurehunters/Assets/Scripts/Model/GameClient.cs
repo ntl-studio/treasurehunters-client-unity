@@ -21,6 +21,9 @@ namespace TreasureHunters
 
         MakingMove,
 
+        PlayerDied,             // This player is dead, so game is "over", but technically not Finished as 
+                                // other can still play
+
         Finished                // Someone won the game (it could be you)
     }
 
@@ -80,6 +83,10 @@ namespace TreasureHunters
                         case GameClientState.MakingMove:
                             Debug.LogError("Should not be assigning MakingMove state directory");
                             break;
+                        case GameClientState.PlayerDied:
+                            IsPlayerAlive = false;
+                            OnPlayerDied?.Invoke();
+                            break;
                         case GameClientState.Finished:
                             OnGameFinished?.Invoke();
                             break;
@@ -103,6 +110,7 @@ namespace TreasureHunters
         public event GameEvent OnEndMove;
         public event GameEvent OnEndMoveAnimation;
         public event GameEvent OnGameFinished;
+        public event GameEvent OnPlayerDied;
 
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
@@ -138,7 +146,6 @@ namespace TreasureHunters
         public const int FieldHeight = GameField.FieldHeight;
 
         private string _currentPlayerName;
-
         public string CurrentPlayerName
         {
             set
@@ -172,7 +179,6 @@ namespace TreasureHunters
         }
 
         private List<PlayerMovesDetails> _playersMovesHistory;
-
         public List<PlayerMovesDetails> PlayersMovesHistory
         {
             set
@@ -197,13 +203,13 @@ namespace TreasureHunters
         private Position _playerPosition;
         public Position PlayerPosition
         {
-            get => _playerPosition;
             set
             {
                 PreviousPosition = _playerPosition;
                 _playerPosition = value;
                 OnUpdatePlayerPosition?.Invoke();
             }
+            get => _playerPosition;
         }
 
         public int PlayersCount = -1;
@@ -242,6 +248,7 @@ namespace TreasureHunters
                 (dir == ActionDirection.Up && !_visibleArea[1, 1].HasFlag(FieldCell.TopWall));
         }
 
+        private string _gameId;
         public string GameId
         {
             get
@@ -250,8 +257,6 @@ namespace TreasureHunters
                 return _gameId;
             }
         }
-
-        private string _gameId;
 
         private string _playerName;
         public string PlayerName
@@ -278,7 +283,6 @@ namespace TreasureHunters
         }
 
         private string _winnerName;
-
         public string WinnerName
         {
             set
@@ -334,6 +338,8 @@ namespace TreasureHunters
             }
             get => _treasurePosition_Debug;
         }
+
+        public bool IsPlayerAlive { get; private set; } = true;
 
         public void StartFiringGun() { OnStartFiringGun?.Invoke(); }
         public void ChoosePlayerAction() { OnChoosePlayerAction?.Invoke(); }

@@ -1,4 +1,3 @@
-using Position = TreasureHunters.Position;
 using TMPro;
 using TreasureHunters;
 using UnityEngine.UI;
@@ -34,10 +33,8 @@ public class GamesListItem : MonoBehaviour
         DeleteGameButton.GetComponent<Button>().onClick.AddListener(DeleteGame);
 
         _gamesList = gameObject.GetComponentInParent<GamesList>();
-        Debug.Assert(_gamesList);
 
-        if (AllowRejoin)
-            JoinButtonText.text = "Rejoin";
+        Game.OnJoined += () => _gamesList.UpdateGamesListAsync();
     }
 
     public string GameId 
@@ -61,7 +58,24 @@ public class GamesListItem : MonoBehaviour
         }
     }
 
-    public bool AllowRejoin;
+    public void ResetControls()
+    {
+        JoinGameButton.interactable = true;
+        StartGameButton.interactable = true;
+        AllowRejoin = true;
+    }
+
+    private bool _allowRejoin;
+
+    public bool AllowRejoin
+    {
+        set
+        {
+            _allowRejoin = value;
+            JoinButtonText.text = _allowRejoin ? "Rejoin" : "Join";
+        }
+        get => _allowRejoin;
+    }
 
     private GameClient Game => GameClient.Instance();
 

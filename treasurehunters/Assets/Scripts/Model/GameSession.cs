@@ -75,16 +75,27 @@ public class GameSession : MonoBehaviour
     {
         while (true)
         {
-            var currentPlayer = await Server.GetCurrentPlayerAsync(Game.GameId);
+            var playerInfo = await Server.GetPlayerInfoAsync(Game.GameId, Game.PlayerName);
 
-            if (currentPlayer.name == Game.PlayerName)
+            Game.SetVisibleArea(playerInfo.visiblearea);
+            Game.CurrentPlayerName = playerInfo.currentplayername;
+
+            if (!playerInfo.isalive)
             {
-                Game.State = currentPlayer.gamestate == "Finished" ? GameClientState.Finished : GameClientState.YourTurn;
+                Game.State = GameClientState.PlayerDied;
+            }
+            else if (playerInfo.gamestate == GameState.Finished)
+            {
+                Game.State = GameClientState.Finished;
+                break;
+            }
+            else if (playerInfo.isplayerturn)
+            {
+                Game.State = GameClientState.YourTurn;
                 break;
             }
 
-            Game.CurrentPlayerName = currentPlayer.name;
-            Debug.Log($"Waiting for your turn. Current player is {currentPlayer.name}.");
+            Debug.Log($"Waiting for your turn. Current player is {playerInfo.currentplayername}");
             await Task.Delay(2000);
         }
     }

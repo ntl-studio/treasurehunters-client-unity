@@ -77,7 +77,11 @@ namespace JsonObjects
     {
         public int x;
         public int y;
+        public bool isalive;
+        public bool isplayerturn;
         public int[] visiblearea;
+        public GameState gamestate;
+        public string currentplayername;
     }
 
     [System.Serializable]

@@ -76,7 +76,9 @@ public class PlayerMovement : MonoBehaviour
         };
 
         Game.OnChoosePlayerAction += () => _acceptInput = false;
-        Game.OnChoosePlayerActionCancel += () => _enableAcceptInput = true; 
+        Game.OnChoosePlayerActionCancel += () => _enableAcceptInput = true;
+
+        Game.OnPlayerDied += () => _acceptInput = false;
     }
 
     void Update()

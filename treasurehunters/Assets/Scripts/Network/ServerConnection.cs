@@ -131,13 +131,13 @@ public class ServerConnection : MonoBehaviour
             }
         }
 
-        // foreach (var player in playersMoveStates.data.players)
         for (int playerId = 0; playerId < playersMoveStates.data.players.Length; ++playerId)
         {
             var details = _playerMoveStates[playerId];
             var playerData  = playersMoveStates.data.players[playerId];
 
             details.StatesCount = playerData.actionstates.Length;
+
             for (int actionId = 0; actionId < details.StatesCount; ++actionId)
             {
                 details.Moves[actionId].Position = playerData.actionstates[actionId].position;

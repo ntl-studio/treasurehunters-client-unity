@@ -40,7 +40,6 @@ public class GamesList : MonoBehaviour
         UpdateGamesListAsync();
     }
 
-
     public async void UpdateGamesListAsync()
     {
         var games = await ServerConnection.Instance().GetGamesListAsync();
@@ -68,16 +67,14 @@ public class GamesList : MonoBehaviour
             _gameListItems[gameId].GameId = game.id;
             _gameListItems[gameId].State = game.state;
             _gameListItems[gameId].NumberOfPlayers = game.playerscount.ToString();
-
             _gameListItems[gameId].gameObject.SetActive(true);
-
-            if (game.players.Any(p => p == Game.PlayerName))
-                _gameListItems[gameId].AllowRejoin = true;
+            _gameListItems[gameId].AllowRejoin = game.players.Any(p => p == Game.PlayerName);
         }
 
         for (int gameId = games.games.Length; gameId < _gameListItems.Count; ++gameId)
         {
             _gameListItems[gameId].gameObject.SetActive(false);
+            _gameListItems[gameId].ResetControls();
         }
     }
 
