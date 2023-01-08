@@ -69,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
                     }
                     break;
                 case ActionType.FireGun:
+                    GameUtils.UpdateRotation(_lastAction.Direction, transform);
                     PlayerAnimation.PlayShootAnimation();
                     break;
             }
