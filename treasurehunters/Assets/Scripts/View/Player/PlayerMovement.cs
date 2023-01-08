@@ -27,7 +27,6 @@ public class PlayerMovement : MonoBehaviour
         Move, // Default mode
         Gun
     }
-
     
     void Start()
     {
@@ -50,19 +49,28 @@ public class PlayerMovement : MonoBehaviour
 
         Game.OnPerformActionClient += (result) =>
         {
-            if (result)
+            switch (_lastAction.Type)
             {
-                Vector2Int shift = GameUtils.ActionDirectionToVector2(_lastAction.Direction);
+                case ActionType.Move:
+                    if (result)
+                    {
+                        Vector2Int shift = GameUtils.ActionDirectionToVector2(_lastAction.Direction);
 
-                _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y, 0);
+                        _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y,
+                            0);
 
-                _direction = (_destination - transform.position).normalized;
-                Debug.Log($"set direction {_direction}");
+                        _direction = (_destination - transform.position).normalized;
+                        Debug.Log($"set direction {_direction}");
 
-                _isPlayingMovingAnimation = true;
-                MoveAnimation();
+                        _isPlayingMovingAnimation = true;
+                        MoveAnimation();
 
-                GameUtils.UpdateRotation(_lastAction.Direction, transform);
+                        GameUtils.UpdateRotation(_lastAction.Direction, transform);
+                    }
+                    break;
+                case ActionType.FireGun:
+                    PlayerAnimation.PlayShootAnimation();
+                    break;
             }
 
             _lastAction = PlayerAction.None;
@@ -72,7 +80,6 @@ public class PlayerMovement : MonoBehaviour
         {
             _actionType = EActionType.Gun;
             _enableAcceptInput = true;
-            PlayerAnimation.PlayShootAnimation();
         };
 
         Game.OnChoosePlayerAction += () => _acceptInput = false;
