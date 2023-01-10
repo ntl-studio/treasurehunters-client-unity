@@ -108,9 +108,4 @@ public class GameSession : MonoBehaviour
     {
         Game.PlayersMovesHistory = await Server.GetMovesHistoryAsync(Game.GameId);
     }
-
-    private async Task UpdateWinnerName()
-    {
-        Game.PlayersMovesHistory = await Server.GetMovesHistoryAsync(Game.GameId);
-    }
 }

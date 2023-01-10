@@ -115,14 +115,14 @@ public class ServerConnection : MonoBehaviour
         {
             _playerMoveStates = new List<PlayerMovesDetails>(Game.PlayersCount);
 
-            var moves = new List<PlayerActionState>(Game.HistorySize);
-            for (int moveId = 0; moveId < Game.HistorySize; ++moveId)
-            {
-                moves.Add(new PlayerActionState());
-            }
-
             for (int playerId = 0; playerId < Game.PlayersCount; ++playerId)
             {
+                var moves = new List<PlayerActionState>(Game.HistorySize);
+                for (int moveId = 0; moveId < Game.HistorySize; ++moveId)
+                {
+                    moves.Add(new PlayerActionState());
+                }
+
                 _playerMoveStates.Add(new PlayerMovesDetails()
                 {
                     PlayerName = playersMoveStates.data.players[playerId].player,
