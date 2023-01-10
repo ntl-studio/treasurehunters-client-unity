@@ -66,11 +66,9 @@ public class BoardView : MonoBehaviour
 
         GenerateBoardSprites();
 
-        Game.OnUpdateVisibleArea += UpdatePlayerVisibility;
-
-        Game.OnEndMoveAnimation += () =>
+        Game.OnUpdateVisibleArea += () =>
         {
-            FogVisitedAreas();
+            FogVisitedAreas(Game.PreviousPosition);
             UpdatePlayerVisibility();
         };
 
@@ -137,10 +135,8 @@ public class BoardView : MonoBehaviour
         }
     }
 
-    public void FogVisitedAreas()
+    public void FogVisitedAreas(Position position)
     {
-        var position = Game.PreviousPosition;
-
         for (int x = 0; x < VisibleArea.Width; ++x)
         {
             for (int y = 0; y < VisibleArea.Height; ++y)
