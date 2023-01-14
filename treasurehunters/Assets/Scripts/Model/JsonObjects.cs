@@ -78,6 +78,7 @@ namespace JsonObjects
         public int x;
         public int y;
         public bool isalive;
+        public int bullets;
         public bool isplayerturn;
         public int[] visiblearea;
         public GameState gamestate;
@@ -96,6 +97,7 @@ namespace JsonObjects
     {
         public T data;
         public bool successful;
+        public string errormessage;
     }
 
     public class PlayerSessionIdDataJson : DataJson<PlayerSessionIdJson> { }

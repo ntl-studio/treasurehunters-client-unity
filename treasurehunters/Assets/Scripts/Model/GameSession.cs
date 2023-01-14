@@ -44,6 +44,7 @@ public class GameSession : MonoBehaviour
 
         Debug.Log($"Updating player position to ({player.x}, {player.y})");
         Game.PlayerPosition = new TreasureHunters.Position(player.x, player.y);
+        Game.Bullets = player.bullets;
         Game.SetVisibleArea(player.visiblearea);
 
         if (Game.State != GameClientState.Finished)

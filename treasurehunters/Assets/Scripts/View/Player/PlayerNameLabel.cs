@@ -15,12 +15,13 @@ public class PlayerNameLabel : MonoBehaviour
         UpdatePlayerName();
         Game.OnYourTurn += UpdatePlayerName;
         Game.OnEndMoveAnimation += UpdatePlayerName;
+        Game.OnUpdateBullets += UpdatePlayerName;
     }
 
     void UpdatePlayerName()
     {
-        _playerNameText.text = Game.PlayerName +
-                              " (" + Game.PlayerPosition.X + ", "
-                              + Game.PlayerPosition.Y + ")";
+        _playerNameText.text =
+            $"{Game.PlayerName} ({Game.PlayerPosition.X},{Game.PlayerPosition.Y})\n" +
+            $"Bullets: {Game.Bullets}";
     }
 }

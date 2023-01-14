@@ -174,8 +174,8 @@ public class ServerConnection : MonoBehaviour
 
         var jsonText = await response.Content.ReadAsStringAsync();
 
-        var data = JsonUtility.FromJson<T>(jsonText);
-        if (data == null)
+        var reply = JsonUtility.FromJson<T>(jsonText);
+        if (reply == null)
         {
             Debug.Log($"Could not read data form the json: {jsonText}, webrequest {uri}");
             Debug.Assert(true);
@@ -183,6 +183,6 @@ public class ServerConnection : MonoBehaviour
         else
             Debug.Log($"Getting data: {jsonText}, webrequest {uri}");
 
-        return data;
+        return reply;
     }
 }

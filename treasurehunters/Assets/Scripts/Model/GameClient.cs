@@ -114,6 +114,7 @@ namespace TreasureHunters
 
         public event GameEvent OnUpdateVisibleArea;
         public event GameEvent OnUpdatePlayerPosition;
+        public event GameEvent OnUpdateBullets;
         public event GameEvent OnUpdatePlayersMoveHistory;
 
         public event GameEvent OnUpdatePlayerName;
@@ -212,6 +213,18 @@ namespace TreasureHunters
             get => _playerPosition;
         }
 
+        private int _bullets;
+
+        public int Bullets
+        {
+            set
+            {
+                _bullets = value;
+                OnUpdateBullets?.Invoke();
+            }
+            get => _bullets;
+        }
+
         public int PlayersCount = -1;
 
         public Dictionary<string, Position> Enemies = new();
@@ -227,6 +240,9 @@ namespace TreasureHunters
                 State = GameClientState.Finished;
 
             PlayerHasTreasure = actionResult.data.hastreasure;
+
+            if (!actionResult.successful)
+                Debug.Log($"Perform Action failed: {actionResult.errormessage}");
 
             OnPerformActionServer?.Invoke(actionResult.successful);
 
