@@ -64,6 +64,8 @@ public class GamesList : MonoBehaviour
                 _gameListItems.Add(AddNewGameListItem());
 
             var game = games.games[gameId];
+            _gameListItems[gameId].ResetControls();
+
             _gameListItems[gameId].GameId = game.id;
             _gameListItems[gameId].State = game.state;
             _gameListItems[gameId].NumberOfPlayers = game.playerscount.ToString();
