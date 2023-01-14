@@ -110,6 +110,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (Game.State == GameClientState.Finished && !_isPlayingMovingAnimation)
+            return;
+
         if (_acceptInput)
             HandleInput();
 
