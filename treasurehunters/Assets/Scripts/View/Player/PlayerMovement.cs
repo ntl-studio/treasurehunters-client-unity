@@ -3,6 +3,7 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
+using Position = TreasureHunters.Position;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -36,6 +37,24 @@ public class PlayerMovement : MonoBehaviour
             _acceptInput = true;
         };
 
+        Game.OnWaitingForTurn += () =>
+        {
+            _acceptInput = false;
+        };
+
+        // This is to double check that the player position on the client and player position on the
+        // server match
+        Game.OnEndMoveAnimation += () =>
+        {
+            var clientPos = new Position((int)transform.position.x, (int)transform.position.y);
+            if (Game.PlayerPosition != clientPos)
+            {
+                Debug.LogWarning($"Client position {clientPos} and server position {Game.PlayerPosition} do not match, " +
+                                 "forcing client position update the update");
+                transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
+            }
+        };
+
         Game.OnUpdatePlayerPosition += () =>
         {
             if (!_isPlayingMovingAnimation)
@@ -56,8 +75,8 @@ public class PlayerMovement : MonoBehaviour
                     {
                         Vector2Int shift = GameUtils.ActionDirectionToVector2(_lastAction.Direction);
 
-                        _destination = new Vector3(transform.position.x + shift.x, transform.position.y + shift.y,
-                            0);
+                        _destination = new Vector3(
+                            transform.position.x + shift.x, transform.position.y + shift.y, 0);
 
                         _direction = (_destination - transform.position).normalized;
                         Debug.Log($"set direction {_direction}");
