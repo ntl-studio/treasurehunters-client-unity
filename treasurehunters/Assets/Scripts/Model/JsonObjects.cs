@@ -12,7 +12,7 @@ namespace JsonObjects
     public class GameJson
     {
         public string id;
-        public string state;
+        public GameState state;
         public int playerscount;
         public string[] players;
     }

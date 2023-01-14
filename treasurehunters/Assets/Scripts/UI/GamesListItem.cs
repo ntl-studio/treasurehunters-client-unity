@@ -1,3 +1,4 @@
+using NtlStudio.TreasureHunters.Model;
 using TMPro;
 using TreasureHunters;
 using UnityEngine.UI;
@@ -44,16 +45,16 @@ public class GamesListItem : MonoBehaviour
     }
     public string NumberOfPlayers { set => NumberOfPlayersText.text = value; }
 
-    public string State
+    public GameState State
     {
         set
         {
-            GameStateText.text = value;
+            GameStateText.text = value.ToString();
 
-            if (value == "Finished")
+            if (value == GameState.Finished)
                 JoinGameButton.interactable = false;
 
-            if (value is "Running" or "Finished")
+            if (value is GameState.Running or GameState.Finished)
                 StartGameButton.interactable = false;
         }
     }

@@ -56,7 +56,6 @@ public class GameSession : MonoBehaviour
         var treasurePosition = await Server.GetTreasurePositionAsync(Game.GameId);
         Game.TreasurePosition_Debug = new TreasureHunters.Position(treasurePosition.x, treasurePosition.y);
     }
-    private readonly WaitForSeconds _waitFor2Seconds = new WaitForSeconds(2);
 
     async Task WaitForGameStartAsync()
     {
@@ -64,7 +63,7 @@ public class GameSession : MonoBehaviour
         {
             var gameState = await Server.GetGameStateAsync(Game.GameId);
 
-            if (gameState.state != GameState.NotStarted.ToString())
+            if (gameState.state != GameState.NotStarted)
             {
                 Game.PlayersCount = gameState.playerscount;
                 Game.State = GameClientState.WaitingForTurn;
