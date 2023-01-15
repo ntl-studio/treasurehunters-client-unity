@@ -27,15 +27,15 @@ public class NextTurn : MonoBehaviour
         Game.OnWaitingForTurn += () =>
         {
             Message.text = Game.IsPlayerAlive 
-                ? $"Waiting for turn.\n Current player:\n{Game.CurrentPlayerName}" 
-                : $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
+                ? $"Waiting for turn.\nCurrent player: {Game.CurrentPlayerName}" 
+                : $"You died, sorry.\nCurrent player: {Game.CurrentPlayerName}";
         };
 
         Game.OnUpdateCurrentPlayerName += () =>
         {
             Message.text = Game.IsPlayerAlive
-                ? $"Waiting for turn.\n Current player:\n{Game.CurrentPlayerName}"
-                : $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
+                ? $"Waiting for turn.\nCurrent player: {Game.CurrentPlayerName}"
+                : $"You died, sorry.\nCurrent player: {Game.CurrentPlayerName}";
         };
 
         Game.OnYourTurn += () => { Message.text = "Your turn!"; };
@@ -49,7 +49,7 @@ public class NextTurn : MonoBehaviour
 
         Game.OnPlayerDied += () => 
         { 
-            Message.text = $"You died, sorry.\n Current player:\n{Game.CurrentPlayerName}";
+            Message.text = $"You died, sorry.\n Current player: {Game.CurrentPlayerName}";
         };
     }
 }

@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
+    public GameObject _playerCamera;
+
     private static GameClient Game => GameClient.Instance();
 
     private EActionType _actionType;
@@ -31,6 +33,12 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
+        var cameras = GameObject.FindGameObjectsWithTag("PlayerCamera");
+        Debug.Assert(cameras.Length == 1);
+        _playerCamera = cameras[0];
+
+        Debug.Assert(_playerCamera);
+
         Game.OnYourTurn += () =>
         {
             _actionType = EActionType.Move;
@@ -58,7 +66,11 @@ public class PlayerMovement : MonoBehaviour
         Game.OnUpdatePlayerPosition += () =>
         {
             if (!_isPlayingMovingAnimation)
+            {
                 transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
+
+                UpdatePlayerCameraPosition();
+            }
         };
 
         Game.OnPerformActionServer += (_) =>
@@ -136,6 +148,8 @@ public class PlayerMovement : MonoBehaviour
                 // tell the game we finished the move when animation finished playing
                 Game.EndMoveAnimation(); 
             }
+
+            UpdatePlayerCameraPosition();
         }
     }
 
@@ -182,5 +196,14 @@ public class PlayerMovement : MonoBehaviour
 
             Game.PerformAction(_lastAction); 
         }
+    }
+
+    private void UpdatePlayerCameraPosition()
+    {
+        _playerCamera.transform.position =
+            new Vector3(
+                transform.position.x,
+                transform.position.y,
+                -1);
     }
 }
