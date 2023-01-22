@@ -263,15 +263,16 @@ namespace TreasureHunters
             if (actionResult.data.state == "Finished")
                 State = GameClientState.Finished;
 
-            PlayerHasTreasure = actionResult.data.hastreasure;
-
             if (!actionResult.successful)
                 Debug.Log($"Perform Action failed: {actionResult.errormessage}");
 
             OnPerformActionServer?.Invoke(actionResult.successful);
 
             if (actionResult.successful && playerAction.Type is Move or Skip)
+            {
+                PlayerHasTreasure = actionResult.data.hastreasure;
                 OnEndMove?.Invoke();
+            }
         }
 
         bool PerformActionClient(PlayerAction playerAction)
