@@ -3,6 +3,7 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Position = TreasureHunters.Position;
 
 public class PlayerMovement : MonoBehaviour
@@ -19,7 +20,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    public GameObject _playerCamera;
+    public GameObject _playerCameraObject;
+    public Camera _playerCamera;
 
     private static GameClient Game => GameClient.Instance();
 
@@ -35,8 +37,9 @@ public class PlayerMovement : MonoBehaviour
     {
         var cameras = GameObject.FindGameObjectsWithTag("PlayerCamera");
         Debug.Assert(cameras.Length == 1);
-        _playerCamera = cameras[0];
-
+        _playerCameraObject = cameras[0];
+        Debug.Assert(_playerCameraObject);
+        _playerCamera = _playerCameraObject.GetComponent<Camera>();
         Debug.Assert(_playerCamera);
 
         Game.OnYourTurn += () =>
@@ -118,15 +121,34 @@ public class PlayerMovement : MonoBehaviour
         Game.OnChoosePlayerActionCancel += () => _enableAcceptInput = true;
 
         Game.OnPlayerDied += () => _acceptInput = false;
+
+        Game.OnGameViewClick += (clickWorldPosition) =>
+        {
+            if (!_acceptInput || _isPlayingMovingAnimation) 
+                return;
+
+            ActionDirection direction = ActionDirection.None;
+            var playerPosition = transform.position;
+
+            var shiftX = (int)math.round(clickWorldPosition.x - playerPosition.x);
+            var shiftY = (int)math.round(clickWorldPosition.y - playerPosition.y);
+
+            if ((math.abs(shiftX) == 1) ^ (math.abs(shiftY) == 1))
+            {
+                if (math.abs(shiftX) > math.abs(shiftY))
+                    direction = shiftX > 0 ? ActionDirection.Right : ActionDirection.Left;
+                else
+                    direction = shiftY > 0 ? ActionDirection.Up : ActionDirection.Down;
+            }
+
+            HandleDirection(direction);
+        };
     }
 
     void Update()
     {
         if (Game.State == GameClientState.Finished && !_isPlayingMovingAnimation)
             return;
-
-        if (_acceptInput)
-            HandleInput();
 
         if (_isPlayingMovingAnimation)
         {
@@ -150,6 +172,10 @@ public class PlayerMovement : MonoBehaviour
             }
 
             UpdatePlayerCameraPosition();
+        }
+        else if (_acceptInput)
+        {
+            HandleKeyBoardInput();
         }
     }
 
@@ -179,13 +205,14 @@ public class PlayerMovement : MonoBehaviour
 
     private PlayerAction _lastAction = PlayerAction.None;
 
-    private void HandleInput()
+    private void HandleKeyBoardInput()
     {
-        if (_isPlayingMovingAnimation)
-            return;
+        ActionDirection direction = GetActionDirectionFromKeyboard(transform.position);
+        HandleDirection(direction);
+    }
 
-        ActionDirection direction = GameUtils.GetActionDirection(transform.position);
-
+    private void HandleDirection(ActionDirection direction)
+    {
         if (direction != ActionDirection.None)
         {
             _lastAction = new PlayerAction()
@@ -194,13 +221,29 @@ public class PlayerMovement : MonoBehaviour
                 Type = _actionType == EActionType.Move ? ActionType.Move : ActionType.FireGun
             };
 
-            Game.PerformAction(_lastAction); 
+            Game.PerformAction(_lastAction);
         }
+    }
+
+    public ActionDirection GetActionDirectionFromKeyboard(Vector3 playerPosition)
+    {
+        ActionDirection direction = ActionDirection.None;
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            direction = ActionDirection.Left;
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+            direction = ActionDirection.Up;
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+            direction = ActionDirection.Right;
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+            direction = ActionDirection.Down;
+
+        return direction;
     }
 
     private void UpdatePlayerCameraPosition()
     {
-        _playerCamera.transform.position =
+        _playerCameraObject.transform.position =
             new Vector3(
                 transform.position.x,
                 transform.position.y,

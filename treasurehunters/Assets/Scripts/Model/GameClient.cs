@@ -132,6 +132,9 @@ namespace TreasureHunters
         // when the player chooses to fire gun from the menu
         public event GameEvent OnStartFiringGun;
 
+        public delegate void GameViewClickEvent(Vector3 worldPosition);
+        public event GameViewClickEvent OnGameViewClick;
+
         private void AddCallbacksDebug()
         {
             OnJoined += () => Debug.Log("OnJoined");
@@ -360,5 +363,6 @@ namespace TreasureHunters
         public void StartFiringGun() { OnStartFiringGun?.Invoke(); }
         public void ChoosePlayerAction() { OnChoosePlayerAction?.Invoke(); }
         public void ChoosePlayerActionCancel() { OnChoosePlayerActionCancel?.Invoke(); }
+        public void GameViewClick(Vector3 worldPosition) { OnGameViewClick?.Invoke(worldPosition); }
     }
 }
