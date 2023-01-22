@@ -7,31 +7,65 @@ public class PlayerActions : MonoBehaviour
 {
     private static GameClient Game => GameClient.Instance();
 
-    public Button GrenadeButton;
-    public Button GunButton;
+    public Toggle MoveToggle;
+    public Toggle GrenadeToggle;
+    public Toggle GunToggle;
     public Button SkipButton;
+
+    private ClientActionType _clientActionTypeUI;
 
     void Start()
     {
-        Debug.Assert(GrenadeButton);
-        GrenadeButton.onClick.AddListener(GrenadeAction);
+        Debug.Assert(MoveToggle);
+        MoveToggle.onValueChanged.AddListener(MoveToggleChanged);
 
-        Debug.Assert(GunButton);
-        GunButton.onClick.AddListener(GunAction);
+        Debug.Assert(GunToggle);
+        GunToggle.onValueChanged.AddListener(GunToggleChanged);
+
+        Debug.Assert(GrenadeToggle);
+        GrenadeToggle.onValueChanged.AddListener(GrenadeToggleChanged);
 
         Debug.Assert(SkipButton);
         SkipButton.onClick.AddListener(SkipAction);
+
+        Game.OnClientActionTypeChanged += (clientActionType) =>
+        {
+            if (clientActionType != _clientActionTypeUI)
+            {
+                switch (clientActionType)
+                {
+                    case ClientActionType.Move:
+                        MoveToggle.isOn = true;
+                        break;
+                    case ClientActionType.Gun:
+                        GunToggle.isOn = true;
+                        break;
+                    case ClientActionType.Grenade:
+                        GrenadeToggle.isOn = true;
+                        break;
+                }
+            }
+
+            _clientActionTypeUI = clientActionType;
+        };
     }
 
-    public void GrenadeAction()
+    public void MoveToggleChanged(bool value)
     {
-        Debug.Log("Throw grenade");
+        if (value)
+            Game.ClientActionType = ClientActionType.Move;
     }
 
-    public void GunAction()
+    public void GunToggleChanged(bool value)
     {
-        Debug.Log("Shoot gun");
-        Game.StartFiringGun();
+        if (value)
+            Game.ClientActionType = ClientActionType.Gun;
+    }
+
+    public void GrenadeToggleChanged(bool value)
+    {
+        if (value)
+            Game.ClientActionType = ClientActionType.Grenade;
     }
     
     public void SkipAction()

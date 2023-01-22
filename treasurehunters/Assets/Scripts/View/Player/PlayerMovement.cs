@@ -3,7 +3,6 @@ using NtlStudio.TreasureHunters.Model;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Position = TreasureHunters.Position;
 
 public class PlayerMovement : MonoBehaviour
@@ -20,19 +19,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _destination;
     private Vector3 _direction;
 
-    public GameObject _playerCameraObject;
-    public Camera _playerCamera;
+    private GameObject _playerCameraObject;
+    private Camera _playerCamera;
 
     private static GameClient Game => GameClient.Instance();
 
-    private EActionType _actionType;
-
-    private enum EActionType
-    {
-        Move, // Default mode
-        Gun
-    }
-    
     void Start()
     {
         var cameras = GameObject.FindGameObjectsWithTag("PlayerCamera");
@@ -42,16 +33,9 @@ public class PlayerMovement : MonoBehaviour
         _playerCamera = _playerCameraObject.GetComponent<Camera>();
         Debug.Assert(_playerCamera);
 
-        Game.OnYourTurn += () =>
-        {
-            _actionType = EActionType.Move;
-            _acceptInput = true;
-        };
+        Game.OnYourTurn += () => { _acceptInput = true; };
 
-        Game.OnWaitingForTurn += () =>
-        {
-            _acceptInput = false;
-        };
+        Game.OnWaitingForTurn += () => { _acceptInput = false; };
 
         // This is to double check that the player position on the client and player position on the
         // server match
@@ -74,11 +58,6 @@ public class PlayerMovement : MonoBehaviour
 
                 UpdatePlayerCameraPosition();
             }
-        };
-
-        Game.OnPerformActionServer += (_) =>
-        {
-            _actionType = EActionType.Move;
         };
 
         Game.OnPerformActionClient += (result) =>
@@ -105,20 +84,12 @@ public class PlayerMovement : MonoBehaviour
                 case ActionType.FireGun:
                     GameUtils.UpdateRotation(_lastAction.Direction, transform);
                     PlayerAnimation.PlayShootAnimation();
+                    Game.ClientActionType = ClientActionType.Move;
                     break;
             }
 
             _lastAction = PlayerAction.None;
         };
-
-        Game.OnStartFiringGun += () =>
-        {
-            _actionType = EActionType.Gun;
-            _enableAcceptInput = true;
-        };
-
-        Game.OnChoosePlayerAction += () => _acceptInput = false;
-        Game.OnChoosePlayerActionCancel += () => _enableAcceptInput = true;
 
         Game.OnPlayerDied += () => _acceptInput = false;
 
@@ -203,6 +174,7 @@ public class PlayerMovement : MonoBehaviour
         transform.position = new Vector3(Game.PlayerPosition.X, Game.PlayerPosition.Y);
     }
 
+                // Type = _actionType == EActionType.Move ? ActionType.Move : ActionType.FireGun
     private PlayerAction _lastAction = PlayerAction.None;
 
     private void HandleKeyBoardInput()
@@ -218,7 +190,7 @@ public class PlayerMovement : MonoBehaviour
             _lastAction = new PlayerAction()
             {
                 Direction = direction,
-                Type = _actionType == EActionType.Move ? ActionType.Move : ActionType.FireGun
+                Type = Game.ClientActionType == ClientActionType.Move ? ActionType.Move : ActionType.FireGun
             };
 
             Game.PerformAction(_lastAction);

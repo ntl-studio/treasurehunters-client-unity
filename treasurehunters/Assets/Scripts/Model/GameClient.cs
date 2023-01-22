@@ -27,6 +27,13 @@ namespace TreasureHunters
         Finished                // Someone won the game (it could be you)
     }
 
+    public enum ClientActionType
+    {
+        Move,
+        Gun,
+        Grenade
+    }
+
     public class GameClient
     {
         private static GameClient _instance;
@@ -98,6 +105,20 @@ namespace TreasureHunters
             get => _state;
         }
 
+        private ClientActionType _clientActionType = ClientActionType.Move;
+
+        public ClientActionType ClientActionType
+        {
+            set
+            {
+                if (value != _clientActionType)
+                    OnClientActionTypeChanged?.Invoke(value);
+
+                _clientActionType = value;
+            }
+            get => _clientActionType;
+        }
+
         public delegate void GameEvent();
         public delegate void GameEventBool(bool value);
 
@@ -126,11 +147,11 @@ namespace TreasureHunters
         // current player is the player who's turn is now, and it is not necessarily player who runs the client
         public event GameEvent OnUpdateCurrentPlayerName;
 
-        public event GameEvent OnChoosePlayerAction;
-        public event GameEvent OnChoosePlayerActionCancel;
-
         // when the player chooses to fire gun from the menu
         public event GameEvent OnStartFiringGun;
+
+        public delegate void ClientActionTypeChanged(ClientActionType clientActionType);
+        public event ClientActionTypeChanged OnClientActionTypeChanged;
 
         public delegate void GameViewClickEvent(Vector3 worldPosition);
         public event GameViewClickEvent OnGameViewClick;
@@ -360,9 +381,6 @@ namespace TreasureHunters
 
         public bool IsPlayerAlive { get; private set; } = true;
 
-        public void StartFiringGun() { OnStartFiringGun?.Invoke(); }
-        public void ChoosePlayerAction() { OnChoosePlayerAction?.Invoke(); }
-        public void ChoosePlayerActionCancel() { OnChoosePlayerActionCancel?.Invoke(); }
         public void GameViewClick(Vector3 worldPosition) { OnGameViewClick?.Invoke(worldPosition); }
     }
 }
