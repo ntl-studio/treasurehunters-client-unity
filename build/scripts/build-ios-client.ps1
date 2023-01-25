@@ -26,6 +26,7 @@ $buildFolderToRemove = $projectPath + '/' + $buildPath + "_BurstDebugInformation
 Remove-Item -Path "$buildFolderToRemove" -Recurse -Force
 
 $xcodeProj = $projectPath + '/' + $buildPath + '/' + 'Unity-iPhone.xcodeproj'
+$infoPlist = $projectPath + '/' + $buildPath + '/' + 'Info.plist'
 # open -W "$xcodeProj"
 
 
@@ -36,7 +37,7 @@ if (!$devTeamId) {
 
 $projectFileContent = Get-Content "$xcodeProj/project.pbxproj" -Raw
 
-$projectFileContent = $projectFileContent -replace 'Unity-Target-New.app', 'TreasureHunters.app'
+$projectFileContent = $projectFileContent -replace 'Unity-Target-New.app', 'Treasure Hunters.app'
 $projectFileContent | Set-Content "$xcodeProj/project.pbxproj"
 
 [System.Collections.Generic.List[string]]$projectFileContent = get-content "$xcodeProj/project.pbxproj"
@@ -62,7 +63,7 @@ if ($targetAttributesIndex -eq -1) {
     exit
 }
 
-$projectFileContent.Insert($targetAttributesIndex + 2, "						DevelopmentTeam = $devTeamId;");
+$projectFileContent.Insert($targetAttributesIndex + 2, "						DevelopmentTeam = $devTeamId;")
 
 $createdToolsVersionIndex = Get-Index $projectFileContent $targetAttributesIndex 'CreatedOnToolsVersion = 9.2;'
 if ($createdToolsVersionIndex -eq -1) {
@@ -78,91 +79,65 @@ if ($provisioningStyleIndex -eq -1) {
 
 $projectFileContent[$provisioningStyleIndex] = '				ProvisioningStyle = Automatic;'
 
-$xcBuildConfigurationIndex = Get-Index $projectFileContent $provisioningStyleIndex 'Begin XCBuildConfiguration section'
-if ($xcBuildConfigurationIndex -eq -1) {
-    Write-Error "Could not find XCBuildConfiguration section"
-    exit
+
+Function Write-BuildConfiguration($projectFileContent, $startIndex, $searchTemplate) {
+    $buildConfigurationSectionIndex = Get-Index $projectFileContent $startIndex $searchTemplate
+    if ($buildConfigurationSectionIndex -eq -1) {
+        Write-Error "Could not find $searchTemplate section"
+        exit
+    }
+
+    $developmentTeamIndex = Get-Index $projectFileContent $buildConfigurationSectionIndex 'DEVELOPMENT_TEAM = "";'
+    if ($developmentTeamIndex -eq -1) {
+        Write-Error "Could not find DEVELOPMENT_TEAM item"
+        exit
+    }
+
+    $projectFileContent.Insert($developmentTeamIndex + 1, "				`"DEVELOPMENT_TEAM[sdk=iphoneos*]`" = $devTeamId;")
+
+    $infoPlistFileIndex = Get-Index $projectFileContent $developmentTeamIndex 'INFOPLIST_FILE = Info.plist;'
+    if ($infoPlistFileIndex -eq -1) {
+        Write-Error "Could not find INFOPLIST_FILE item"
+        exit
+    }
+
+    $projectFileContent.Insert($infoPlistFileIndex + 1, "				INFOPLIST_KEY_LSApplicationCategoryType = `"public.app-category.games`";")
+
+    $provisioningProfileSpecifierIndex = Get-Index $projectFileContent $developmentTeamIndex 'PROVISIONING_PROFILE_SPECIFIER = "$(PROVISIONING_PROFILE_SPECIFIER_APP)";'
+    if ($provisioningProfileSpecifierIndex -eq -1) {
+        Write-Error "Could not find PROVISIONING_PROFILE_SPECIFIER item after line $developmentTeamIndex"
+        exit
+    }
+
+    $projectFileContent.Insert($provisioningProfileSpecifierIndex + 1, '				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "NTL-Studio";');
+
+    $targetedDeviceFamilyIndex = Get-Index $projectFileContent $developmentTeamIndex 'TARGETED_DEVICE_FAMILY = '
+    if ($targetedDeviceFamilyIndex -eq -1) {
+        Write-Error "Could not find TARGETED_DEVICE_FAMILTY item"
+        exit
+    }
+
+    $projectFileContent[$targetedDeviceFamilyIndex] = '				TARGETED_DEVICE_FAMILY = 1;'
+    $projectFileContent.Insert($targetedDeviceFamilyIndex + 1, "				SUPPORTS_MACCATALYST = NO;")
+    $projectFileContent.Insert($targetedDeviceFamilyIndex + 2, "                SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;")
+
 }
 
-$developmentTeamIndex = Get-Index $projectFileContent $xcBuildConfigurationIndex 'DEVELOPMENT_TEAM = "";'
-if ($developmentTeamIndex -eq -1) {
-    Write-Error "Could not find DEVELOPMENT_TEAM item"
-    exit
-}
-
-$projectFileContent.Insert($developmentTeamIndex + 1, "				`"DEVELOPMENT_TEAM[sdk=iphoneos*]`" = $devTeamId;");
-
-$provisioningProfileSpecifierIndex = Get-Index $projectFileContent $developmentTeamIndex 'PROVISIONING_PROFILE_SPECIFIER = "$(PROVISIONING_PROFILE_SPECIFIER_APP)";'
-if ($provisioningProfileSpecifierIndex -eq -1) {
-    Write-Error "Could not find PROVISIONING_PROFILE_SPECIFIER item after line $developmentTeamIndex"
-    exit
-}
-
-$projectFileContent.Insert($provisioningProfileSpecifierIndex + 1, '				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Treasure Hunters AdHoc";');
-
-$developmentTeamIndex = Get-Index $projectFileContent $provisioningProfileSpecifierIndex 'DEVELOPMENT_TEAM = "";'
-if ($developmentTeamIndex -eq -1) {
-    Write-Error "Could not find DEVELOPMENT_TEAM item"
-    exit
-}
-
-$projectFileContent.Insert($developmentTeamIndex + 1, "				`"DEVELOPMENT_TEAM[sdk=iphoneos*]`" = $devTeamId;");
-
-$provisioningProfileSpecifierIndex = Get-Index $projectFileContent $developmentTeamIndex 'PROVISIONING_PROFILE_SPECIFIER = "$(PROVISIONING_PROFILE_SPECIFIER_APP)";'
-if ($provisioningProfileSpecifierIndex -eq -1) {
-    Write-Error "Could not find PROVISIONING_PROFILE_SPECIFIER item after line $developmentTeamIndex"
-    exit
-}
-
-$projectFileContent.Insert($provisioningProfileSpecifierIndex + 1, '				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Treasure Hunters AdHoc";');
-
-$releaseForRunningIndex = Get-Index $projectFileContent $provisioningProfileSpecifierIndex '/* ReleaseForRunning */'
-if ($releaseForRunningIndex -eq -1) {
-    Write-Error "Could not find ReleaseForRunning item after line $provisioningProfileSpecifierIndex"
-    exit
-}
-
-$developmentTeamIndex = Get-Index $projectFileContent $releaseForRunningIndex 'DEVELOPMENT_TEAM = "";'
-if ($developmentTeamIndex -eq -1) {
-    Write-Error "Could not find DEVELOPMENT_TEAM item"
-    exit
-}
-
-$projectFileContent.Insert($developmentTeamIndex + 1, "				`"DEVELOPMENT_TEAM[sdk=iphoneos*]`" = $devTeamId;");
-
-$provisioningProfileSpecifierIndex = Get-Index $projectFileContent $developmentTeamIndex 'PROVISIONING_PROFILE_SPECIFIER = "$(PROVISIONING_PROFILE_SPECIFIER_APP)";'
-if ($provisioningProfileSpecifierIndex -eq -1) {
-    Write-Error "Could not find PROVISIONING_PROFILE_SPECIFIER item after line $developmentTeamIndex"
-    exit
-}
-
-$projectFileContent.Insert($provisioningProfileSpecifierIndex + 1, '				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Treasure Hunters AdHoc";');
-
-$releaseForProfilingIndex = Get-Index $projectFileContent $provisioningProfileSpecifierIndex '/* ReleaseForProfiling */'
-if ($releaseForProfilingIndex -eq -1) {
-    Write-Error "Could not find ReleaseForProfiling item after line $provisioningProfileSpecifierIndex"
-    exit
-}
-
-$developmentTeamIndex = Get-Index $projectFileContent $releaseForProfilingIndex 'DEVELOPMENT_TEAM = "";'
-if ($developmentTeamIndex -eq -1) {
-    Write-Error "Could not find DEVELOPMENT_TEAM item"
-    exit
-}
-
-$projectFileContent.Insert($developmentTeamIndex + 1, "				`"DEVELOPMENT_TEAM[sdk=iphoneos*]`" = $devTeamId;");
-
-$provisioningProfileSpecifierIndex = Get-Index $projectFileContent $developmentTeamIndex 'PROVISIONING_PROFILE_SPECIFIER = "$(PROVISIONING_PROFILE_SPECIFIER_APP)";'
-if ($provisioningProfileSpecifierIndex -eq -1) {
-    Write-Error "Could not find PROVISIONING_PROFILE_SPECIFIER item after line $developmentTeamIndex"
-    exit
-}
-
-$projectFileContent.Insert($provisioningProfileSpecifierIndex + 1, '				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Treasure Hunters AdHoc";');
+Write-BuildConfiguration $projectFileContent $provisioningStyleIndex '1D6058940D05DD3E006BFB54 /* Debug */ ='
+Write-BuildConfiguration $projectFileContent $provisioningStyleIndex '1D6058950D05DD3E006BFB54 /* Release */ ='
+Write-BuildConfiguration $projectFileContent $provisioningStyleIndex '56E860811D6757FF00A1AB2B /* ReleaseForRunning */ ='
+Write-BuildConfiguration $projectFileContent $provisioningStyleIndex '56E860841D67581C00A1AB2B /* ReleaseForProfiling */ ='
 
 Set-Content "$xcodeProj/project.pbxproj" $projectFileContent
-
 # open -W "$xcodeProj"
+
+$plist = Get-Content $infoPlist
+$plist = $plist | Select-String -pattern 'UIInterfaceOrientationPortraitUpsideDown' -NotMatch
+$plist = $plist | Select-String -pattern 'UIInterfaceOrientationLandscapeLeft' -NotMatch
+$plist = $plist | Select-String -pattern 'UIInterfaceOrientationLandscapeRight' -NotMatch
+Set-Content $infoPlist $plist
+
+$exportOptions = Resolve-Path ./ExportOptions.plist
 
 Set-Location "$xcodeProj/.."
 xcodebuild 
@@ -170,7 +145,7 @@ xcodebuild clean -workspace Unity-iPhone.xcodeproj/project.xcworkspace -scheme U
 $archivePath = "../archives/TreasureHunters-" + (Get-Date -Format "yyyy-MM-dd-HH-mm-ss") + ".xcarchive" 
 xcodebuild archive -workspace Unity-iPhone.xcodeproj/project.xcworkspace -scheme Unity-iPhone -archivePath "$archivePath"
 $appsPath = "../apps/TreasureHunters-" + (Get-Date -Format "yyyy-MM-dd-HH-mm-ss")
-xcodebuild -exportArchive -archivePath "$archivePath" -exportPath "$appsPath" -exportOptionsPlist "../archives/exportOptions.plist"
+xcodebuild -exportArchive -archivePath "$archivePath" -exportPath "$appsPath" -exportOptionsPlist "$exportOptions"
 
 Write-Information "Update manifest.plist"
 
