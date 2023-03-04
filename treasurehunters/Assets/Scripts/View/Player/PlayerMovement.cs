@@ -1,5 +1,5 @@
 using System;
-using NtlStudio.TreasureHunters.Model;
+using NtlStudio.TreasureHunters.Common;
 using TreasureHunters;
 using Unity.Mathematics;
 using UnityEngine;

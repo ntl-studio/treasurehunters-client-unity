@@ -1,9 +1,7 @@
-using NtlStudio.TreasureHunters.Model;
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Common;
 using TreasureHunters;
 using UnityEngine;
-
-using SM = NtlStudio.TreasureHunters.Model;
 
 public class PlayerMovesDetails
 {

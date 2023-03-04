@@ -1,8 +1,7 @@
-using NtlStudio.TreasureHunters.Model;
 using System;
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Common;
 using UnityEngine;
-using static NtlStudio.TreasureHunters.Model.ActionType;
 
 namespace TreasureHunters
 {
@@ -46,7 +45,7 @@ namespace TreasureHunters
         private const string PlayerNameKey = "PlayerName";
         private const string ServerNameKey = "ServerName";
 
-        public int HistorySize => Game.ActionsHistorySize;
+        public int HistorySize => GameSettings.ActionsHistorySize;
 
         private GameClient()
         {
@@ -167,8 +166,8 @@ namespace TreasureHunters
             OnUpdatePlayerPosition += () => Debug.Log("OnUpdatePlayerPosition");
         }
 
-        public const int FieldWidth = GameField.FieldWidth;
-        public const int FieldHeight = GameField.FieldHeight;
+        public const int FieldWidth = GameSettings.FieldWidth;
+        public const int FieldHeight = GameSettings.FieldHeight;
 
         private string _currentPlayerName;
         public string CurrentPlayerName
@@ -181,23 +180,24 @@ namespace TreasureHunters
             get => _currentPlayerName;
         }
 
-        private VisibleArea _visibleArea;
+        private FieldCell[,] _visibleArea;
 
         public void SetVisibleArea(int[] cells)
         {
-            FieldCell[,] fieldCells = new FieldCell[VisibleArea.Width, VisibleArea.Height];
+            FieldCell[,] fieldCells = new FieldCell[GameSettings.VisibleAreaWidth, GameSettings.VisibleAreaHeight];
 
-            for (int x = 0; x < VisibleArea.Width; ++x)
+            for (int x = 0; x < GameSettings.VisibleAreaWidth; ++x)
             {
-                for (int y = 0; y < VisibleArea.Height; ++y)
+                for (int y = 0; y < GameSettings.VisibleAreaHeight; ++y)
                     fieldCells[x, y] = (FieldCell)cells[y * 3 + x];
             }
-            _visibleArea = new VisibleArea(fieldCells);
+
+            _visibleArea = fieldCells;
 
             OnUpdateVisibleArea?.Invoke();
         }
 
-        public VisibleArea CurrentVisibleArea()
+        public FieldCell[,] CurrentVisibleArea()
         {
             Debug.Assert(_visibleArea != null);
             return _visibleArea;
@@ -268,7 +268,7 @@ namespace TreasureHunters
 
             OnPerformActionServer?.Invoke(actionResult.successful);
 
-            if (actionResult.successful && playerAction.Type is Move or Skip)
+            if (actionResult.successful && playerAction.Type is ActionType.Move or ActionType.Skip)
             {
                 PlayerHasTreasure = actionResult.data.hastreasure;
                 OnEndMove?.Invoke();
@@ -277,7 +277,7 @@ namespace TreasureHunters
 
         bool PerformActionClient(PlayerAction playerAction)
         {
-            if (playerAction.Type is not Move) 
+            if (playerAction.Type is not ActionType.Move) 
                 return false;
 
             var dir = playerAction.Direction;

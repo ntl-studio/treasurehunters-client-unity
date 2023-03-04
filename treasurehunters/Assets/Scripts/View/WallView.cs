@@ -1,4 +1,4 @@
-using NtlStudio.TreasureHunters.Model;
+using NtlStudio.TreasureHunters.Common;
 using UnityEngine;
 
 public class WallView : MonoBehaviour

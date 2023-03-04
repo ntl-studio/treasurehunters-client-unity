@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 
 using JsonObjects;
-using NtlStudio.TreasureHunters.Model;
+using NtlStudio.TreasureHunters.Common;
 using TreasureHunters;
 
 public class ServerConnection : MonoBehaviour

@@ -1,4 +1,4 @@
-using NtlStudio.TreasureHunters.Model;
+using NtlStudio.TreasureHunters.Common;
 using TMPro;
 using TreasureHunters;
 using UnityEngine.UI;

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
+using NtlStudio.TreasureHunters.Common;
 using TMPro;
 using UnityEngine;
-
-using SM = NtlStudio.TreasureHunters.Model;
 
 public class ActionsListView : MonoBehaviour
 {
@@ -16,7 +15,7 @@ public class ActionsListView : MonoBehaviour
         Debug.Assert(ActionsParent);
         Debug.Assert(PlayerNameText);
 
-        for (int i = 0; i < SM.Game.ActionsHistorySize; ++i)
+        for (int i = 0; i < GameSettings.ActionsHistorySize; ++i)
         {
             var actionStateViewObj = Instantiate(ActionStateViewPrefab, ActionsParent, false);
 
@@ -34,7 +33,7 @@ public class ActionsListView : MonoBehaviour
     private Vector3 _lastActionPosition;
     private readonly List<GameObject> _actionsList = new();
 
-    public void UpdatePlayerActionStates(List<SM.PlayerActionState> playerActions)
+    public void UpdatePlayerActionStates(List<PlayerActionState> playerActions)
     {
         for (int i = 0; i < playerActions.Count; ++i)
         {

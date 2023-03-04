@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using NtlStudio.TreasureHunters.Model;
+using NtlStudio.TreasureHunters.Common;
 using TreasureHunters;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -7,14 +7,14 @@ using Position = TreasureHunters.Position;
 
 class PlayerBoardView
 {
-    public FieldCell[,] Board = new FieldCell[GameField.FieldWidth, GameField.FieldHeight];
-    public bool[,] Visited = new bool[GameField.FieldWidth, GameField.FieldHeight];
+    public FieldCell[,] Board = new FieldCell[GameSettings.FieldWidth, GameSettings.FieldHeight];
+    public bool[,] Visited = new bool[GameSettings.FieldWidth, GameSettings.FieldHeight];
 
     public PlayerBoardView()
     {
-        for (int x = 0; x < GameField.FieldWidth; ++x)
+        for (int x = 0; x < GameSettings.FieldWidth; ++x)
         {
-            for (int y = 0; y < GameField.FieldHeight; ++y)
+            for (int y = 0; y < GameSettings.FieldHeight; ++y)
             {
                 Board[x, y] = FieldCell.Empty;
                 Visited[x, y] = false;
@@ -137,15 +137,15 @@ public class BoardView : MonoBehaviour
 
     public void FogVisitedAreas(Position position)
     {
-        for (int x = 0; x < VisibleArea.Width; ++x)
+        for (int x = 0; x < GameSettings.VisibleAreaWidth; ++x)
         {
-            for (int y = 0; y < VisibleArea.Height; ++y)
+            for (int y = 0; y < GameSettings.VisibleAreaHeight; ++y)
             {
                 var fieldX = x + position.X - 1;
                 var fieldY = y + position.Y - 1;
 
-                if (fieldX is >= 0 and < GameField.FieldWidth &&
-                    fieldY is >= 0 and < GameField.FieldHeight)
+                if (fieldX is >= 0 and < GameSettings.FieldWidth &&
+                    fieldY is >= 0 and < GameSettings.FieldHeight)
                 {
                     if (_playerBoard.Visited[fieldX, fieldY])
                         _ceilingCells[fieldY][fieldX].State = CeilingState.Fog;
@@ -164,15 +164,15 @@ public class BoardView : MonoBehaviour
         if (!Game.IsTreasureAlwaysVisible)
             _treasure.SetActive(false);
 
-        for (int x = 0; x < VisibleArea.Width; ++x)
+        for (int x = 0; x < GameSettings.VisibleAreaWidth; ++x)
         {
-            for (int y = 0; y < VisibleArea.Height; ++y)
+            for (int y = 0; y < GameSettings.VisibleAreaHeight; ++y)
             {
                 var fieldX = x + position.X - 1;
                 var fieldY = y + position.Y - 1;
 
-                if (fieldX is < 0 or >= GameField.FieldWidth ||
-                    fieldY is < 0 or >= GameField.FieldHeight)
+                if (fieldX is < 0 or >= GameSettings.FieldWidth ||
+                    fieldY is < 0 or >= GameSettings.FieldHeight)
                 {
                     continue;
                 }

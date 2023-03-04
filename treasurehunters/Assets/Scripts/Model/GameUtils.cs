@@ -1,10 +1,6 @@
 using System;
-using Unity.Mathematics;
-using UnityEngine.EventSystems;
+using NtlStudio.TreasureHunters.Common;
 using UnityEngine;
-
-using NtlStudio.TreasureHunters.Model;
-using SM = NtlStudio.TreasureHunters.Model;
 
 namespace TreasureHunters
 {

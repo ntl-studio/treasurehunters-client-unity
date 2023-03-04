@@ -1,9 +1,7 @@
-using System;
+using NtlStudio.TreasureHunters.Common;
 using TreasureHunters;
 using UnityEngine;
 using UnityEngine.UI;
-
-using SM = NtlStudio.TreasureHunters.Model;
 
 public class PlayerActionStateView : MonoBehaviour
 {
@@ -30,29 +28,29 @@ public class PlayerActionStateView : MonoBehaviour
         Debug.Assert(SkullImage);
     }
 
-    public void SetWallsVisibility(SM.PlayerActionState playerActionState)
+    public void SetWallsVisibility(PlayerActionState playerActionState)
     {
         PlayerImage.SetActive(false);
         SkullImage.SetActive(false);
-        UpdateWalls(SM.FieldCell.Empty);
+        UpdateWalls(FieldCell.Empty);
 
-        if (playerActionState.Action.Type == SM.ActionType.Move)
+        if (playerActionState.Action.Type == ActionType.Move)
         {
             UpdateWalls(playerActionState.FieldCell);
             PlayerImage.SetActive(true);
             GameUtils.UpdateRotation(playerActionState.Action.Direction, PlayerDirectionTransform);
         }
-        else if (playerActionState.Action.Type == SM.ActionType.Die)
+        else if (playerActionState.Action.Type == ActionType.Die)
         {
             SkullImage.SetActive(true);
         }
     }
 
-    protected void UpdateWalls(SM.FieldCell cell)
+    protected void UpdateWalls(FieldCell cell)
     {
-        RightWallImage.gameObject.SetActive(cell.HasFlag(SM.FieldCell.RightWall));
-        DownWallImage.gameObject.SetActive(cell.HasFlag(SM.FieldCell.BottomWall));
-        LeftWallImage.gameObject.SetActive(cell.HasFlag(SM.FieldCell.LeftWall));
-        UpWallImage.gameObject.SetActive(cell.HasFlag(SM.FieldCell.TopWall));
+        RightWallImage.gameObject.SetActive(cell.HasFlag(FieldCell.RightWall));
+        DownWallImage.gameObject.SetActive(cell.HasFlag(FieldCell.BottomWall));
+        LeftWallImage.gameObject.SetActive(cell.HasFlag(FieldCell.LeftWall));
+        UpWallImage.gameObject.SetActive(cell.HasFlag(FieldCell.TopWall));
     }
 }
